@@ -1,0 +1,69 @@
+#  Validating workload recovery and service availability
+
+= Validating Workload Recovery and Service Availability
+
+After injecting a disruption using Krkn, the most critical phase of the chaos engineering lifecycle is evaluating how your system responds. Validation ensures that the "steady state" is restored and that your automated remediation strategies function as expected.
+
+== Understanding Recovery Validation
+Validation is the process of confirming that your services return to their expected performance levels—Service Level Indicators (SLIs)—after a disruption. Relying on "self-healing" mechanisms without active verification is a common operational pitfall.
+
+To validate recovery, you must monitor three distinct phases:
+1. **Disruption Phase:** The period where the Krkn scenario (e.g., pod kill or network latency) is active.
+2. **Impact Phase:** The duration where metrics deviate from the established baseline.
+3. **Recovery Phase:** The duration from the cessation of the disruption until metrics return to the defined steady state.
+
+== Defining Success Criteria
+Before executing a disruption, define what "recovery" looks like. Use your established metrics (latency, error rates, throughput) to create validation gates:
+
+*   **Self-Healing Verification:** Ensure that Machine Health Checks have successfully remediated unhealthy nodes or that the Kubernetes scheduler has successfully restarted pods.
+*   **Service Level Objective (SLO) Adherence:** Confirm that even during recovery, the impact on user-facing latency remained within the defined SLO buffers.
+*   **Data Integrity:** Verify that during the recovery phase, no data was corrupted or lost due to abrupt process termination.
+
+== Hands-on Lab: Validating Pod-Disruption Recovery
+
+In this lab, you will use Krkn to disrupt a deployment and validate that the application recovers without human intervention.
+
+=== Prerequisites
+*   A running Kubernetes cluster with Krkn Operator installed.
+*   A target deployment (e.g., `nginx-deployment`) with at least 3 replicas.
+*   Prometheus/Grafana configured to track the `kube_pod_status_ready` metric.
+
+=== Step 1: Establish the Steady State
+Execute a PromQL query to ensure the service is stable before starting.
+[source,promql]
+----
+sum(kube_pod_status_ready{namespace="my-app", condition="true"})
+----
+*Ensure this returns a value of 3 before proceeding.*
+
+=== Step 2: Inject the Disruption
+Create a Krkn scenario configuration to kill pods within the `my-app` namespace.
+
+[source,yaml]
+----
+scenario:
+  name: pod-disruption
+  duration: 60s
+  namespace: my-app
+  instance_count: 2
+----
+
+=== Step 3: Observe Recovery Metrics
+Once the disruption starts, observe the recovery in your monitoring dashboard. Look for the following events:
+1. **Detection:** The `kube_pod_status_ready` count drops to 1.
+2. **Scheduling:** The controller detects the missing pods and creates new ones.
+3. **Recovery:** The count returns to 3.
+
+=== Step 4: Validate and Analyze
+Compare the time taken for recovery against your expectations. If recovery takes longer than anticipated, evaluate the following:
+
+*   **Readiness Probes:** Were the readiness probes too strict, delaying the "Ready" status of new pods?
+*   **Resource Constraints:** Did the cluster have enough capacity to schedule new pods immediately, or was it blocked by resource starvation?
+*   **Automated Remediation:** Did the Machine Health Checks trigger as expected to replace faulty nodes?
+
+== Troubleshooting Recovery Failures
+If your service fails to return to the steady state:
+
+*   **Check Pending Pods:** If pods are stuck in `Pending`, examine the events: `kubectl describe pod <pod-name>`. This often indicates a lack of cluster resources.
+*   **Review CrashLoopBackOff:** If pods are failing to start, check the logs for dependency issues: `kubectl logs <pod-name> --previous`.
+*   **Inspect Topology:** If using multi-zone clusters, verify if the disruption caused a zone-wide failure that prevented recovery due to cross-zone latency or policy restrictions.

@@ -1,0 +1,79 @@
+#  Combining recovery checks with system health metrics
+
+= Combining recovery checks with system health metrics
+
+In Chaos Engineering, verifying that a specific component has recovered after a disruption is only the first step. To truly understand system resilience, you must correlate component recovery with the overall health of the cluster and application performance metrics. Krkn achieves this through a multi-layered validation strategy that combines localized recovery checks, holistic cluster health signals (via Cerberus), and custom PromQL metric evaluations.
+
+== The Triple-Layer Validation Strategy
+
+To ensure a comprehensive assessment of system resilience, Krkn uses three distinct validation layers:
+
+. **Component Recovery Checks**: Most Krkn scenarios include built-in logic to verify that the targeted resources (e.g., pods, nodes) have returned to a "Ready" state after the chaos duration.
+. **Holistic Cluster Health (Cerberus)**: A global health signal that monitors the entire environment. If Cerberus reports an unhealthy state, Krkn can halt the experiment to prevent further collateral damage.
+. **Metrics Evaluation (PromQL)**: Evaluating specific performance indicators—such as latency, throughput, or etcd health—against defined Service Level Objectives (SLOs) to determine the true impact of the disruption.
+
+== Evaluating System Health via PromQL
+
+Beyond basic "up/down" status, performance metrics provide the context needed to identify silent failures or degraded user experiences. Krkn allows you to query the in-cluster Prometheus instance to validate system stability during and after chaos.
+
+You can define custom PromQL expressions that return an exit status of `0` (pass) or `1` (fail) based on the severity of the metrics observed. This is critical for catching issues such as:
+* **Resource Spikes**: Unexpected CPU or memory pressure during recovery.
+* **Etcd Health**: Monitoring disk fsync latency or leader elections that could lead to cluster instability.
+* **Application Throughput**: Ensuring that while the component is "running," it is actually processing the expected volume of transactions.
+
+== Implementing Recovery Validation: A Hands-On Approach
+
+In this exercise, we will configure a Krkn experiment to validate both the recovery of a targeted component and the overall health of the system using PromQL.
+
+=== Prerequisites
+* A running OpenShift cluster with Krkn and Cerberus installed.
+* Permissions to modify `ChaosScenario` definitions.
+
+=== Step 1: Defining the Metrics Evaluation
+Create a configuration file to evaluate the `etcd_disk_wal_fsync_duration_seconds` to ensure that cluster storage performance remains within acceptable bounds during the experiment.
+
+[source,yaml]
+----
+# prometheus_evaluation.yaml
+metrics:
+  - name: "Check etcd fsync latency"
+    query: "histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket[5m])) by (le))"
+    threshold: 0.01 # Acceptable latency limit
+    severity: "critical"
+    operator: "<"
+----
+
+=== Step 2: Configuring the Experiment
+Integrate the health checks into your chaos scenario. This ensures that the scenario considers both the component recovery and the custom metric evaluation as part of its pass/fail criteria.
+
+[source,yaml]
+----
+# chaos_experiment.yaml
+scenario:
+  type: "pod-disruption"
+  target: "my-app-deployment"
+  # Recovery check: built-in
+  duration: 300
+  # Holistic check: Cerberus
+  cerberus_enabled: true 
+  # Metric evaluation: In-cluster PromQL
+  metrics_check:
+    enabled: true
+    config_file: "prometheus_evaluation.yaml"
+----
+
+=== Step 3: Executing and Analyzing
+1. Execute the scenario using the Krkn CLI or via the Chaos Studio workflow.
+2. Monitor the logs for the `metrics_evaluation` phase.
+3. If the scenario fails, check the logs to see if the failure was triggered by the component failing to restart or by the PromQL metric exceeding the `threshold`.
+
+[TIP]
+====
+**Best Practice**: Always deploy Machine Health Checks in your cluster. They act as the primary remediation layer, ensuring that unhealthy nodes are replaced automatically. This provides a baseline for stability, allowing Krkn to measure whether your *application* logic is resilient even when the infrastructure recovers correctly.
+====
+
+== Summary Checklist for Validation
+* [ ] Does the scenario include internal recovery checks for the targeted pods/nodes?
+* [ ] Is Cerberus configured to signal the overall health of the cluster?
+* [ ] Are there PromQL queries configured to catch performance degradation that doesn't trigger a hard "down" status?
+* [ ] Are exit conditions clearly mapped to the severity of the violation?

@@ -1,0 +1,71 @@
+#  Mapping risks to Krkn disruption scenarios
+
+= Mapping Risks to Krkn Disruption Scenarios
+
+In Chaos Engineering, the transition from identifying a theoretical failure mode to executing a controlled experiment is where resilience is truly built. Mapping your system's risks to specific Krkn disruption scenarios ensures that your testing is intentional, measurable, and safe.
+
+== Understanding the Risk-to-Scenario Mapping
+Risk mapping involves identifying a component's "failure mode" and selecting the appropriate Krkn scenario that mimics the real-world conditions causing that failure. 
+
+When mapping, categorize your risks into two primary layers:
+*   **Infrastructure-Level Risks:** Node failures, network partitioning, storage latency, or cloud-provider API throttles.
+*   **Application/Workload-Level Risks:** Pod crashes, container resource exhaustion (CPU/Memory), dependency timeouts, or service mesh traffic failures.
+
+== Identifying Scenarios via Krkn-Hub
+The link between your risk and the execution is the **Krkn-hub**. Krkn provides specialized container images, each designed to inject a specific type of fault. When you identify a risk—for example, "What happens if our database service becomes unreachable due to a network partition?"—you map it to the corresponding network latency or packet loss scenario provided by the Krkn ecosystem.
+
+=== Mapping Framework Table
+
+| Identified Risk | Failure Mode Category | Recommended Krkn Scenario Type |
+| :--- | :--- | :--- |
+| Database connection timeout | Network | Network Latency / Packet Loss |
+| High pod churn under load | Resource | Pod Disruptions / Memory Stress |
+| Worker node failure | Infrastructure | Node Shutdown / Node Power-off |
+| Dependent service latency | API / Communication | Service Mesh / Proxy Faults |
+
+== Hands-on Activity: Defining the Experiment Mapping
+
+In this activity, you will map a high-level risk to a specific Krkn execution plan.
+
+### Prerequisites
+*   Access to a Kubernetes cluster.
+*   `krknctl` installed and configured.
+*   An identified service with a clear "steady state" (e.g., a web service returning 200 OK).
+
+### Step 1: Define the Steady State
+Before mapping the risk, define your baseline.
+*   **Metric:** HTTP 200 responses per second.
+*   **Threshold:** > 95% success rate over a 1-minute window.
+
+### Step 2: Select the Krkn Disruption Scenario
+Assume your risk is: *"The application will fail if the front-end pod is killed suddenly by the scheduler."*
+1.  Navigate to the `krkn-hub` documentation.
+2.  Locate the **Pod Disruption** scenarios.
+3.  Choose the `pod-delete` scenario, which forces the Kubernetes scheduler to terminate and restart specific pods, simulating unexpected preemption.
+
+### Step 3: Configure the Risk Mapping
+Create a configuration file (YAML) that maps the risk to the execution parameters:
+
+[source,yaml]
+----
+# Example mapping configuration
+experiment:
+  scenario: "pod-delete"
+  target_cluster: "production-cluster-01"
+  blast_radius: 
+    label_selector: "app=frontend"
+    count: 1 # Only terminate one pod at a time to control blast radius
+  duration: 300s # The window to observe the impact on the steady state
+----
+
+### Step 4: Validate the Mapping
+Execute the scenario using `krknctl` to see if the system recovers as expected:
+[source,bash]
+----
+krknctl run pod-delete --config experiment-map.yaml
+----
+
+== Best Practices for Mapping
+*   **Start Small:** Map risks to scenarios that affect only a single node or a single pod initially.
+*   **Validate Metrics:** Ensure that your metrics (Prometheus/Grafana) are actively scraping during the scenario execution. If you cannot measure the impact, the risk mapping is incomplete.
+*   **Stop Conditions:** Always map a "Stop Condition" to your risk. If the error rate exceeds your defined threshold (e.g., > 10% 5xx errors), the Krkn Operator should automatically roll back the experiment to preserve system integrity.

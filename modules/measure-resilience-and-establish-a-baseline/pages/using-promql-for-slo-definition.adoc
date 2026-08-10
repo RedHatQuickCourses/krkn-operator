@@ -1,0 +1,68 @@
+#  Using PromQL for SLO definition
+
+= Using PromQL for SLO definition
+
+In the context of Chaos Engineering with Krkn, defining a Service Level Objective (SLO) is the transition from "chaos for the sake of chaos" to "data-driven resilience validation." By leveraging PromQL (Prometheus Query Language), you transform abstract system health into quantitative benchmarks that determine whether your application successfully withstood a disruption.
+
+== The Role of PromQL in Resiliency
+Krkn utilizes PromQL to evaluate the "Steady State" of your services. Rather than relying on simple binary checks (e.g., "Is the pod running?"), PromQL allows you to measure the actual user experience and system performance during a chaos experiment.
+
+When defining an SLO for a Krkn experiment, you focus on three primary dimensions:
+*   **Availability:** The percentage of successful requests versus total requests.
+*   **Latency:** The duration taken to process requests (e.g., P99 latency).
+*   **Throughput:** The volume of requests processed per unit of time.
+
+== Defining SLOs with PromQL
+To integrate SLOs into your chaos workflows, you must define PromQL expressions that represent your "normal" operational boundaries.
+
+=== Example: Latency SLO
+A typical latency SLO might define that 99% of requests must be served in under 200ms. In PromQL, this would look like:
+
+[source,promql]
+----
+histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) < 0.2
+----
+
+If this value spikes above `0.2` during a Krkn scenario (such as a pod-kill or network latency injection), the Resilience Score calculation will penalize the result, indicating a breach of the SLO.
+
+=== Example: Error Rate SLO
+To ensure the application remains functional, you might define an error rate limit:
+
+[source,promql]
+----
+sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100 < 1
+----
+This query triggers a failure in your resiliency assessment if the error rate exceeds 1% over a 5-minute window.
+
+== Implementing PromQL in Krkn Workflows
+To evaluate these metrics during a Krkn execution, follow this integration pattern:
+
+1.  **Create a PromQL File:** Store your queries in a structured format (usually a YAML file containing key-value pairs of query names and expressions).
+2.  **File Management:** Upload this configuration file to the Krkn environment via the File Management interface.
+3.  **Workflow Configuration:** Enable the **Resiliency Score** option on your chaos workflow.
+4.  **Mounting:** Point the workflow to your uploaded PromQL file. During the experiment, Krkn will poll the in-cluster Prometheus instance using these queries.
+
+[NOTE]
+====
+Krkn uses the results of these queries to calculate the **Resiliency Score**. If a query result deviates from the threshold defined in your PromQL logic, Krkn marks the exit status accordingly. You can set severity levels for each query to distinguish between minor performance degradation and critical service failure.
+====
+
+== Hands-on Lab: Defining and Testing an SLO
+In this activity, you will define a basic SLO for a sample service and link it to a Krkn workflow.
+
+*   **Step 1:** Identify a key metric for your service (e.g., `container_cpu_usage_seconds_total`).
+*   **Step 2:** Write a PromQL expression that defines the "healthy" limit for this metric.
+*   **Step 3:** Save the expression into a `slos.yaml` file. 
+    *   *Example structure:*
+    [source,yaml]
+    ----
+    queries:
+      - name: "High CPU Check"
+        query: "sum(container_cpu_usage_seconds_total) < 0.5"
+        severity: "critical"
+    ----
+*   **Step 4:** Upload `slos.yaml` to the Krkn File Manager.
+*   **Step 5:** In your Chaos Workflow configuration, enable the **Resiliency Score** checkbox and select `slos.yaml` as your metric source.
+*   **Step 6:** Execute a disruption scenario (e.g., `pod-disruption`) and observe the **Jobs** dashboard to view the impact on your newly defined SLO.
+
+By mapping your risks to these specific PromQL metrics, you move from manual observation to automated, objective-based resilience verification.

@@ -1,0 +1,80 @@
+#  Verifying alerts and dependent component impact
+
+= Verifying alerts and dependent component impact
+
+In Chaos Engineering, the ultimate measure of a system's resilience is not just whether the system survives a disruption, but whether the observability stack correctly captures the event. Verifying that alerts fire as expected and that dependent components behave predictably is critical to reducing Mean Time to Recovery (MTTR).
+
+== The Role of Alerts in Chaos Experiments
+
+When you inject a failure using Krkn, your observability layer (typically Prometheus and Alertmanager) serves as the primary feedback loop. If a disruption occurs and no alert is triggered, you have discovered a gap in your monitoring—a "silent failure" that is often more dangerous than the disruption itself.
+
+Key considerations for alert verification:
+* **Severity Alignment:** Ensure that the injected chaos triggers alerts at the expected severity (e.g., Warning vs. Critical).
+* **Correlation:** Verify that the alerts map directly to the service or node impacted by the Krkn scenario.
+* **Notification Fidelity:** Confirm that alerts reach the correct team channels (Slack, PagerDuty, etc.) with relevant SOP links or runbooks attached.
+
+== Analyzing Dependent Component Impact
+
+Complex microservices environments are rarely isolated. A failure in a "dependency" (e.g., a database, an authentication service, or an API gateway) often triggers a cascading effect.
+
+=== Cascading Failure Indicators
+When monitoring dependent components, look for:
+* **Latency Spikes:** Upstream services waiting on a degraded downstream dependency.
+* **Error Rate Increases:** HTTP 5xx responses originating from services that cannot reach their dependencies.
+* **Resource Exhaustion:** If a dependency fails, look for connection pooling issues or thread pool saturation in the calling service.
+
+[TIP]
+====
+To truly validate system robustness, **run multiple chaos tests simultaneously**. As noted in our best practices, combining disruptions (e.g., IO stress on a database while inducing network latency on the application) allows you to observe how dependent components react when their "steady state" is challenged by multifaceted failures.
+====
+
+== Hands-on Lab: Verifying Alerting and Dependency Impact
+
+In this lab, we will induce a controlled failure and verify that the monitoring stack correctly identifies the impact on dependent workloads.
+
+=== Prerequisites
+* A running Krkn Operator on your cluster.
+* Prometheus and Alertmanager configured with active notification policies.
+* A test application with clear Prometheus metrics and defined alerts.
+
+=== Step 1: Baseline Verification
+1. Access your Prometheus dashboard.
+2. Ensure no firing alerts exist for the target namespace.
+3. Note the current throughput and latency metrics for the dependent application.
+
+=== Step 2: Inject a Focused Disruption
+Execute a Krkn scenario designed to impact a specific dependency. For example, a pod-disruption scenario:
+
+[source,yaml]
+----
+# chaos-scenario.yaml
+scenario: pod-disruption
+duration: 300s
+target:
+  label_selector: "app=backend-database"
+blast_radius: 1
+----
+
+Execute via `oc` or `kubectl` by applying the job manifest or using the Krkn CLI.
+
+=== Step 3: Verify Alerts
+1. Immediately monitor your Alertmanager dashboard.
+2. **Check:** Did the expected alert fire? If not, investigate the Prometheus rule definitions.
+3. **Check:** Is the alert description actionable? Does it point to the correct affected component?
+
+=== Step 4: Analyze Dependent Component Impact
+Run a PromQL query to observe the impact on the upstream application while the database is being disrupted:
+
+[source,promql]
+----
+# Check error rates for the dependent service
+rate(http_requests_total{status=~"5..", service="frontend-app"}[1m])
+----
+
+1. Observe if the `frontend-app` shows an increase in 5xx errors.
+2. Confirm if the system auto-heals (recovery validation) once the Krkn job completes and the target pods are recreated.
+
+=== Step 5: Post-Experiment Review
+* **Document:** Record whether the alert fired within the expected timeframe.
+* **Refine:** If the alert fired too late, adjust the `for` duration in your Prometheus alert rules.
+* **Remediate:** If dependencies failed catastrophically rather than gracefully, implement circuit breakers or retries in the dependent application code.

@@ -1,0 +1,64 @@
+#  Establishing metrics for availability, latency, and throughput
+
+= Establishing metrics for availability, latency, and throughput
+
+In the context of Chaos Engineering with Krkn, moving from intuition-based testing to evidence-based validation requires a rigorous approach to metrics. To determine if your system has maintained its "steady state" during a disruption, you must define and monitor clear metrics for Availability, Latency, and Throughput.
+
+== Understanding the Golden Signals
+When identifying service risks, we align our hypotheses with the "Four Golden Signals" of monitoring. For Krkn experiments, we prioritize the following three:
+
+*   **Availability:** The percentage of requests that succeed (e.g., HTTP 2xx/3xx codes vs. 5xx). This directly maps to your Service Level Objectives (SLOs).
+*   **Latency:** The time it takes to service a request. It is critical to distinguish between latency for successful requests and latency for failed requests.
+*   **Throughput:** The amount of work the system is performing, typically measured in requests per second (RPS) or transactions per second (TPS).
+
+== Defining Steady State Metrics
+Before executing a Krkn scenario, establish a baseline for your metrics. If you do not know what "normal" looks like, you cannot mathematically prove that a disruption caused an anomaly.
+
+=== Best Practices for Metric Selection
+*   **Use Quantiles for Latency:** Avoid using averages. An average can mask the experience of the "long tail" of users. Use p95 or p99 latency to capture the experience of users impacted by the disruption.
+*   **Define Success Thresholds:** Establish the limit of acceptable degradation. For example: "During a pod-kill experiment, p99 latency must not exceed 500ms for more than 30 seconds."
+*   **Contextualize Throughput:** Ensure throughput metrics account for background noise. If your experiment targets a specific microservice, isolate its throughput metrics from the global application traffic.
+
+== Mapping Metrics to Krkn Experiments
+When planning your Krkn scenario, you must define the "Observation Window." This is the time during which you collect metrics to validate your hypothesis.
+
+[source,yaml]
+----
+# Example structure of a Krkn experiment configuration
+experiment:
+  name: "pod-disruption-latency-test"
+  metrics:
+    - name: "http_requests_total"
+      query: "sum(rate(http_requests_total{status=~'2..'}[1m]))"
+    - name: "p99_latency"
+      query: "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[1m])))"
+  steady_state_thresholds:
+    max_latency_increase: "20%"
+    min_availability: "99.9%"
+----
+
+== Hands-on Activity: Establishing a Monitoring Baseline
+
+In this exercise, you will define the metrics needed to validate the impact of a pod disruption.
+
+**Prerequisites:**
+*   A running application with an exposed Prometheus metrics endpoint.
+*   Access to a Grafana dashboard or PromQL console.
+
+**Step 1: Baseline Recording**
+1.  Observe your application in a steady state for 10 minutes.
+2.  Capture the current `p99` latency and `error_rate` (5xx codes).
+3.  *Record these values.* These are your "Steady State" constants.
+
+**Step 2: Defining the Stop Condition**
+Use your baseline to define a stop condition in your Krkn config. If these thresholds are breached during a disruption, the operator must stop the experiment to prevent a total outage.
+*   **Availability Threshold:** If `error_rate` > 5% for more than 1 minute, trigger rollback.
+*   **Latency Threshold:** If `p99_latency` > baseline * 1.5, trigger rollback.
+
+**Step 3: Verification**
+Once you run the Krkn experiment, compare the post-experiment report against these recorded baselines. If the availability dropped but stayed within your defined "acceptable limit," the service is considered resilient to that specific failure mode.
+
+[TIP]
+====
+Always ensure that your metric scraping interval is shorter than the duration of the chaos experiment. If your experiment runs for 60 seconds but your Prometheus scrape interval is 60 seconds, you may miss the spike in latency or throughput changes.
+====

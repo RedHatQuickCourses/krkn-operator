@@ -1,0 +1,88 @@
+#  Integrating chaos testing into CI/CD pipelines
+
+= Integrating chaos testing into CI/CD pipelines
+
+Integrating Chaos Engineering into your CI/CD pipelines transforms resilience from a periodic audit into a continuous verification process. By automating chaos experiments, you ensure that as your infrastructure, configurations, and application code evolve, your system's ability to withstand failure remains intact.
+
+== Why integrate into CI/CD?
+
+Software systems are dynamic. A configuration change, a dependency update, or a new version of an operator can introduce subtle failure modes. Continuous testing in your pipelines provides:
+
+*   **Regression testing for resilience:** Catch unintended side effects where a service recovery path is broken by new code.
+*   **Early feedback:** Detect failures in deployment manifests or readiness probes before they reach higher environments.
+*   **Standardized execution:** Ensure that the same rigorous fault injection criteria are applied consistently across every release candidate.
+
+== Pipeline Integration Strategy
+
+To effectively integrate Krkn into your pipeline, follow these best practices:
+
+1.  **Define the Scope:** Do not run your entire suite of experiments on every commit. Use chaos testing for specific stages (e.g., integration, performance testing, or nightly builds).
+2.  **Ensure Observability:** The pipeline should be connected to your monitoring stack (e.g., Prometheus/Grafana) to validate the "Steady State" before, during, and after the experiment.
+3.  **Automated Rollback:** Always configure the pipeline to trigger an immediate rollback or recovery action if the chaos experiment causes an unacceptable breach of your Service Level Objectives (SLOs).
+
+== Hands-on Activity: Automating a Pod Disruption Experiment
+
+In this activity, you will integrate a basic Krkn pod-disruption scenario into an automated pipeline step.
+
+=== Prerequisites
+*   A running cluster with the Krkn Operator installed.
+*   Access to your CI/CD runner (e.g., Tekton, GitHub Actions, or Jenkins).
+*   A configured `scenario.yaml` file defining the target namespace and disruption type.
+
+=== Step 1: Configure the experiment manifest
+Create a minimal `pod-disruption.yaml` that identifies the target application.
+
+[source,yaml]
+----
+chaos_engine:
+  scenario: pod-disruption
+  target_namespace: "my-app-prod"
+  duration: 60
+  label_selector: "app=backend-api"
+  kill_count: 2
+----
+
+=== Step 2: Define the CI Pipeline Task
+Add a step to your pipeline to execute the Krkn job. Using a shell-based CI runner, the task should trigger the execution and wait for the status report.
+
+[source,bash]
+----
+# Example pipeline script
+echo "Starting Chaos Experiment..."
+# Trigger the Krkn job via oc/kubectl
+oc apply -f pod-disruption.yaml -n krkn-chaos
+
+# Poll for experiment completion
+while [ $(oc get chaosengine -n krkn-chaos -o jsonpath='{.items[0].status.status}') != "Completed" ]; do
+  echo "Waiting for chaos experiment to finish..."
+  sleep 10
+done
+
+# Validate against resilience metrics
+./scripts/validate-slo.sh --threshold 99.9
+----
+
+=== Step 3: Implement Post-Experiment Validation
+The pipeline must not just execute the chaos; it must verify recovery. Include a script that checks:
+*   **Pod Readiness:** Are all replicas back to a 'Running' state?
+*   **SLO adherence:** Did the latency remain within defined bounds during the experiment window?
+
+[source,bash]
+----
+# Check if pods are ready
+READY_PODS=$(oc get deployment backend-api -n my-app-prod -o jsonpath='{.status.readyReplicas}')
+EXPECTED_PODS=3
+
+if [ "$READY_PODS" -eq "$EXPECTED_PODS" ]; then
+    echo "Recovery Successful: All pods are ready."
+else
+    echo "Recovery Failed: Expected $EXPECTED_PODS, got $READY_PODS"
+    exit 1
+fi
+----
+
+== Best Practices for Pipeline Success
+
+*   **Fail Fast:** If the baseline health check fails before the experiment starts, abort the pipeline immediately. Do not inject chaos into an already unstable system.
+*   **Log Collection:** Configure the pipeline to archive the Krkn logs and experiment reports as build artifacts for auditability and historical analysis.
+*   **Isolation:** Use dedicated namespaces for chaos execution to ensure that the blast radius remains contained within the scope of the test.

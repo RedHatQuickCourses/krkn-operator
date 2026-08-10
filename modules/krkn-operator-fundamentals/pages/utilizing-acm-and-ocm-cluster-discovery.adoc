@@ -1,0 +1,65 @@
+#  Utilizing ACM and OCM cluster discovery
+
+= Utilizing ACM and OCM Cluster Discovery
+
+In large-scale Kubernetes environments, manually managing chaos experiment targets can become an administrative burden. The Krkn Operator simplifies this by integrating with **Open Cluster Management (OCM)** and **Red Hat Advanced Cluster Management (ACM)**, enabling automated discovery of managed clusters.
+
+== Understanding OCM/ACM Integration
+
+The Krkn Operator does not strictly require ACM or OCM to function; manual cluster registration is fully supported and offers feature parity. However, integrating with OCM/ACM provides:
+
+*   **Automated Discovery:** Automatically populates your available targets without manual configuration.
+*   **Centralized Management:** Leverages your existing multi-cluster governance infrastructure.
+*   **Operational Efficiency:** Reduces the risk of human error when onboarding new clusters for chaos testing.
+
+[NOTE]
+====
+The integration with OCM/ACM is optional. It is designed to automate the discovery process, not to provide additional chaos functionality. All clusters—whether discovered via ACM/OCM or added manually—possess the same capabilities within the Krkn Operator.
+====
+
+== Enabling Cluster Discovery via Helm
+
+To enable the integration during the installation of the Krkn Operator, you must set the `acm.enabled` flag to `true` in your Helm deployment.
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace \
+  --set acm.enabled=true
+----
+
+== Compatibility and Requirements
+
+Before enabling integration, ensure your environment meets the tested compatibility requirements. Using unsupported versions may lead to discovery failures or inconsistent behavior.
+
+.Verified OCM Compatibility Matrix
+|===
+| OCM Version | Status |
+| 1.1.0 | Tested |
+| 1.2.0 | Tested |
+| 1.3.1 | Tested |
+|===
+
+[TIP]
+====
+If you are running an older version of ACM not listed in the table, the integration may still function; however, it is not actively tested or supported. We recommend upgrading to one of the validated versions above to ensure stability in your chaos experiments.
+====
+
+== Hands-on Activity: Verifying Cluster Discovery
+
+In this activity, you will verify that your clusters are correctly being identified by the Krkn Operator.
+
+1.  **Check Pod Status:** Ensure the `krkn-operator` is running in the `krkn-operator-system` namespace.
+    `kubectl get pods -n krkn-operator-system`
+2.  **Verify Configuration:** Inspect the operator deployment configuration to confirm that the OCM integration is active.
+    `kubectl get deployment krkn-operator-controller-manager -n krkn-operator-system -o yaml | grep -A 2 acm`
+3.  **Validate Discovery:** Use the Krkn Operator CLI or API to list the discovered clusters.
+    *   If using the Chaos Studio interface, navigate to the **Clusters** tab.
+    *   If using the CLI, run the command: `krkn-cli list-clusters`
+4.  **Troubleshooting:**
+    *   If clusters do not appear, verify that the `krkn-operator` has the necessary `ClusterRole` permissions to read the OCM/ACM resources.
+    *   Ensure the `ManagedCluster` custom resources in the OCM hub cluster are in the `Ready` state.
+
+By successfully integrating OCM/ACM, you lay the foundation for automated, multi-cluster resilience testing, allowing you to scale your chaos engineering efforts across the entire fleet seamlessly.

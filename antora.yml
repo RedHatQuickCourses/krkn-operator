@@ -1,10 +1,24 @@
-name: REPLACEREPONAME
-title: FIXME Course Title
-version: 1
+name: krkn-operator
+title:  Chaos Engineering with Krkn
+version: 1.0.0
 nav:
 - modules/ROOT/nav.adoc
 - modules/LABENV/nav.adoc
-- modules/chapter1/nav.adoc
-- modules/chapter2/nav.adoc
-- modules/chapter3/nav.adoc
+
+- modules/chaos-engineering-methodology/nav.adoc
+
+- modules/turn-risk-into-a-testable-experiment/nav.adoc
+
+- modules/krkn-operator-fundamentals/nav.adoc
+
+- modules/run-and-interpret-one-chaos-experiment/nav.adoc
+
+- modules/build-workflows-with-chaos-studio/nav.adoc
+
+- modules/measure-resilience-and-establish-a-baseline/nav.adoc
+
+- modules/operationalize-resilience-validation/nav.adoc
+
+- modules/hands-on-labs/nav.adoc
+
 - modules/appendix/nav.adoc

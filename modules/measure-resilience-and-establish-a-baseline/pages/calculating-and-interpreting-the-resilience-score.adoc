@@ -1,0 +1,55 @@
+#  Calculating and interpreting the Resilience Score
+
+= Calculating and interpreting the Resilience Score
+
+The Resiliency Score is a quantitative metric provided by the Krkn Operator that evaluates how well your application maintains its service levels during a chaos experiment. Unlike binary pass/fail tests, the Resiliency Score provides a nuanced view of system stability by correlating chaos events with real-time application telemetry.
+
+== Understanding the Resiliency Score Mechanism
+
+The score is derived from your application's Service Level Indicators (SLIs). By analyzing these metrics via PromQL during the chaos workflow, Krkn translates technical performance data into a normalized score.
+
+=== Core Components
+*   **PromQL Definition:** A structured file containing queries for latency, error rates, or throughput that defines your "steady state."
+*   **Thresholds:** Expected performance ranges defined within your queries.
+*   **Workflow Integration:** The score is calculated by evaluating these queries across the duration of the Graph Run in Chaos Studio.
+
+== Configuring Resiliency Score Calculation
+
+To calculate a Resiliency Score, you must define the metrics that matter most to your application's reliability.
+
+. **Define PromQL Queries:** Create a file that captures your key performance metrics.
++
+[source,yaml]
+----
+# Example structure for a resilience_metrics.promql file
+# Query for error rate threshold
+sum(rate(http_requests_total{status=~"5.."}[1m])) / sum(rate(http_requests_total[1m])) < 0.05
+----
+
+. **Enable Resiliency Score in Chaos Studio:**
+*   Navigate to your workflow in **Chaos Studio**.
+*   Select the **Resiliency Score** option within the workflow configuration settings.
+*   Mount your `resilience_metrics.promql` file via the File Management interface.
+
+. **Execute and Monitor:** 
+*   Run the workflow. The Krkn Operator will execute the mounted PromQL queries in parallel with the chaos scenarios.
+*   Results are aggregated and processed to generate the final score, which appears in the **Jobs** page.
+
+== Interpreting the Results
+
+Once the execution completes, the Jobs page displays the Resiliency Score alongside the Graph Run visualization.
+
+*   **Quantitative Insights:** A high score indicates that your application successfully maintained its expected performance (SLOs) despite the injected failures. A low score highlights specific areas where the system failed to recover or degraded beyond acceptable limits.
+*   **Granular Analysis:** Since the score is tied to the Graph Run, you can inspect individual nodes (scenarios) to see exactly which disruption caused a drop in the resilience score. 
+*   **Trend Analysis:** By running identical workflows over time—especially after code changes or infrastructure upgrades—you can compare scores to determine if your application's resilience is improving or regressing.
+
+== Best Practices for Resilience Measurement
+
+*   **Map to SLOs:** Ensure that your PromQL queries reflect your business-critical Service Level Objectives. If latency spikes, the score should reflect the degradation of user experience.
+*   **Standardize Metrics:** Use the same PromQL file across different environments (e.g., staging vs. production) to establish a consistent baseline for resilience.
+*   **Iterative Remediation:** Do not treat the score as just a metric. If a chaos scenario causes a significant drop in the Resiliency Score, investigate the specific node logs, remediate the underlying recovery issue, and re-run the test to validate the fix.
+
+[TIP]
+====
+The Resiliency Score is most effective when evaluated against a "Steady State." Ensure your baseline metrics are captured during normal operations before running your first high-impact chaos experiment.
+====

@@ -1,0 +1,70 @@
+#  Identifying SLO degradation and performance trends
+
+= Identifying SLO degradation and performance trends
+
+In the context of Chaos Engineering with Krkn, identifying Service Level Objective (SLO) degradation is the primary indicator of your system’s resilience. While chaos experiments intentionally disrupt components, the goal is to determine if your architecture and self-healing mechanisms maintain performance within predefined thresholds.
+
+== Understanding SLO Degradation
+SLO degradation occurs when the metrics tracking your service's health drift outside of agreed-upon boundaries during or after a disruption. 
+
+To effectively identify these trends, you must distinguish between:
+*   **Expected Transient Impact:** Short-lived latency spikes caused by node restarts or pod evictions where the system self-heals within defined recovery time objectives (RTO).
+*   **Systemic SLO Violation:** Sustained degradation where throughput drops or error rates climb, signaling that the system’s redundancy or load balancing is insufficient to handle the injected failure.
+
+== Monitoring Performance Trends
+To spot degradation, you must baseline your system’s "Steady State" using PromQL queries. When running Krkn experiments, compare these metrics across three distinct phases:
+
+1.  **Pre-Disruption (Baseline):** Your "normal" operating window.
+2.  **Disruption (Turbulence):** The period during which Krkn is executing its scenario (e.g., pod kills, network latency injection).
+3.  **Post-Disruption (Recovery):** The period following the removal of the disruption to see if metrics return to the baseline or remain degraded.
+
+[#promql-examples]
+=== Monitoring Metrics with PromQL
+Use the following patterns in your observability platform (e.g., Grafana/Thanos) to visualize degradation:
+
+*   **Availability (Success Rate):**
+    `sum(rate(http_requests_total{status=~"2.."}[5m])) / sum(rate(http_requests_total[5m]))`
+*   **Latency (p99):**
+    `histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))`
+*   **Throughput:**
+    `sum(rate(http_requests_total[5m]))`
+
+== Analyzing Performance Trends
+When reviewing the results of a Krkn experiment, look for the following patterns to identify performance degradation:
+
+*   **The "Limping" Pattern:** Metrics do not return to the pre-disruption baseline, indicating that the system's automated recovery failed to restore the original state (e.g., a node failed to rejoin the cluster, or a process is stuck in a crash loop).
+*   **Cascading Failure:** An SLO violation in one service triggers a chain reaction in dependent components, leading to a wider outage than the initial blast radius intended.
+*   **Slow Recovery:** The system eventually recovers, but the time taken exceeds your Recovery Time Objective (RTO).
+
+== Hands-on Lab: Detecting SLO Degradation
+
+In this exercise, we will observe how an SLO threshold reacts to a pod-disruption experiment.
+
+. **Step 1: Define the Threshold**
+   Identify a critical latency metric. For example, if your p99 latency baseline is `200ms`, set your observation threshold to `300ms` as a trigger for "Degraded."
+
+. **Step 2: Execute Krkn Experiment**
+   Run a `pod-disruption` scenario using the Krkn Operator:
+   [source,yaml]
+   ----
+   apiVersion: chaos.krkn.cloud/v1beta1
+   kind: ChaosScenario
+   metadata:
+     name: pod-disruption-test
+   spec:
+     scenario: pod-disruption
+     parameters:
+       - name: EXPECTED_RECOVERY_TIME
+         value: "60"
+   ----
+
+. **Step 3: Correlate and Visualize**
+   Observe your dashboard during the experiment. 
+   *   If latency exceeds `300ms` for longer than the `EXPECTED_RECOVERY_TIME`, log the event as a **Degraded State**.
+   *   Compare this timestamp against the Krkn execution logs to confirm if the degradation was a direct result of the chaos injection or an underlying platform instability.
+
+. **Step 4: Remediation Recommendation**
+   If the trend shows consistent SLO degradation during specific failure modes:
+   *   **Review Pod Disruption Budgets (PDBs):** Are there enough replicas to satisfy the disruption?
+   *   **Optimize Readiness Probes:** Is the application taking too long to become "Ready" after a restart?
+   *   **Scaling:** Does the cluster need horizontal autoscaling to handle the diverted traffic during the disruption?

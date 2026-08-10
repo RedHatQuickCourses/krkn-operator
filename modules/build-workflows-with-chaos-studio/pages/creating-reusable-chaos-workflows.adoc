@@ -1,0 +1,57 @@
+#  Creating reusable chaos workflows
+
+= Creating reusable chaos workflows
+
+Chaos Studio provides a visual, low-code environment to orchestrate complex failure patterns. Instead of executing isolated scenarios, you can design, save, and reuse **Chaos Workflows** to simulate real-world outages—such as a cascading failure caused by a network partition followed by a node drain.
+
+== Understanding Workflow Architecture
+
+A chaos workflow is a directed graph where nodes represent individual chaos scenarios and edges define the execution flow. By leveraging **Chaos Studio**, you can move beyond simple disruption to modeling complex, multi-layered "failure days."
+
+Key components of a workflow include:
+*   **Nodes:** Represent a specific Krkn scenario (e.g., `pod-disruption`, `network-chaos`, `node-cpu-hog`).
+*   **Edges:** Define the execution dependency, enabling sequential (chained) or parallel (simultaneous) operations.
+*   **Configuration Files:** Reusable YAML definitions that store experiment parameters (duration, blast radius, target clusters).
+
+== Designing for Reusability
+
+To ensure your workflows provide long-term value, follow these design principles:
+
+*   **Modularize Scenarios:** Break down complex incidents into discrete, reusable scenarios. For example, create a "Database Latency" scenario that can be plugged into various platform-level workflows.
+*   **Abstract Configurations:** Use **File Management** to store parameter sets. By decoupling the scenario logic from the specific target infrastructure, you can reuse the same workflow template across development, staging, and production environments by simply swapping the configuration file.
+*   **Define Consistent Steady-State Metrics:** Ensure every workflow node includes a baseline health check. This ensures that when a workflow is reused, the Resilience Score remains consistent and comparable.
+
+== Practical Activity: Building a Multi-Stage Failure Workflow
+
+In this lab, you will create a reusable workflow that simulates a two-stage failure: first a network latency event, followed by a controlled pod-disruption experiment.
+
+=== Prerequisites
+*   Access to the Chaos Studio dashboard.
+*   A pre-configured scenario registry connected to your cluster.
+
+=== Step 1: Initialize the Workflow Canvas
+1.  Navigate to **Chaos Studio** in your management console.
+2.  Click **Create New Workflow**.
+3.  Provide a name, such as `app-resilience-load-test`.
+
+=== Step 2: Add Sequential Scenario Nodes
+1.  Drag the **Network Chaos** node onto the canvas.
+2.  Open the configuration panel for this node and select a pre-uploaded configuration file from the **File Management** library.
+3.  Drag a **Pod Disruption** node onto the canvas.
+4.  Connect the output of the **Network Chaos** node to the input of the **Pod Disruption** node. This establishes a **sequential execution** pattern.
+
+=== Step 3: Configure Parallel Execution (Optional)
+If you wish to test system recovery under simultaneous pressure:
+1.  Add two nodes: `Node Memory Stress` and `Node CPU Stress`.
+2.  Connect both nodes to the same preceding step.
+3.  Chaos Studio will execute these in parallel, allowing you to measure the cumulative impact on your application's throughput.
+
+=== Step 4: Validate and Save
+1.  Click **Validate Workflow**. The engine will verify that all required parameters are defined in the associated configuration files.
+2.  Click **Save as Template**. This enables the workflow to appear in your "Reusable Templates" library for future use across different clusters.
+
+== Best Practices for Workflow Management
+
+*   **Versioning:** Always tag your workflow versions in your repository (e.g., `v1.0-network-failure-baseline`) to track how resilience improvements change the outcome over time.
+*   **Rollback Planning:** When building workflows, ensure the final node in a complex chain includes a "Health Recovery" check to verify the system has returned to its steady state after the chaos concludes.
+*   **Monitoring Integration:** Map your workflow stages to specific PromQL queries in your monitoring tool to visualize exactly when the **Resilience Score** drops during the workflow execution.

@@ -1,0 +1,11 @@
+#  Run and interpret one chaos experiment
+
+= Run and interpret one chaos experiment
+
+Executing a chaos experiment involves transitioning from theoretical risk to actionable data by inducing controlled disruptions within a target cluster. The process focuses on validating system recovery and service reliability under stress.
+
+*   **Execution Setup**: Define the experiment parameters, select the target cluster, and utilize scenario registries to initiate the disruption.
+*   **Monitoring and Validation**: Continuously observe the system’s steady state, focusing on key performance indicators like latency, throughput, and error rates.
+*   **Result Analysis**: Review experiment logs and status reports to determine if the system successfully recovered according to predefined criteria.
+*   **Impact Assessment**: Evaluate the effectiveness of configured alerts and assess how dependent components responded to the injected fault.
+*   **Blast Radius Management**: Ensure stop conditions are monitored during execution, with rollback plans ready to execute if the experiment exceeds defined safety thresholds.

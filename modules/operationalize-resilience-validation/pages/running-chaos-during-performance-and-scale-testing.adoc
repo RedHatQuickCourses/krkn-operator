@@ -1,0 +1,82 @@
+#  Running chaos during performance and scale testing
+
+= Running chaos during performance and scale testing
+
+In distributed systems, testing performance and scalability in isolation often leads to a false sense of security. While your application might handle high traffic loads under ideal conditions, it may fail catastrophically when infrastructure instability is introduced. Integrating chaos engineering directly into performance and scale testing allows you to observe how your system's "Steady State"—typically defined by latency, throughput, and error rates—degrades under combined stress.
+
+== Why combine chaos with performance testing?
+
+Performance testing validates that your system meets throughput and latency requirements under load. Adding chaos testing to these runs provides critical insights:
+
+*   **Resource Contention:** Identifies if specific components become bottlenecks when resources (CPU/Memory) are throttled during high load.
+*   **Failover Efficacy:** Observes if automated recovery mechanisms (e.g., pod restarts, service migrations) actually trigger and succeed when the system is already under resource pressure.
+*   **Cascading Failure Analysis:** Determines if a minor disruption in one service causes a systemic collapse under heavy load.
+*   **Signaling and Coordination:** Uses tools like Krkn's signaling feature to ensure chaos events are synchronized with the ramp-up or peak periods of your load tests.
+
+== Implementing integrated testing
+
+To effectively run chaos during scale testing, follow these architectural principles:
+
+[#steady-state-monitoring]
+=== 1. Define the Baseline
+Before introducing faults, establish your performance baseline. Use PromQL to define your Service Level Objectives (SLOs):
+*   **Latency:** P99 response times during peak load.
+*   **Throughput:** Requests per second (RPS) handled by the ingress.
+*   **Error Rates:** Percentage of 5xx HTTP codes.
+
+=== 2. Managing Chaos Lifecycle with Load
+Use Krkn to orchestrate the chaos events in coordination with your load generation tool (e.g., Locust, k6, or Jaeger). 
+
+[source,yaml]
+----
+# Example structure for coordinating chaos with load testing
+chaos_scenario:
+  type: pod-disruption
+  target: "auth-service"
+  start_after_load_reaches: 80% # Using signaling/wait conditions
+  duration: 5m
+----
+
+=== 3. Observing Impact
+During the execution, monitor if the performance metrics deviate significantly from the baseline defined in step 1. If the system fails to recover or the performance degradation exceeds the SLO threshold, trigger an automated stop condition.
+
+== Hands-on Lab: Synchronizing Chaos with Load
+
+In this exercise, you will run a pod-disruption experiment while your application is under a synthetic load to measure resilience.
+
+. **Prerequisites**
+* A cluster with a deployed application and Krkn Operator installed.
+* A load testing tool configured to hit your application ingress.
+
+. **Step 1: Start the Load Generator**
+Begin your load test and wait for the system to reach a steady-state at 70% of peak capacity.
+
+. **Step 2: Define the Krkn Scenario**
+Create a `chaos-config.yaml` focusing on a specific microservice. Use a moderate blast radius to ensure you are testing the resiliency of the application logic, not just infrastructure collapse.
+
+[source,yaml]
+----
+scenario:
+  name: "Auth-Service-Load-Test-Disruption"
+  type: "pod-disruption"
+  target_pods: "auth-service-*"
+  duration: 300
+  percentage_to_kill: 25
+----
+
+. **Step 3: Execute and Monitor**
+Execute the scenario via the Krkn operator:
+[source,bash]
+----
+krkn-operator run --config chaos-config.yaml
+----
+
+. **Step 4: Analyze the Resilience Score**
+Compare the P99 latency recorded during the chaos period against your baseline. 
+*   *Observation:* Did the load balancer correctly reroute traffic? 
+*   *Validation:* Did the application recover automatically once the Krkn experiment concluded, or did it require manual intervention?
+
+== Best Practices for Integrated Testing
+*   **Stop Conditions:** Always define clear thresholds (e.g., "if error rate > 5%, abort chaos"). This prevents total outage during a performance test.
+*   **Document Dependencies:** Ensure that your metrics monitoring includes the health of underlying infrastructure (nodes/nodes-network) to distinguish between application issues and resource starvation.
+*   **Iterate:** Start with minor disruptions (single pod deletion) during low load, then increase intensity and concurrency as you gain confidence in your system's recovery models.

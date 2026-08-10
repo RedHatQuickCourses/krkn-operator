@@ -1,22 +1,35 @@
-= An Example Quick Course
+=  Chaos Engineering with Krkn
 :navtitle: Home
 
 == Introduction
 
-Course Title: Course title FIXME
+Course Title:  Chaos Engineering with Krkn
 
 Description:
 Course description FIXME
 
-Duration: pass:[<span class="course-total-duration" aria-live="polite">…</span>]
+Duration: FIXME hours
 
-== Objectives
+== Topics covered in this course
 
-On completing this course, you should be able to:
 
-* Observable, measurable objective...
-* Observable, measurable objective...
-* Observable, measurable objective...
+*  Chaos engineering methodology
+
+*  Turn risk into a testable experiment
+
+*  Krkn Operator fundamentals
+
+*  Run and interpret one chaos experiment
+
+*  Build workflows with Chaos Studio
+
+*  Measure resilience and establish a baseline
+
+*  Operationalize resilience validation
+
+*  Hands-on Labs
+
+
 
 == Prerequisites
 

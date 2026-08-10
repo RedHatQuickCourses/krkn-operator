@@ -1,0 +1,86 @@
+#  Managing blast radius and rollback planning
+
+= Managing blast radius and rollback planning
+
+In Chaos Engineering, the goal is to learn about system weaknesses without causing unintended downtime or service degradation. Managing the **blast radius** (the scope of the impact) and establishing robust **rollback planning** are the two primary safety pillars of any Krkn experiment.
+
+== Defining the Blast Radius
+
+The blast radius defines the boundaries of your experiment. When executing scenarios with Krkn, you must ensure that the disruption is constrained to the intended targets.
+
+*   **Target Selection:** Use Krkn’s multi-cluster capabilities to precisely define which clusters or namespaces are subject to testing. By leveraging Open Cluster Management (OCM) or manual registration, you can isolate experiments to non-critical development or staging environments before promoting them to production.
+*   **Resource Scoping:** Within a cluster, limit the blast radius by targeting specific labels or deployments. Avoid running global disruptions (like killing all pods in a namespace) until you have verified the behavior on a subset of instances.
+*   **Sequential Execution:** Instead of testing the entire architecture at once, use sequential execution to validate one microservice or node group at a time. This allows you to observe the recovery of one component before triggering a dependency failure.
+
+== Rollback Planning and Safety Mechanisms
+
+A rollback plan ensures that if a system does not recover as expected, the environment can be returned to a "steady state" immediately.
+
+=== 1. Define the Steady State
+Before any experiment begins, you must explicitly define what "normal" looks like. Use PromQL to monitor:
+*   **Latency:** The average response time of your services.
+*   **Throughput:** The request count per second.
+*   **Error Rate:** The percentage of HTTP 5xx responses.
+
+=== 2. Implementation of Stop Conditions
+Krkn experiments should be configured with automated stop conditions. If your steady state metrics cross a pre-defined threshold during a scenario (e.g., error rates exceed 5%), the experiment must be terminated. 
+
+*   **Observability Integration:** Link your Krkn scenarios to your monitoring stack (e.g., Prometheus/Grafana).
+*   **Automated Rollback:** Ensure that your experiment configuration includes `kill` signals or cleanup hooks that restore the desired replica count or network policy configuration if the scenario triggers an alert.
+
+=== 3. Manual Intervention (The "Big Red Button")
+Regardless of automation, always have a manual intervention plan:
+*   **Emergency Termination:** Know how to identify and delete the running Krkn job if the experiment spirals out of control.
+*   **Human-in-the-loop:** Especially in production environments, ensure a subject matter expert is monitoring the dashboard throughout the experiment duration to manually trigger a rollback if necessary.
+
+== Hands-on Activity: Configuring a Controlled Experiment
+
+In this activity, you will learn how to limit the blast radius for a pod-disruption scenario.
+
+[IMPORTANT]
+====
+Ensure you are operating in a non-production cluster before proceeding.
+====
+
+. **Step 1: Scope the target**
+Create a YAML configuration for a `pod-disruption` scenario. Limit the scope using the `selector` field to target only a specific application label rather than the entire namespace.
++
+[source,yaml]
+----
+scenario: pod-disruption
+target_pods:
+  selector: "app=frontend"
+  namespace: "testing-ns"
+  count: 1 # Limit to only 1 pod to keep impact low
+----
+
+. **Step 2: Set the Experiment Duration**
+Keep the duration short for your first run to minimize the blast radius. 
++
+[source,yaml]
+----
+duration: 60s # The experiment will automatically cease after 60 seconds
+----
+
+. **Step 3: Define the Stop Condition**
+Configure a validation check that runs alongside the experiment. If the `frontend` service latency exceeds 500ms, the experiment must cease.
++
+[source,yaml]
+----
+stop_conditions:
+  - metric: "http_request_duration_seconds"
+    threshold: 0.5
+    comparison: ">"
+----
+
+. **Step 4: Execute and Monitor**
+Run the scenario using `krknctl`. Keep a terminal open to monitor the logs. If the system fails to recover within 30 seconds of the scenario finishing, manually revert the target deployment:
++
+[source,bash]
+----
+# Manual rollback command if automated recovery fails
+kubectl scale deployment/frontend --replicas=3 -n testing-ns
+----
+
+. **Step 5: Review Results**
+Use the Krkn output logs to compare the "steady state" against the "disrupted state." If the blast radius was too large (e.g., more services were impacted than intended), refine your selectors and re-run.

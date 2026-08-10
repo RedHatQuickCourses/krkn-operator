@@ -1,0 +1,58 @@
+#  Configuring experiment parameters and attachments
+
+= Configuring experiment parameters and attachments
+
+In Krkn, the precision of a chaos experiment relies entirely on how you define its parameters and manage its associated data. Proper configuration ensures that your disruption is targeted, measurable, and safe.
+
+== Understanding Parameter Categories
+
+When configuring a scenario, parameters are organized into three distinct categories. You must address these to satisfy both the framework requirements and your specific testing goals:
+
+*   **Mandatory:** These are the "must-have" settings required for the scenario to function (e.g., target namespace, duration, or specific resource names). An experiment will not execute if these are missing.
+*   **Optional:** These provide fine-grained control over the behavior of the chaos. You use these to define label selectors, specific timing windows, or filters to narrow the scope of the disruption.
+*   **Global:** These are framework-level configurations. They govern how the experiment interacts with the broader ecosystem, such as integration settings for Prometheus, Elasticsearch, or Cerberus. You only modify these if you need to override the system defaults.
+
+== Managing File Attachments
+
+Attachments in Krkn allow you to inject external logic or configuration into your experiments. Files are mounted at runtime and serve different purposes depending on where they are applied:
+
+*   **Run Scenarios:** Files are mounted as configuration files during the initial parameter setup to dictate the behavior of the scenario.
+*   **Chaos Studio (Nodes):** Files are mounted on individual nodes within a workflow. This allows you to apply unique configurations to specific steps in a multi-stage disruption.
+*   **Chaos Studio (Resiliency Score):** Specific files are mounted as **PromQL query files**. These define the mathematical logic used to calculate your Resiliency Score, allowing Krkn to evaluate system health before, during, and after the disruption.
+
+== Hands-on Lab: Configuring a Targeted Pod Disruption
+
+In this lab, you will configure a Pod-kill experiment with specific parameters and a monitoring attachment.
+
+=== Step 1: Scenario Parameterization
+1. Navigate to the **Chaos Studio** interface or the scenario configuration YAML.
+2. Select the `pod-chaos` scenario from the registry.
+3. Set the **Mandatory** parameters:
+   * `TARGET_NAMESPACE`: `production-app`
+   * `DURATION`: `300s`
+4. Define **Optional** parameters to limit the blast radius:
+   * `LABEL_SELECTOR`: `app=frontend`
+   * `POD_NAME_FILTER`: `frontend-*`
+
+=== Step 2: Attaching the Resiliency Logic
+To validate the experiment, you must attach the monitoring logic that defines your "Steady State."
+1. Prepare a file named `frontend-availability.promql` containing your SLO query (e.g., `sum(rate(http_requests_total{status=~"2.."}[1m]))`).
+2. In the **Resiliency Score** configuration section of your workflow node, upload or point to this `frontend-availability.promql` file.
+3. This file will be mounted at execution time, allowing Krkn to compare real-time traffic against your baseline during the disruption.
+
+=== Step 3: Preview and Execution
+1. Navigate to the **Preview** tab in the configuration wizard.
+2. Review the summary of your Mandatory, Optional, and Global parameters.
+3. Ensure the attachment path for the PromQL file is correctly mapped.
+4. Click **Execute** to trigger the experiment.
+
+[TIP]
+====
+If you need to repeat a specific scenario with identical parameters at different stages of a workflow, use the **Clone** feature in Chaos Studio. Cloning duplicates the node configuration, saving time and ensuring consistency across complex multi-stage failure models.
+====
+
+== Verification
+Once the experiment completes, navigate to the **Logs and Status** report. Verify that:
+*   The `TARGET_NAMESPACE` and `LABEL_SELECTOR` were respected.
+*   The `Resiliency Score` calculation utilized your attached PromQL file.
+*   No unexpected clusters or namespaces were impacted.

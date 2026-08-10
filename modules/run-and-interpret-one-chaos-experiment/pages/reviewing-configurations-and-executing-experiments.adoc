@@ -1,0 +1,71 @@
+#  Reviewing configurations and executing experiments
+
+= Reviewing configurations and executing experiments
+
+Before injecting disruptions into a production or staging environment, it is critical to perform a final validation of your experiment parameters. The Krkn Operator provides a structured preview mechanism to ensure that your "blast radius" is contained and your expected steady-state metrics are clearly defined.
+
+== The importance of the pre-execution review
+
+Executing a chaos experiment without a rigorous configuration review can lead to unintended consequences, such as exceeding the defined blast radius or triggering false-positive alerts. The review phase serves as the "stop condition" gatekeeper, allowing you to verify:
+
+* **Target Accuracy:** Confirm the target cluster, namespace, and specific resource labels (e.g., `app=frontend`) match the intended scope.
+* **Disruption Intensity:** Validate that parameters such as `duration`, `grace_period`, and `concurrency` align with your hypothesis.
+* **Safety Mechanisms:** Ensure that your monitoring tools (Prometheus/Grafana) are configured to observe the target and that automated rollback or "stop" conditions are primed.
+
+== Steps to review and execute
+
+When using the Krkn Operator interface, follow this systematic approach to transition from configuration to execution.
+
+=== 1. The Configuration Summary (Preview)
+Before the `Run` command is finalized, the Krkn Operator generates a **Configuration Summary**. This interface aggregates all inputs provided in the scenario registry:
+
+* **Scope Check:** Identify which clusters and nodes will be impacted.
+* **Parameter Validation:** Review key-value pairs for the disruption (e.g., `pod_failure_percentage: 20`).
+* **Dependency Check:** Verify that the required service account permissions and cluster discovery mappings are correctly resolved for the target cluster.
+
+=== 2. Executing the Experiment
+Once the summary is validated, the execution process triggers the underlying Kubernetes Jobs.
+
+* **Initialization:** Krkn Operator initializes the chaos engine pod within the target namespace.
+* **Observability Sync:** The system begins streaming real-time status updates back to the Krkn dashboard.
+* **Steady-State Monitoring:** The experiment begins by capturing the current state (Latency, Error Rate, Throughput) to establish a baseline before the disruption starts.
+
+=== 3. Monitoring Execution
+During execution, utilize the Krkn terminal and logs interface:
+* **Real-time Logs:** Access the pod logs to verify that the scenario is interacting with the target resources as expected.
+* **Status Reports:** Track the progress percentage and current stage of the chaos workflow.
+
+[IMPORTANT]
+====
+If at any point the system metrics deviate beyond your defined SLO thresholds, trigger the manual abort mechanism via the Krkn dashboard to immediately revert the environment to a stable state.
+====
+
+== Hands-on Activity: Executing a Pod-Disruption Experiment
+
+In this activity, you will verify the configuration of a pod-disruption scenario and execute it against a test namespace.
+
+**Prerequisites:**
+* Access to a Krkn-enabled cluster.
+* A target application deployed in a namespace (e.g., `demo-app`).
+
+. **Step 1: Configuration Preview**
+   - Navigate to the Krkn Operator **Run Scenarios** tab.
+   - Select the `pod-disruption` scenario.
+   - Configure the blast radius to target `namespace: demo-app`.
+   - Click **Preview** to load the summary modal.
+
+. **Step 2: Validation**
+   - Inspect the summary modal. Ensure the `target_label` matches your test application.
+   - Confirm that the `duration` is set to `5m` (5 minutes).
+
+. **Step 3: Execution**
+   - Click **Execute**.
+   - Navigate to the **Jobs** section to observe the pod spin-up.
+
+. **Step 4: Observation**
+   - Open your Prometheus dashboard or the Krkn **Resilience Score** view.
+   - Observe how the `error_rate` metrics shift as the pods are terminated and restarted by the Kubernetes controller.
+
+. **Step 5: Post-Mortem**
+   - Once the experiment completes, review the generated status report.
+   - Verify that the workload successfully recovered within the expected time frame.

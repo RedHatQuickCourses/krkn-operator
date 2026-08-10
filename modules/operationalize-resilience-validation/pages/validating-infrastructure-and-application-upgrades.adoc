@@ -1,0 +1,69 @@
+#  Validating infrastructure and application upgrades
+
+= Validating Infrastructure and Application Upgrades with Chaos Engineering
+
+In a cloud-native ecosystem, upgrades—whether at the infrastructure level (e.g., Kubernetes version upgrades, node OS patching) or the application level (e.g., deployment rollouts)—are frequent sources of instability. Traditional testing often focuses on functional success, but fails to account for the "turbulent" conditions that occur during transition states.
+
+By integrating Krkn into your upgrade lifecycle, you can move beyond simple health checks to **Resilience Validation**, ensuring that your systems not only survive the update process but maintain service level indicators (SLIs) throughout.
+
+== The Role of Chaos in Upgrades
+
+Upgrades often involve shifting traffic, draining nodes, or restarting pods. If these processes encounter unforeseen issues, the result is often cascading failure. Chaos engineering allows you to simulate "worst-case" scenarios during these transitions:
+
+*   **Infrastructure Upgrades:** Inject network latency or pod disruptions during a node drain to ensure Pod Disruption Budgets (PDBs) are configured correctly and workloads rebalance without downtime.
+*   **Application Upgrades:** Trigger service failures while a rolling update is in progress to verify that the system can handle concurrent versioning and potential compatibility gaps.
+
+== Strategy for Validation
+
+To validate an upgrade, follow this structured approach:
+
+1.  **Define Steady State:** Establish baseline metrics for latency, error rates, and throughput before initiating the upgrade.
+2.  **Define Stop Conditions:** Configure automated triggers (e.g., Prometheus alerts) that halt the upgrade if latency exceeds a defined threshold during a chaos experiment.
+3.  **Run Concurrent Chaos:** Execute Krkn scenarios (such as `pod-scenarios`) simultaneously with your deployment or upgrade pipeline to test system adaptability.
+4.  **Observe Recovery:** Measure the Mean Time to Recovery (MTTR) as the system settles back into the new steady state.
+
+== Hands-on Lab: Validating a Rolling Update
+
+In this lab, you will use Krkn to inject pod disruptions during a deployment rollout to ensure that your application remains available throughout the process.
+
+=== Prerequisites
+*   A running Kubernetes cluster.
+*   Krkn Operator installed and configured.
+*   An application with a defined `Deployment` and `PodDisruptionBudget`.
+
+=== Step 1: Establish the Baseline
+Monitor your application's request latency using your monitoring stack (e.g., Grafana/Prometheus). Ensure the current version is stable.
+
+=== Step 2: Configure the Chaos Experiment
+Create a Krkn scenario file (`upgrade-chaos.yaml`) to target the application pods during the upgrade:
+
+[source,yaml]
+----
+scenario: pod-scenarios
+duration: 300
+namespace: my-app-namespace
+label_selector: "app=my-web-service"
+actions:
+  - action: kill_pods
+    count: 1
+    probability: 0.5
+----
+
+=== Step 3: Execute and Validate
+1.  **Initiate the Upgrade:** Start your application rollout (e.g., `kubectl set image deployment/my-app-web web=new-version`).
+2.  **Run the Experiment:** Execute the Krkn job simultaneously:
+    `oc apply -f upgrade-chaos.yaml`
+3.  **Monitor Resilience:**
+    *   Observe the `Replicas` and `AvailableReplicas` in your deployment.
+    *   Check for spikes in 5xx error codes.
+    *   Verify that your alerting system fires appropriately if thresholds are breached, but the upgrade completes successfully.
+
+=== Step 4: Analyze and Remediate
+If the service availability drops below your SLO during the combined upgrade and chaos run:
+*   **Audit PDBs:** Ensure `minAvailable` or `maxUnavailable` is set to allow for the concurrent upgrade and chaos-induced pod loss.
+*   **Refine Readiness Probes:** Ensure readiness probes are accurate so the load balancer does not route traffic to pods that are in an unstable transition state.
+
+== Best Practices for Operationalizing
+*   **Automate in CI/CD:** Incorporate Krkn execution into your pipeline (e.g., Jenkins or Tekton) to trigger chaos tests automatically following the completion of an infrastructure update.
+*   **Standardize Metrics:** Use a consistent `Resilience Score` across different environment upgrades to track if your system becomes more or less resilient after specific patches.
+*   **Alert Consistency:** Ensure that chaos-induced events do not "alert fatigue" your SRE team. Use labels to differentiate between "Chaos Testing" and "Production Incident."

@@ -1,0 +1,64 @@
+#  Connecting and cloning workflow nodes
+
+= Connecting and cloning workflow nodes
+
+In the Krkn Chaos Studio, complex failure scenarios are rarely the result of a single disruption. To model realistic platform-level failures—such as a cascading network partition followed by a pod-killer event—you must orchestrate multiple scenarios using the workflow canvas.
+
+This section covers how to manipulate workflow nodes to build, expand, and structure your chaos experiments.
+
+== Visualizing Workflow Nodes
+
+Within the Chaos Studio editor, every node functions as an individual Krkn scenario. A node is only considered valid for execution when all mandatory parameters, registry selections, and configuration files are properly defined.
+
+*   **Valid Nodes:** Displayed with green borders and green connection arrows.
+*   **Unconfigured Nodes:** Displayed with red borders and red connection arrows.
+
+[NOTE]
+====
+You cannot trigger a workflow execution if any node in the chain remains unconfigured. Always verify the state of your nodes before initiating an experiment.
+====
+
+== Connecting Nodes for Execution Orchestration
+
+The visual editor uses directional arrows to establish dependencies and dictate the order of operations. By connecting nodes, you define the "Chaos Pipeline."
+
+=== Defining Execution Logic
+*   **Serial Execution:** Drag an arrow from the output port of one node to the input port of the next. Krkn will execute these scenarios sequentially; the second node will only begin after the first node has completed its disruption cycle.
+*   **Parallel Execution:** To trigger multiple failures simultaneously, branch your workflow by drawing arrows from a single source node to multiple downstream target nodes. This is highly effective for testing how a system handles "compounding" stress from different vectors at the same time.
+
+[TIP]
+====
+When modeling complex disruptions, use parallel execution to simulate "noisy neighbor" scenarios or multi-vector attacks, ensuring your monitoring tools catch the aggregate impact on your SLOs.
+====
+
+== Cloning Nodes for Efficiency
+
+Manual configuration of recurring scenario parameters can be time-consuming, especially when testing the same failure mode with slight variations (or repeating the same event across different time intervals). 
+
+The **Clone** feature allows you to duplicate a fully configured node instantly.
+
+*   **Duplicate Configuration:** When you clone a node, all selected registries, scenario parameters, and mounted files are copied to the new instance.
+*   **Rapid Iteration:** Cloning is the preferred method for building "wave" disruptions. For example, if you need to run a `pod-disruption` scenario three times during a single workflow, configure it once, clone it twice, and chain them together sequentially.
+
+== Hands-on Activity: Modeling a Sequential Failure
+
+In this activity, you will create a two-stage failure workflow using node cloning.
+
+1.  **Create the Primary Node:**
+    *   Drag a new node onto the canvas.
+    *   Select your registry and choose the `pod-disruption` scenario.
+    *   Configure your mandatory parameters (e.g., `label_selector`, `namespace`).
+2.  **Clone the Scenario:**
+    *   Right-click the configured node and select **Clone**.
+    *   Place the second node to the right of the first.
+3.  **Establish Dependency:**
+    *   Click the output port of the first node.
+    *   Drag the arrow to the input port of the cloned node.
+4.  **Validate:**
+    *   Observe the arrow color. If both nodes are green, the connection is valid.
+    *   Click the **Execute** button to run the sequential disruption.
+
+[WARNING]
+====
+Always review the blast radius of cloned nodes. Even if parameters are identical, ensure that the target cluster settings for the cloned node match your intended scope to avoid accidental disruption outside of your test environment.
+====

@@ -1,0 +1,52 @@
+#  Configuring multi-cluster scenario execution
+
+= Configuring multi-cluster scenario execution
+
+In complex, distributed environments, testing resilience often requires verifying how a failure propagates across multiple infrastructure boundaries. Krkn’s architecture enables you to execute chaos scenarios simultaneously across several clusters, providing a comprehensive view of how your global control plane and individual workloads handle synchronized disruption.
+
+== Understanding Multi-Cluster Execution
+
+When you configure multi-cluster scenario execution in Krkn, you are not just running independent tests; you are orchestrating a coordinated failure experiment. By selecting multiple target clusters, Krkn triggers the scenario on each target environment concurrently, allowing you to observe cross-cluster latency, service availability, and global recovery patterns.
+
+=== Prerequisites for Multi-Cluster Runs
+Before configuring your execution, ensure:
+* **Connectivity:** The Krkn controller has the necessary `kubeconfig` or ServiceAccount tokens to access all target clusters.
+* **Permissions:** The Krkn operator must have appropriate RBAC permissions (cluster-admin or scoped permissions) on all target clusters to perform the requested disruption (e.g., pod kills, node pressure, network latency).
+* **Registry Access:** The scenario registries must be reachable from the target clusters to pull the necessary chaos logic.
+
+== Configuring Execution via the Guided Wizard
+
+To ensure a standardized approach, Krkn provides a step-by-step wizard to configure and deploy scenarios across a fleet of clusters.
+
+=== Step-by-Step Configuration
+
+. **Initiate the Run:** From the Krkn dashboard, navigate to the **Run Scenarios** section and select the **Run Scenarios Wizard**.
+. **Select Target Clusters:** 
+    * The interface will display a list of discovered clusters (utilizing ACM or OCM cluster discovery).
+    * Check all clusters that should be subjected to the disruption. 
+    * *Note:* All selected clusters will execute the scenario simultaneously upon initiation.
+. **Select Scenario:** Choose the desired chaos scenario from your registered libraries. 
+. **Define Experiment Parameters:** 
+    * Specify the blast radius (e.g., number of pods, percentage of nodes).
+    * Set the duration of the impact.
+    * Define the steady-state metrics and stop conditions.
+. **Review and Execute:** Validate the cluster selection and parameters. Once triggered, Krkn initiates the pods on the selected target clusters to execute the experiment.
+
+== Monitoring and Analysis
+
+Once the multi-cluster execution begins, you can track the experiment status globally:
+
+* **Execution Outcome:** Monitor the status (Success/Failure) for each individual cluster.
+* **Centralized Logs:** Access the console logs for the specific Krkn pods generated on each cluster. This is critical for identifying why a scenario might have succeeded on one cluster but failed on another (often due to environmental configuration drift).
+* **Observability Correlation:** If your environment is integrated with a centralized monitoring tool (like Prometheus/Grafana), use the timestamps from the Krkn execution logs to correlate the disruption with metrics across all target clusters simultaneously.
+
+== Best Practices for Multi-Cluster Chaos
+
+[IMPORTANT]
+====
+**Manage the Blast Radius:** Running a high-impact scenario across multiple clusters simultaneously increases the risk of a widespread outage. Always start with a "canary" approach by selecting a single development cluster before expanding to a multi-cluster production-like environment.
+====
+
+* **Standardize Scenarios:** Use the same scenario version across all targets to ensure the results are comparable.
+* **Verification:** Ensure that your recovery validation checks are defined globally, so you can clearly see when one cluster recovers slower than others, indicating a potential configuration issue in that specific region or environment.
+* **Stop Conditions:** Configure strict stop conditions. If the experiment causes unintended degradation that exceeds your SLOs, ensure the "Stop on Failure" setting is enabled to rollback the scenario across all clusters immediately.

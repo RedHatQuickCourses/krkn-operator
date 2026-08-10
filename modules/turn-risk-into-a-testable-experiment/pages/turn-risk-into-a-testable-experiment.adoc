@@ -1,0 +1,12 @@
+#  Turn risk into a testable experiment
+
+= Turn risk into a testable experiment
+
+Transforming system risks into actionable chaos experiments requires a structured approach to validate service resilience:
+
+*   **Identify Failure Modes:** Pinpoint potential service risks and failure points within the infrastructure.
+*   **Define Steady State:** Establish baseline metrics for availability, latency, and throughput to characterize normal operations.
+*   **Formulate Hypotheses:** Create testable assumptions regarding how the system should behave when specific disruptions occur.
+*   **Scope the Experiment:** Determine the target environment, duration, and blast radius to minimize unnecessary impact.
+*   **Map to Krkn Scenarios:** Align identified risks with specific Krkn disruption scenarios to trigger the desired failure mode.
+*   **Establish Safety Controls:** Define clear monitoring criteria, stop conditions, and rollback procedures to maintain system stability during testing.

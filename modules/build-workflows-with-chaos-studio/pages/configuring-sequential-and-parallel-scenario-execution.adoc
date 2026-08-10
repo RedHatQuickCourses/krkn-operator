@@ -1,0 +1,54 @@
+#  Configuring sequential and parallel scenario execution
+
+= Configuring Sequential and Parallel Scenario Execution
+
+In complex distributed systems, failures rarely occur in isolation. To accurately simulate real-world outages—such as a cascading failure caused by a network partition followed by a service crash—Krkn’s Chaos Studio allows you to design sophisticated workflows. By chaining scenarios together, you can orchestrate complex failure patterns using sequential and parallel execution logic.
+
+== Understanding Workflow Execution Models
+
+Chaos Studio workflows are built using a node-based architecture. Each node represents a specific disruption scenario. The way these nodes are connected defines the flow of the experiment:
+
+*   **Sequential Execution:** Nodes are linked in a linear path. A downstream node only initiates once the upstream node has successfully completed. This is ideal for testing cumulative system stress or multi-stage recovery processes.
+*   **Parallel Execution:** Multiple nodes are triggered simultaneously. This allows you to simulate "storm" conditions where multiple components fail at the exact same time, testing the system's ability to handle aggregate resource contention or simultaneous service unavailability.
+
+== Designing Workflow Logic
+
+When building your workflow, consider the relationship between your disruptions:
+
+1.  **Sequential (Cascading):** Use this to test the "fail-over" capability. For example, trigger a `pod-kill` on a primary service, wait for the recovery, then trigger a `network-latency` event to see if the system recovers correctly under degraded networking.
+2.  **Parallel (Coincident):** Use this to test "blast radius" impact. For example, executing `memory-hog` on multiple nodes in different availability zones simultaneously to observe how the cluster scheduler (like Kubernetes) handles resource pressure across the platform.
+
+== Hands-on Lab: Creating a Multi-Stage Failure Workflow
+
+In this lab, you will configure a workflow that tests system resilience against a simultaneous disruption followed by a secondary cascading failure.
+
+=== Prerequisites
+* Access to a Krkn-enabled cluster with the Chaos Studio operator installed.
+* At least two scenario definitions registered in your registry.
+
+=== Step 1: Initialize the Workflow
+1. Navigate to the **Chaos Studio** dashboard in your Krkn UI.
+2. Click **Create New Workflow**.
+3. Provide a unique name and description (e.g., `resilience-stress-test-01`).
+
+=== Step 2: Configure Parallel Disruption
+1. Add two **Scenario Nodes** to the canvas.
+2. Configure both nodes to run the `pod-disruption` scenario.
+3. Drag the start-trigger point of both nodes from the **Start** node simultaneously. This ensures that the two pod disruptions begin at the exact same time.
+
+=== Step 3: Configure Sequential Recovery Validation
+1. Add a third node: **Health Check** or a secondary disruption like `network-partition`.
+2. Connect the output of the two parallel `pod-disruption` nodes to the input of this third node.
+3. *Logic Note:* By connecting them this way, the third node will wait for the parallel disruptions to conclude before initiating its own sequence.
+
+=== Step 4: Validate and Execute
+1. Click the **Validate Workflow** button to ensure no nodes are orphaned and configurations are valid.
+2. Select your **Target Clusters** from the deployment dropdown.
+3. Click **Run**.
+4. Monitor the **Jobs** tab to observe the simultaneous start of the first two nodes, followed by the serial execution of the third.
+
+== Best Practices for Workflow Design
+
+*   **Define Clear Stop Conditions:** Always attach a "Stop Condition" to your workflow. If a parallel execution causes a breach of your SLOs (e.g., latency spikes above 500ms), the workflow should trigger an automatic rollback.
+*   **Keep it Modular:** Reuse workflow models. If you have a specific "Platform Stress" sequence, save it as a template to maintain consistency across different development and staging environments.
+*   **Analyze Dependencies:** Before creating parallel executions, verify that the services being targeted are not hard-dependent on each other in a way that would trigger a total cluster collapse, unless that is specifically the scope of your experiment.

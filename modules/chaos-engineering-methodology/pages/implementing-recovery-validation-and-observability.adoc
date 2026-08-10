@@ -1,0 +1,63 @@
+#  Implementing recovery validation and observability
+
+= Implementing recovery validation and observability
+
+In Chaos Engineering, the value of an experiment is not determined by the disruption itself, but by the system's ability to maintain or recover its steady state. Implementing robust recovery validation and observability is critical to ensuring that failures do not cascade into catastrophic outages.
+
+== The Role of Recovery Validation
+
+Recovery validation is the process of confirming that the system returns to a healthy state after a disruption is injected. Krkn handles this through two primary layers:
+
+1. **Scenario-Specific Checks:** Most Krkn scenarios include built-in logic to verify if the targeted component recovers within a predefined duration.
+2. **Holistic Health Signals (Cerberus):** Because a failure in one component often impacts dependent services, verifying the target alone is insufficient. We utilize **Cerberus** to monitor the health of the entire cluster.
+
+[IMPORTANT]
+====
+If Cerberus is enabled, it acts as a global "kill switch." It continuously tracks the health signal of the cluster. If the health signal drops below acceptable thresholds during an experiment, Cerberus sends a signal to halt the chaos, preventing further damage and protecting the environment.
+====
+
+== Observability and Metrics Evaluation
+
+To determine whether an experiment is a success or a failure, we evaluate the system against three pillars:
+
+*   **Component Recovery:** Did the specific target (e.g., a Deployment or StatefulSet) return to its expected replica count and running state within the defined time limit?
+*   **Cluster Health:** Using Cerberus, did the broader cluster metrics (API server latency, node health, etc.) remain within acceptable bounds?
+*   **In-Cluster Prometheus:** We use PromQL to query metrics such as throughput, latency, and error rates to confirm that user-facing traffic is successfully processed post-disruption.
+
+== Hands-on Lab: Configuring Health Signals
+
+In this exercise, you will learn how to integrate recovery validation into your workflow.
+
+=== Step 1: Define the Steady State
+Before starting, ensure you have a baseline for your application using Prometheus:
+```promql
+# Example: Monitor request success rate for your service
+sum(rate(http_requests_total{status=~"2.."}[5m])) / sum(rate(http_requests_total[5m]))
+```
+
+=== Step 2: Enable Cerberus for Global Monitoring
+To protect your environment, configure your Krkn execution to interface with Cerberus. Add the following to your configuration file:
+
+[source,yaml]
+----
+cerberus:
+  enabled: true
+  url: "http://cerberus-service.cerberus.svc.cluster.local"
+  check_period: 30
+----
+
+=== Step 3: Execute and Observe
+1. Run your chosen Krkn scenario.
+2. During execution, observe the Krkn logs. You will see output indicating that the controller is watching for recovery.
+3. Simulate a scenario where the application fails to recover. Verify that Cerberus detects the degradation and halts the experiment.
+
+=== Step 4: Validate Results
+Post-experiment, verify the logs to see the final "Pass/Fail" status. A pass requires:
+*   The target component reached the steady state (e.g., all replicas Ready).
+*   Cerberus did not trigger a fail signal.
+*   Prometheus metrics returned to baseline levels within the defined timeframe.
+
+== Best Practices for Resilience
+*   **Minimal Initialization:** Design components for fast recovery logic. Long initialization times during restarts increase the risk of cascading failures.
+*   **High Availability (HA):** Ensure your application uses `PodDisruptionBudgets` and multi-zone deployments so that the recovery validation process doesn't wait on infrastructure that cannot recover due to lack of resources.
+*   **Threshold Tuning:** Set your failure detection thresholds based on real-world SLOs rather than aggressive, arbitrary timers, to avoid "false positive" failures in your chaos experiments.

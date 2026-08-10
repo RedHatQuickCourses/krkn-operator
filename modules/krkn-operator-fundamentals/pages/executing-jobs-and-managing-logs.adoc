@@ -1,0 +1,63 @@
+#  Executing jobs and managing logs
+
+= Executing jobs and managing logs
+
+In the Krkn ecosystem, the lifecycle of a chaos experiment centers on the **Jobs** interface. This is where your hypotheses meet reality, allowing you to monitor real-time disruptions, inspect granular execution data, and troubleshoot unexpected outcomes.
+
+== Executing Chaos Experiments
+
+When you launch a scenario, you transition from configuration to execution. The Krkn platform automates the orchestration of these experiments, managing the lifecycle of the disruption pods, target resource isolation, and data collection.
+
+=== Launching a Job
+To initiate an experiment:
+1. Navigate to your desired scenario within the registry.
+2. Configure the experiment parameters (blast radius, duration, and target namespace/labels).
+3. Click **Run**.
+4. You will be automatically redirected to the **Jobs** dashboard.
+
+=== Monitoring Real-Time Status
+The Jobs dashboard provides a high-level view of all scenario executions within your group. Key metrics displayed include:
+* **Status:** (Pending, Running, Succeeded, Failed, or Interrupted).
+* **Execution Timestamp:** Start and end times for duration tracking.
+* **Cluster Targets:** The specific infrastructure or application targets affected by the run.
+
+== Managing and Inspecting Logs
+
+Once a job is running or completed, managing the output is critical for validating whether your service maintained its steady state.
+
+=== Accessing Console Logs
+To inspect the internal behavior of the Krkn operator during the execution:
+1. Locate the specific job in the **Jobs** list.
+2. Select the **Logs** tab associated with that job.
+3. Review the output for:
+    * **Disruption initiation:** Confirming that the targeted resources were successfully impacted.
+    * **Recovery sequence:** Observing the automated cleanup or workload recovery steps.
+    * **Errors/Warnings:** Identifying issues with permissions, connectivity, or invalid resource selectors.
+
+=== Permissions and Visibility
+The Krkn platform enforces a granular security model regarding job management:
+* **View Access:** Users with "View" permissions can inspect job outcomes, graph run nodes, and Resiliency Scores, but are restricted from executing or deleting experiments.
+* **Group Isolation:** By default, the dashboard displays only jobs associated with your specific group. 
+* **Cluster-Wide Transparency:** A cluster-wide indicator shows the names of scenarios running across other groups, providing visibility without compromising the security of unauthorized jobs.
+* **Deletion:** Removing historical job data requires explicit "Delete" permissions to ensure audit trails remain intact.
+
+== Hands-on Activity: Observing a Job Lifecycle
+
+In this activity, you will execute a pod-disruption experiment and verify the logs to confirm the system's behavior.
+
+. **Launch the Experiment:**
+   * Select a standard pod-disruption scenario from your registry.
+   * Set a duration of 120 seconds.
+   * Click **Run**.
+
+. **Monitor Execution:**
+   * Observe the status change from `Pending` to `Running` on the **Jobs** page.
+   * Refresh the page to see the real-time status updates as the chaos progresses.
+
+. **Inspect Logs:**
+   * Once the status reaches `Succeeded`, click on the job ID.
+   * Navigate to the **Logs** tab.
+   * Search for the log entry `Disruption successfully initiated` and verify the recovery timestamp to see if the workload scaled back to its original steady state.
+
+. **Analyze Results:**
+   * Review the **Resiliency Score** generated post-execution. If the score is lower than expected, cross-reference the console logs with your application metrics to identify the specific moment of SLO degradation.

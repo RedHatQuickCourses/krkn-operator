@@ -1,0 +1,7 @@
+* xref:operationalize-resilience-validation.adoc[]
+** xref:validating-infrastructure-and-application-upgrades.adoc[]
+** xref:integrating-chaos-testing-into-cicd-pipelines.adoc[]
+** xref:running-chaos-during-performance-and-scale-testing.adoc[]
+** xref:standardizing-execution-across-managed-clusters.adoc[]
+** xref:storing-and-comparing-long-term-results.adoc[]
+** xref:combining-recovery-checks-with-system-health-metrics.adoc[]

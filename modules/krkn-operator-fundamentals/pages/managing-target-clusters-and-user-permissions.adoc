@@ -1,0 +1,72 @@
+#  Managing target clusters and user permissions
+
+= Managing target clusters and user permissions
+
+In the Krkn ecosystem, security and operational safety are foundational. Because chaos experiments intentionally induce failures, access control is not merely a feature—it is a critical safeguard. Krkn utilizes a group-based permission model to ensure that only authorized users can impact specific environments.
+
+== The Permission Model
+
+Krkn operates on a strict **Group-Based Access Control (GBAC)** architecture. Every user must be associated with at least one group; a user without a group assignment has no access to the platform. 
+
+Permissions are not assigned to individual users directly, but are inherited from the groups they belong to. This approach ensures consistent policy enforcement across teams.
+
+=== Group Configuration
+When an Administrator creates a group, they define the operational boundaries for all members of that group:
+
+*   **Cluster Scoping:** Defines which target clusters are visible and available for experimentation.
+*   **Permissions:** Grants specific actions, such as `View`, `Run`, or `Delete`.
+*   **Registries:** Defines which scenario registries are visible to the group, allowing teams to use specific sets of pre-validated experiments.
+
+[IMPORTANT]
+====
+If a user is not assigned to a group, they are effectively "locked out" of the Krkn platform, preventing accidental or unauthorized execution of disruptive experiments.
+====
+
+=== Administrative Roles and Responsibilities
+Administrators manage the platform infrastructure, serving as the "Source of Truth" for security policies. Their responsibilities include:
+
+*   **Cluster Lifecycle:** Registering and removing target clusters from the Krkn platform.
+*   **User/Group Management:** Creating groups, defining the scope, and mapping users to those groups.
+*   **Provider Integration:** Configuring target providers, such as ACM (Advanced Cluster Management) integration, to automate cluster discovery.
+*   **Registry Management:** Setting up private registries and defining group-level visibility.
+
+== Operational Permissions
+Once a user is assigned to a group, their interaction with Krkn is governed by the permissions granted by that group. These permissions determine the scope of a user's chaos engineering activities:
+
+| Permission | Description |
+| :--- | :--- |
+| `View` | Allows users to monitor the status of jobs and view experiment logs. |
+| `Run` | Required to execute scenarios, use the cluster terminal, and design workflows in Chaos Studio. |
+| `Delete` | Allows users to manage and remove past job records or artifacts. |
+
+== Hands-on Lab: Configuring Access
+
+This activity guides you through the process of setting up a secure testing environment for a new team.
+
+=== Prerequisites
+*   Administrator access to the Krkn platform.
+*   A target cluster registered and ready for connection.
+
+=== Step 1: Create a Restricted User Group
+1.  Log in as an **Administrator**.
+2.  Navigate to the **Access Control** or **Groups** management section.
+3.  Click **Create Group**.
+4.  Name the group (e.g., `chaos-testers-prod`).
+5.  Select the **Target Clusters** from the list that this group is permitted to disrupt.
+6.  Assign the `Run` and `View` permissions.
+
+=== Step 2: Assign Users to the Group
+1.  In the same **Groups** management section, navigate to the **Users** tab.
+2.  Select the target user(s).
+3.  Assign them to the `chaos-testers-prod` group.
+
+=== Step 3: Verify Permissions
+1.  Log out as the Administrator.
+2.  Log in as a user assigned to the `chaos-testers-prod` group.
+3.  Navigate to the **Target Clusters** dashboard.
+4.  **Verification:** Ensure you can only see the clusters defined in your group. Attempt to trigger a "No-Op" scenario to confirm you have `Run` permissions.
+
+[TIP]
+====
+Always follow the **Principle of Least Privilege**. Only grant `Delete` permissions to users who are specifically responsible for cleaning up experiment artifacts to prevent accidental deletion of important audit logs.
+====

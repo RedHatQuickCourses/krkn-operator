@@ -1,0 +1,63 @@
+#  Planning monitoring, stop conditions, and rollbacks
+
+= Planning Monitoring, Stop Conditions, and Rollbacks
+
+In Chaos Engineering, the goal is not to break systems for the sake of destruction, but to learn how systems respond to failure. Without robust monitoring, automated safety triggers (stop conditions), and clear rollback plans, an experiment shifts from a controlled test to an uncontrolled incident.
+
+== Monitoring for Steady State
+Before initiating any disruption with Krkn, you must establish a baseline. This "steady state" is defined by specific observability metrics that indicate the application is functioning correctly under normal load.
+
+*   **Availability:** Success rates of HTTP requests or gRPC calls.
+*   **Latency:** P99 response times for critical transactions.
+*   **Throughput:** Requests per second (RPS) handled by the service.
+*   **Resource Health:** CPU, Memory, and Disk utilization of the targeted nodes/pods.
+
+Using Krkn, these metrics should be tracked via a monitoring stack (such as Prometheus). You will use these metrics not only to observe the impact of the chaos but as inputs for your **Resiliency Score**.
+
+== Defining Stop Conditions
+Stop conditions act as the "emergency brake" for your experiment. If your metrics deviate beyond a predefined threshold, the experiment must terminate immediately to protect the production environment and prevent a full-scale outage.
+
+When mapping risks to Krkn scenarios, define stop conditions based on:
+*   **SLO Breaches:** If the error rate exceeds 5% for more than 60 seconds.
+*   **Dependency Failure:** If a secondary service (e.g., a database or message broker) becomes unreachable.
+*   **Blast Radius Expansion:** If the disruption spreads beyond the intended target namespace or cluster nodes.
+
+[IMPORTANT]
+====
+In the Krkn Operator, ensure that your monitoring alerts are configured to notify the SRE team, but also consider automating the "kill switch" by triggering a rollback if your critical SLOs are violated during the execution of a scenario.
+====
+
+== Rollback Planning
+Rollback planning is the process of defining the steps required to return the system to its steady state once the disruption duration has elapsed or if a stop condition is triggered.
+
+1.  **Automated Recovery:** Most Krkn scenarios (such as Node Shutdown or Resource Hogs) include built-in recovery logic. For example, the `Power Outage` scenario automatically triggers a restart of nodes after the specified duration.
+2.  **Manual Intervention:** If an experiment causes an unexpected state (e.g., a process fails to restart after a CPU Hog), have a clear "Runbook" ready to manually restore service.
+3.  **Validation:** After a rollback is triggered, you must verify that:
+    *   Pods are in a `Running` or `Ready` state.
+    *   Traffic is flowing through all nodes.
+    *   Logs show no residual errors caused by the aborted experiment.
+
+== Hands-on Lab: Configuring Stop Conditions in Chaos Studio
+
+In this lab, you will configure a Chaos Studio workflow to monitor an application and define a stop condition based on latency.
+
+. **Step 1: Set the Hypothesis**
+Identify a microservice and define its target P99 latency. For this lab, we will use a threshold of 500ms.
+
+. **Step 2: Configure PromQL Monitoring**
+Within your Chaos Studio workflow node, add a "Resiliency Score" configuration.
+*   Use the following PromQL to track latency:
++
+[source,promql]
+----
+histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+----
+
+. **Step 3: Define the Stop Condition**
+Configure the workflow node to "Abort on Failure." Map this to the PromQL query above. If the resulting value exceeds `0.5` (500ms), the Krkn Operator will stop the disruption scenario.
+
+. **Step 4: Execute and Observe**
+Run your workflow. Observe the **Jobs** page in the Krkn dashboard. If the application latency spikes due to your chaos injection, verify that the scenario terminates early and that the system returns to the baseline metrics within your expected recovery time.
+
+. **Step 5: Verify Recovery**
+Check the logs in the Krkn dashboard to ensure that the recovery phase of the scenario completed successfully and the cluster status returned to `Ready`.

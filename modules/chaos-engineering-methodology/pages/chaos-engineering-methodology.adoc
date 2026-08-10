@@ -1,0 +1,11 @@
+#  Chaos engineering methodology
+
+= Chaos engineering methodology
+
+Chaos engineering is a proactive approach to identifying system weaknesses by injecting controlled disruptions. The methodology focuses on validating system resilience before failures occur in production environments.
+
+*   **Lifecycle Management**: Follows a structured process from hypothesis generation and steady-state definition to disruption execution and recovery validation.
+*   **Proactive Strategy**: Shifts from reactive incident response to proactive identification of failure modes, ensuring systems can withstand stress.
+*   **Performance Evaluation**: Measures key metrics—such as latency, throughput, and error rates—against established Service Level Objectives (SLOs) during disruption.
+*   **Safety and Control**: Prioritizes blast radius management and rollback planning to minimize impact on users, whether testing in staging or production environments.
+*   **Observability**: Relies on robust monitoring to analyze component behavior and verify automated recovery mechanisms during and after chaos injection.

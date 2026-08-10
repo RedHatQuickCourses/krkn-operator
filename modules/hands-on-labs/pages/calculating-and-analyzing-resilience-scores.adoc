@@ -1,0 +1,72 @@
+#  Calculating and analyzing Resilience Scores
+
+= Calculating and analyzing Resilience Scores
+
+The Resiliency Score is a quantitative metric provided by Krkn that moves beyond binary pass/fail outcomes. It offers a nuanced view of how well your application maintains its service level objectives (SLOs) when subjected to turbulent conditions. By evaluating real-time application telemetry during a chaos workflow, the Resiliency Score provides a baseline to track architectural hardening over time.
+
+== Understanding the Scoring Mechanism
+
+The Resiliency Score is derived from custom PromQL queries that define the "health" of your application. Instead of focusing solely on the disruption itself, the score focuses on the *impact* of that disruption on your defined steady state.
+
+=== The Evaluation Lifecycle
+1.  **Metric Definition**: You define a set of PromQL queries that represent your key performance indicators (KPIs), such as request latency, error rates, or successful transaction throughput.
+2.  **Threshold Setting**: Each metric is paired with a threshold that defines the "Acceptable" boundary.
+3.  **Real-time Monitoring**: During the execution of a chaos workflow, Krkn continuously samples these metrics.
+4.  **Aggregation**: The Resiliency Score is calculated by aggregating the duration and magnitude of time the application spends outside of these defined thresholds relative to the total duration of the chaos experiment.
+
+== Configuring Resiliency Scoring
+
+To enable scoring, you must provide Krkn with the necessary observability configuration via the File Management system.
+
+. **Define the PromQL file**: Create a configuration file containing the queries used to evaluate system behavior.
+. **Enable in Workflow**: Within your Chaos Studio workflow, toggle the **Resiliency Score** option.
+. **Mount the File**: Attach your PromQL file to the workflow execution.
+
+[source,yaml]
+----
+# Example structure of a resiliency-score-config.yaml
+metrics:
+  - name: "http_error_rate"
+    query: "sum(rate(http_requests_total{status=~'5..'}[1m])) / sum(rate(http_requests_total[1m]))"
+    threshold: 0.05 # 5% error rate threshold
+  - name: "p99_latency"
+    query: "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))"
+    threshold: 0.5 # 500ms latency threshold
+----
+
+== Analyzing and Interpreting Results
+
+Once the workflow completes, the **Jobs** page displays the final numeric score. 
+
+*   **100% (or equivalent scale)**: Indicates that the application maintained its steady state perfectly throughout the disruption.
+*   **Lower Scores**: Indicate that the service level indicators (SLIs) deviated from the expected thresholds for a significant portion of the test.
+
+=== Remediation Strategy
+Use the score analysis to drive infrastructure and application improvements:
+*   **Trend Identification**: Compare scores across multiple runs. A decreasing score after a deployment suggests a regression in resiliency.
+*   **Threshold Tuning**: If the score is consistently low but the application feels stable, evaluate if your PromQL thresholds are too aggressive for the current architecture.
+*   **Component Isolation**: If a workflow involves multiple stages, use the graph run results to identify which specific disruption scenario caused the largest dip in the Resiliency Score, highlighting a specific dependency that needs hardening.
+
+== Hands-on Lab: Calculating your First Score
+
+In this lab, you will evaluate the resiliency of a sample frontend service.
+
+**Prerequisites:**
+* An active cluster with Krkn Operator installed.
+* Access to the Chaos Studio dashboard.
+
+**Steps:**
+
+1.  **Define Metrics**: Create a `resiliency.yaml` file targeting your `frontend-service` error rate and latency. Upload this to the Krkn File Management system.
+2.  **Create Workflow**:
+    *   Navigate to **Chaos Studio**.
+    *   Select a "Pod Disruption" scenario.
+    *   Enable the **Resiliency Score** toggle.
+    *   Select your uploaded `resiliency.yaml` file from the dropdown.
+3.  **Execute**: Run the workflow. Ensure you have the application under light load to generate sufficient metrics.
+4.  **Evaluate**:
+    *   Once finished, navigate to the **Jobs** page.
+    *   Click on the completed run to view the Score.
+    *   Compare the latency graph against the threshold lines.
+    *   *Question*: Did the latency spike correlate exactly with the pod termination, or did the recovery process introduce additional performance degradation?
+5.  **Refine**: Based on the result, adjust your pod autoscaling (HPA) or increase replica counts and re-run the experiment to see if the score improves.

@@ -1,0 +1,10 @@
+#  Hands-on Labs
+
+== Hands-on Labs
+
+The hands-on labs provide a practical environment to apply chaos engineering principles using the Krkn ecosystem. These labs focus on transitioning from theoretical risk identification to active system validation through the following activities:
+
+*   **Experiment Execution:** Performing controlled pod-disruption tests to observe system behavior and recovery patterns.
+*   **Workflow Modeling:** Creating and running multi-stage failure scenarios using Chaos Studio to simulate complex outages.
+*   **Resilience Analysis:** Utilizing PromQL and telemetry data to calculate and interpret Resilience Scores, establishing a quantitative baseline for system health.
+*   **Automation:** Integrating chaos scenarios into CI/CD pipelines to standardize resilience validation across test environments.

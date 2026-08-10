@@ -1,0 +1,51 @@
+#  Comparing scores across environments and time
+
+= Comparing scores across environments and time
+
+To effectively build a culture of resiliency, a single Resiliency Score is merely a snapshot. The true value of Chaos Engineering with Krkn lies in longitudinal analysis—comparing your system's performance across different environments (e.g., Staging vs. Production) and tracking how your resiliency evolves over time as your architecture matures.
+
+== The Importance of Comparative Analysis
+
+Comparing Resiliency Scores serves two primary purposes:
+
+*   **Environment Parity Validation:** By running identical chaos scenarios in Staging and Production, you can verify if your configuration, auto-scaling policies, and recovery mechanisms perform consistently. Discrepancies often highlight "hidden" production configurations that are missing in lower environments.
+*   **Trend Analysis:** Tracking scores over time helps you quantify the impact of architectural changes. If a score trends downward following a cluster upgrade or a new service deployment, you have immediate empirical evidence of regression in system resilience.
+
+== Strategies for Comparative Benchmarking
+
+To ensure your comparisons are scientifically valid, adhere to these practices:
+
+=== 1. Standardize the PromQL Baseline
+The Resiliency Score is only as accurate as the PromQL queries defined for your steady state. When comparing environments, ensure you are using the **same PromQL file** and the **same expectation thresholds**. If the thresholds differ, the "score" will reflect the variance in expectation rather than the variance in system stability.
+
+=== 2. Control for Load Variance
+Resiliency scores can be highly dependent on the traffic volume at the time of the experiment.
+*   *Observation:* A system might appear resilient during low-traffic periods but fail under peak load.
+*   *Action:* When comparing scores across time, correlate them with traffic intensity metadata. Krkn allows you to capture throughput metrics; use these as context when evaluating if a score improvement is due to better code or simply lower traffic.
+
+=== 3. Mapping Scores to Version Metadata
+Always tag your experiment runs with version identifiers (e.g., Git commit hash, application version, or infrastructure release version). This allows you to create a timeline of resilience that maps directly to your deployment pipeline.
+
+== Evaluating Trends in Krkn
+
+When analyzing your history in the Krkn dashboard, look for the following patterns:
+
+| Pattern | Interpretation | Recommended Action |
+| :--- | :--- | :--- |
+| **Consistent High Score** | Mature system with robust self-healing. | Maintain existing tests; focus on testing "unknown unknowns." |
+| **Downward Trend** | Regression introduced in recent deployments. | Audit recent changes; increase frequency of automated chaos tests. |
+| **High Variance** | Unstable recovery or intermittent dependencies. | Investigate "flaky" components; check for resource contention. |
+| **Score Plateau** | System has reached its current resiliency limit. | Review architecture; consider adding new redundancy or failover patterns. |
+
+== Operationalizing Historical Review
+
+To make these comparisons a standard part of your workflow:
+
+1.  **Centralize Reporting:** Use the Krkn reporting interface to export results into a time-series database. This allows for long-term visualization beyond the default retention period of the Krkn operator.
+2.  **Conduct Quarterly Resiliency Reviews:** Periodically aggregate scores from your staging and production environments to identify systemic areas of weakness that were not captured by individual experiment alerts.
+3.  **Correlation with SLOs:** If your Resiliency Score is consistently high but your real-world service SLOs are dropping, re-evaluate your PromQL metrics. It indicates that your chaos experiment is not correctly modeling the "blast radius" or the specific failure modes affecting your users.
+
+[TIP]
+====
+When you notice a significant shift in scores across time, use the **Resiliency Score history** in the Krkn UI to isolate the specific "Jobs" that contributed to the score drop. Check if the underlying PromQL metric threshold was breached (e.g., latency spikes exceeding the 500ms limit during a node-kill experiment).
+====

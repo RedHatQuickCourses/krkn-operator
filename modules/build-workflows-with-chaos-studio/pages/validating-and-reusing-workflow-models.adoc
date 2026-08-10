@@ -1,0 +1,57 @@
+#  Validating and reusing workflow models
+
+= Validating and Reusing Workflow Models
+
+In Chaos Engineering, the efficiency of your resilience program relies on the ability to define reliable, repeatable, and scalable experiments. Chaos Studio provides a visual environment not only for creating these experiments but also for ensuring they are production-ready through rigorous validation and component reuse.
+
+== Validating Chaos Workflows
+
+Before an experiment is executed, the Chaos Studio editor performs a real-time validation of your workflow graph. This step is critical to prevent mid-execution failures caused by misconfiguration.
+
+The editor uses visual cues to communicate the readiness of your workflow:
+
+*   **Green Indicators:** When nodes are fully configured—meaning a registry is selected, the scenario is defined, and all mandatory parameters are populated—the connections (arrows) between nodes turn green. This indicates that the workflow is ready for execution.
+*   **Red Indicators:** If a node lacks mandatory parameters, is missing a file mount, or has an invalid connection, it will be highlighted with a red border and red connection arrows. A workflow cannot be triggered until all red indicators are resolved.
+
+[IMPORTANT]
+====
+Only fully configured nodes can be connected to other nodes within a workflow. Always verify that your dependency chain is intact before attempting to execute a complex parallel or serial graph.
+====
+
+== Reusing Workflow Components
+
+To scale your testing strategy across different environments (e.g., development, staging, and production), you should adopt a "configure once, run anywhere" approach using the following mechanisms:
+
+### Node Cloning
+Instead of manually recreating identical disruption patterns, use the **Clone** function within Chaos Studio. Cloning allows you to duplicate a fully configured node, including its parameters and file mounts. This is particularly useful for:
+*   Repeating the same disruption scenario across different namespaces or deployments within a single workflow.
+*   Standardizing the input parameters for identical scenarios used in different workflow branches.
+
+### File Management
+Chaos Studio integrates a centralized **File Management** system to handle external dependencies. You can upload and manage text-based configuration files (such as custom `kubeconfig` files, specialized scenario scripts, or disruption parameter overrides) within the platform.
+*   **Decoupling:** By referencing these files rather than hardcoding values, you can swap out configurations (e.g., changing a target cluster’s scale parameters) without modifying the workflow graph itself.
+*   **Reusability:** Once a file is uploaded, it becomes available to any scenario or workflow node, ensuring consistency across your entire resilience suite.
+
+---
+
+== Hands-on Lab: Constructing and Reusing a Workflow
+
+In this lab, you will build a repeatable workflow and prepare it for reuse across clusters.
+
+### Step 1: Configure and Validate a Node
+1.  Open **Chaos Studio** and create a new workflow.
+2.  Drag a "Pod Disruption" scenario onto the canvas.
+3.  Click the node to open the configuration panel. Select your **Scenario Registry** and choose a `pod-delete` scenario.
+4.  Input the mandatory parameters (e.g., `namespace` and `label_selector`).
+5.  Observe the node status. If the arrows turn **green**, proceed. If **red**, check for missing mandatory fields.
+
+### Step 2: Implement Workflow Reuse
+1.  Once the first node is validated, select it and click **Clone**.
+2.  Place the cloned node in parallel to the first.
+3.  Upload a shared configuration file via the **File Management** tab containing specific resource thresholds.
+4.  Attach this file to both nodes. 
+
+### Step 3: Final Validation
+1.  Connect the nodes into a parallel execution pattern.
+2.  Verify that all connections are green.
+3.  Save the workflow model. You can now import this model into other environments by simply updating the target registry references, ensuring your resilience testing methodology remains standardized across your organization.

@@ -1,0 +1,67 @@
+#  Evaluating system performance under disruption
+
+= Evaluating system performance under disruption
+
+In the realm of Chaos Engineering, injecting a failure is only half the battle. The true value lies in measuring how your system behaves—and, more importantly, how it recovers—while under the stress of that disruption. Evaluating performance under disruption requires a shift from viewing systems as binary (up/down) to observing them as dynamic, evolving environments.
+
+== Defining the Steady State
+Before any disruption, you must establish a **Steady State**. The Steady State represents the baseline performance of your system during normal operations. Without this baseline, you cannot quantify the impact of a disruption.
+
+To define your Steady State, focus on the Golden Signals:
+*   **Latency:** The time it takes for a request to be serviced.
+*   **Traffic:** A measure of how much demand is being placed on your system (e.g., requests per second).
+*   **Errors:** The rate of requests that fail, either explicitly (HTTP 500s) or implicitly (wrong content).
+*   **Saturation:** How "full" your service is (e.g., CPU/Memory utilization).
+
+== Observability as a Foundation
+You cannot evaluate what you cannot see. When Krkn executes a disruption, your observability stack (typically Prometheus and Grafana) must be configured to provide real-time feedback. 
+
+When evaluating performance under disruption, monitor:
+1.  **Metric Divergence:** How far do current latency and error rate metrics drift from the established baseline?
+2.  **Resource Contention:** Does the disruption of one component (e.g., pod churn) cause resource exhaustion in another (e.g., node pressure)?
+3.  **Alerting Efficacy:** Do your existing Prometheus alerts fire accurately during the event? If the system is suffering but no alerts trigger, your monitoring is as much a failure point as the software itself.
+
+== Analyzing Impact: Beyond Binary States
+When the system is disrupted, evaluate the performance using these criteria:
+
+*   **Recovery Validation:** How long does it take for the system to return to its steady state once the disruption is removed (or while it is active, if self-healing is in place)?
+*   **Graceful Degradation:** Does the system fail partially? For example, in a microservices architecture, does a backend failure cause the entire frontend to white-screen, or does it return a cached response or an informative error message?
+*   **Cascading Failures:** Use observability to determine if a targeted disruption in one area causes a "domino effect" across unrelated services.
+
+== Hands-on Lab: Measuring Latency during Pod Disruption
+
+In this lab, you will monitor API server latency during a simulated pod disruption scenario using Krkn.
+
+=== Prerequisites
+*   A target cluster with `krkn-hub` installed.
+*   `prometheus` and `grafana` access to monitor metrics.
+
+=== Steps
+
+1.  **Baseline Collection:**
+    Observe your API server latency in Grafana for a 10-minute window of normal traffic. Document the P99 latency.
+    
+    *PromQL Example:*
+    `histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket[5m])) by (le))`
+
+2.  **Execute the Disruption:**
+    Using the Krkn CLI, initiate a pod-kill scenario targeting your application namespace.
+    +
+    [source,bash]
+    ----
+    krkn run pod-disruption -c config.yaml
+    ----
+
+3.  **Observe Performance Shifts:**
+    Monitor the Grafana dashboard during the experiment. Watch specifically for:
+    *   Spikes in latency (P99).
+    *   Increases in 5xx error codes.
+    *   ReplicaSet reconciliation times (how quickly does Kubernetes spawn new pods?).
+
+4.  **Evaluate:**
+    Once the experiment completes, compare the metrics collected during the disruption to your baseline. 
+    *   **Question:** Did the latency remain within your defined SLO (Service Level Objective) threshold despite the pod loss?
+    *   **Action:** If the latency exceeded thresholds, identify the bottleneck—was it network overhead, database connection pooling, or cold-start times of the new pods?
+
+5.  **Clean up:**
+    Ensure all disrupted pods have returned to a `Running` state and that metrics have normalized back to the steady-state baseline.

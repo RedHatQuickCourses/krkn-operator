@@ -1,0 +1,72 @@
+#  Modeling complex platform and service disruptions
+
+= Modeling complex platform and service disruptions
+
+In distributed systems, failures are rarely isolated events. A network partition may lead to a cascading failure of microservices, which in turn triggers a resource exhaustion scenario on your nodes. Modeling these **complex, multi-stage disruptions** is essential for validating the true resilience of your platform.
+
+By moving beyond simple "kill-a-pod" scenarios, you can simulate realistic "worst-case" environments to observe how your system handles compound stress.
+
+== Understanding Multi-Stage Disruptions
+A complex disruption model simulates a chain reaction. Instead of testing for a single point of failure, you test for:
+
+*   **Cascading failures:** How service A recovers when service B is latency-impacted and service C is unavailable.
+*   **Resource starvation loops:** Monitoring how node recovery (e.g., node reboot) interacts with application re-scheduling and pod readiness probes.
+*   **Platform-Application interaction:** Observing how cloud infrastructure instability (node termination) affects the Kubernetes control plane and subsequent application health.
+
+== Strategy: The "Blast Radius" Chain
+To model these effectively in Krkn, we use the following methodology:
+
+1.  **Define Dependencies:** Map out which services rely on others.
+2.  **Sequence the Chaos:** Use workflow orchestration to execute disruptions in a specific order (e.g., first introduce network latency, then terminate a node).
+3.  **Validate Steady State Transitions:** Each stage of the disruption must have a defined expectation for metrics (latency/throughput) before moving to the next stage.
+
+== Hands-on Activity: Modeling a Compound Failure
+This activity demonstrates how to chain a `pod-disruption` with a `node-disruption` using Krkn's workflow capabilities.
+
+=== Prerequisites
+*   Krkn Operator installed and configured in your target cluster.
+*   Access to the Chaos Studio workflow editor.
+
+=== Step 1: Define the Workflow Model
+Create a new workflow configuration file (`complex-failure-workflow.yaml`). You will define two sequential nodes.
+
+[source,yaml]
+----
+name: "node-and-pod-stress-test"
+nodes:
+  - name: "stage-1-pod-kill"
+    scenario: "pod-scenarios"
+    parameters:
+      label_selector: "app=critical-service"
+      count: 2
+  - name: "stage-2-node-termination"
+    scenario: "node-scenarios"
+    depends_on: "stage-1-pod-kill" # Wait for pods to restart before hitting the node
+    parameters:
+      action: "terminate"
+      provider: "aws"
+----
+
+=== Step 2: Configure Stop Conditions
+Crucially, add "circuit breakers" to your model. If your service availability drops below a defined threshold, the workflow must halt to prevent unintended outages.
+
+*   **PromQL Check:** Set a monitor for 5xx errors.
+*   **Stop Condition:** If `rate(http_requests_total{status="5xx"}[1m]) > 5%`, trigger an immediate rollback.
+
+=== Step 3: Execute and Observe
+1.  Navigate to **Chaos Studio** in your Krkn dashboard.
+2.  Import your `complex-failure-workflow.yaml`.
+3.  Execute the workflow and monitor the **Resilience Score** dashboard.
+4.  Observe the transition:
+    *   **Phase 1:** Are the application replicas surviving the initial pod kills?
+    *   **Phase 2:** Once the node is terminated, does the cluster scheduler trigger `MachineHealthChecks` or pod re-scheduling effectively?
+
+== Best Practices for Complex Modeling
+*   **Start with "Steady State":** Never run complex scenarios without first establishing a baseline for your KPIs (latency, error rates) under normal load.
+*   **Validate Recovery:** Ensure your `PodDisruptionBudgets` (PDBs) are strictly defined. For example, if you are testing node failure, ensure your PDBs prevent the cluster from evicting all replicas of an `etcd` or `zookeeper` cluster simultaneously.
+*   **Analyze the "Tail":** Focus on the p99 latency during the transition phase. This is often where cascading failures manifest before a total outage occurs.
+
+[TIP]
+====
+When modeling platform disruptions, always include a "wait" period between scenario stages. This allows the system's automated recovery processes (like Kubelet restarts or Load Balancer health checks) to attempt remediation before you apply the next layer of chaos.
+====

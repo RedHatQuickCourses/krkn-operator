@@ -1,0 +1,56 @@
+#  Identifying service risks and failure modes
+
+= Identifying service risks and failure modes
+
+To build a resilient architecture, you must shift from a reactive "fix-it-when-it-breaks" mentality to a proactive strategy that anticipates failures. Identifying service risks and failure modes is the foundational step of the Chaos Engineering lifecycle. By mapping how components interact and where they are fragile, you can transform abstract risks into measurable, testable experiments.
+
+== The Anatomy of Failure
+Before injecting chaos, you must deconstruct your services to understand their dependencies. Failure modes are not always catastrophic outages; they often manifest as subtle degradations. 
+
+Common failure modes to consider:
+*   **Resource Exhaustion:** Memory leaks, CPU throttling, or storage disk saturation.
+*   **Dependency Failure:** Latency spikes or unavailability of upstream/downstream APIs.
+*   **Networking Issues:** Packet loss, DNS resolution failures, or partitioned subnets.
+*   **Configuration Drift:** Incorrect environment variables or outdated security policies leading to unauthorized access or crashes.
+
+== Mapping Risks to Chaos Scenarios
+Once you identify a potential failure mode, you must determine how to replicate it using Krkn. Krkn provides specific disruption scenarios that allow you to simulate these conditions safely.
+
+[cols="1,2,3", options="header"]
+|===
+| Identified Risk | Failure Mode | Krkn Scenario Category
+| Database connection loss | Network partition/Latency | Network Chaos
+| Unhealthy Node | Memory pressure | Node/Pod Disruption
+| Service Bottleneck | CPU contention | Resource Chaos
+| Expiring Certs | Security/Communication failure | Configuration Chaos
+|===
+
+== Assessing System Fragility
+Use the following methodology to categorize and prioritize your risks:
+
+1.  **Define Steady State:** What does "normal" look like? Document your baseline Key Performance Indicators (KPIs) such as response latency (p99), request throughput, and error rates.
+2.  **Analyze Dependencies:** Map the service graph. If Service A depends on Service B, and Service B experiences a 500ms latency increase, how does that impact the user-facing latency of Service A?
+3.  **Identify Blast Radius:** Determine the scope of the potential failure. Does this affect a single pod, an entire availability zone, or a global multi-cluster deployment?
+4.  **Evaluate Observability Gaps:** If you cannot monitor the failure, you cannot test it. Ensure your Prometheus/Grafana dashboards are capable of alerting on the specific metrics tied to this failure mode.
+
+== Hands-On Activity: Identifying Failure Modes
+In this activity, you will conduct a "Failure Mode and Effects Analysis" (FMEA) for a sample application to prepare for your first Krkn experiment.
+
+=== Prerequisites
+*   Access to an OpenShift cluster.
+*   A deployed application to serve as the target.
+*   Access to `oc` CLI.
+
+=== Steps
+1. **Identify the critical path:** List the components that must remain functional for the user to complete a core task (e.g., "Add to Cart").
+2. **Brainstorm disruptions:** For each component in the critical path, ask: "What happens if this container is killed?" or "What happens if this API becomes unresponsive?"
+3. **Draft the Experiment:**
+   *   *Goal:* Test the application's ability to handle pod loss.
+   *   *Hypothesis:* If a pod is terminated during a traffic spike, the horizontal pod autoscaler (HPA) will spin up a replacement, and the p99 latency will not increase by more than 10%.
+   *   *Stop Condition:* If error rates exceed 5% during the test, terminate the experiment immediately.
+4. **Prepare for Krkn:** Use this hypothesis to select the appropriate Krkn scenario (e.g., `pod-reaper`) in the next phase of your workflow.
+
+[TIP]
+====
+Always start small. Do not test in production until you have validated your failure modes and recovery procedures in a non-production staging environment. Use *Machine Health Checks* in your cluster to ensure that the infrastructure can remediate unhealthy nodes automatically before you attempt to force-trigger these failures manually.
+====

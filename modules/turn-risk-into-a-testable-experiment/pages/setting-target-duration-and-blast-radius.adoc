@@ -1,0 +1,61 @@
+#  Setting target, duration, and blast radius
+
+= Setting target, duration, and blast radius
+
+In Chaos Engineering, the precision of your experiment design directly impacts the reliability of your findings. When using Krkn, defining the boundaries of an experiment ensures that you can test failure modes without causing catastrophic, uncontrolled outages.
+
+== Identifying Experiment Boundaries
+
+Before executing a scenario, you must define the "scope" of the impact. This involves three primary variables:
+
+### 1. Target
+The **target** defines the infrastructure or application components that will be subject to the disruption. 
+*   **Granularity:** You can target specific namespaces, labels, or entire clusters.
+*   **Cluster Discovery:** Krkn integrates with ACM/OCM to discover available infrastructure. When configuring your experiment, use these providers to select the exact clusters or worker nodes where the failure will occur.
+*   **Best Practice:** Start with a small, non-critical subset of your environment to validate that the scenario behaves as expected.
+
+### 2. Duration
+The **duration** defines how long the disruption will persist. 
+*   **Short Bursts:** Useful for testing how systems handle transient network spikes or momentary pod instability.
+*   **Extended Windows:** Used to verify that recovery controllers (like the Kubelet or Kubernetes Deployment controllers) effectively reconcile the system back to the desired steady state over time.
+*   **Calculation:** Ensure your duration is long enough to exceed the typical time-to-detect (TTD) and time-to-recover (TTR) metrics of the system under test.
+
+### 3. Blast Radius
+The **blast radius** defines the "reach" of the experiment. It is the percentage or specific number of resources affected.
+*   **Controlled Impact:** If you are testing a service with 10 replicas, a blast radius of 10% (1 replica) allows you to observe how the load balancer handles a single pod failure.
+*   **Scaling:** As confidence grows, you can increase the blast radius to test the limits of your system’s redundancy—for example, by killing 50% of pods or inducing latency across entire availability zones.
+*   **Risk Mitigation:** Always define a **Stop Condition**—a threshold that, if crossed, will automatically terminate the experiment to prevent the blast radius from expanding beyond your design.
+
+== Hands-on Lab: Configuring Experiment Parameters
+
+In this lab, you will configure a pod-disruption scenario using the Krkn wizard.
+
+=== Prerequisites
+* Access to a Krkn instance with at least one target cluster registered.
+* Appropriate user permissions to execute chaos jobs.
+
+=== Step-by-Step Configuration
+
+. **Initiate the Scenario:**
+   Navigate to the **Run Scenarios** dashboard in your Krkn console. Select the `pod-disruption` scenario.
+
+. **Define Target Clusters:**
+   Using the **Provider Configuration** section, select your target cluster(s). Note that selecting multiple clusters will execute the scenario across all selected targets simultaneously.
+
+. **Set Parameters:**
+   In the configuration wizard, input the following:
+   * **Target Namespace:** `my-app-production`
+   * **Label Selector:** `app=frontend`
+   * **Duration:** `300s` (5 minutes)
+   * **Blast Radius:** Set the `expected_impact` to `20%` of the targeted pods.
+
+. **Validation:**
+   Review the summary panel. Ensure the target cluster IDs match your intended test environment and the blast radius parameters align with your defined SLOs (e.g., ensuring you don't exceed the total replica capacity).
+
+. **Execute:**
+   Click **Run**. Observe the job status in the logs. Monitor your observability platform (e.g., Prometheus/Grafana) to ensure that the blast radius remains contained within the specified parameters.
+
+[TIP]
+====
+If the disruption causes an unexpected drop in throughput beyond your defined metrics, use the **Stop Experiment** function immediately to evaluate if your blast radius was set too aggressively for the current system load.
+====

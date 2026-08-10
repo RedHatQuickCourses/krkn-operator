@@ -1,0 +1,13 @@
+#  Operationalize resilience validation
+
+= Operationalize resilience validation
+
+Operationalizing resilience validation involves integrating chaos engineering into the software development lifecycle to ensure continuous system health and reliability. This practice moves beyond one-off tests by standardizing how resilience is measured and maintained across environments.
+
+Key aspects include:
+
+* **CI/CD Integration:** Embedding chaos experiments directly into delivery pipelines to validate infrastructure and application upgrades automatically.
+* **Standardization:** Implementing consistent execution patterns and recovery checks across all managed clusters.
+* **Performance Context:** Running chaos tests during scale and performance testing to observe behavior under high load.
+* **Long-term Analysis:** Storing, comparing, and trending results over time to identify degradation patterns and ensure SLO compliance.
+* **Holistic Monitoring:** Combining automated recovery validation with system health metrics to provide a comprehensive view of service resilience.

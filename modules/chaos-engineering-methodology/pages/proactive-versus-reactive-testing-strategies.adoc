@@ -1,0 +1,46 @@
+#  Proactive versus reactive testing strategies
+
+= Proactive versus reactive testing strategies
+
+In the context of Chaos Engineering with Krkn, moving from reactive troubleshooting to proactive resilience testing is a fundamental shift in how we manage system reliability. Understanding the distinction between these strategies is essential for reducing Mean Time To Repair (MTTR) and hardening your infrastructure before failures occur in production.
+
+== The Reactive Approach
+Reactive testing is often described as "firefighting." It occurs after an incident has already compromised system availability.
+
+*   **Characteristics:** Triggered by production outages, customer reports, or unexpected performance degradation.
+*   **The Workflow:** Alert triggers -> Investigation -> Root Cause Analysis (RCA) -> Patching.
+*   **Limitations:** By the time a reactive team responds, the business impact—such as downtime, data loss, or service-level objective (SLO) violations—has already occurred. Reliance solely on reactive testing leaves "unknown unknowns" in the architecture, where hidden single points of failure remain undiscovered until they inevitably break.
+
+== The Proactive Approach (Chaos Engineering)
+Proactive testing, specifically through Chaos Engineering with Krkn, involves the deliberate injection of failures into a controlled environment to observe how the system handles turbulence.
+
+*   **Characteristics:** Deliberate, scheduled, and controlled disruption of services, network, or infrastructure components.
+*   **The Workflow:** Hypothesis generation -> Blast radius definition -> Failure injection -> Monitoring steady state -> Recovery validation.
+*   **Benefits:** Proactive testing exposes how your observability stack (alerts and monitoring) performs *under pressure*. It allows SRE teams to validate that automated recovery mechanisms—such as pod restarts, node autoscaling, or failover logic—actually function as designed.
+
+== Comparing Testing Strategies
+
+[cols="1,1,1", options="header"]
+|===
+| Strategy | Focus | Outcome
+| **Reactive** | Responding to failures after they occur. | Minimizing the duration of downtime after an impact.
+| **Proactive** | Identifying weaknesses before they manifest as incidents. | Reducing the *likelihood* of impact and improving system hardening.
+|===
+
+== Best Practices for Transitioning
+To move toward a proactive model using Krkn, implement the following operational standards:
+
+1.  **Define Steady State:** Before injecting chaos, define what "normal" looks like. Use baseline performance data (CPU, memory, latency, and throughput) as your reference point.
+2.  **Ensure Observability:** A proactive test is useless if you cannot measure the impact. Ensure that alerts are tuned for the expected disruption and that they include appropriate severity levels and SOP documentation.
+3.  **Minimize Blast Radius:** Start small. Use Krkn to target specific namespaces or non-critical worker nodes before expanding the blast radius to core platform services.
+4.  **Integrate Recovery Validation:** Do not just break the system; verify that the system recovers without human intervention. If the system does not self-heal, the test has succeeded in identifying a requirement for an architectural improvement.
+
+=== Hands-on Lab: Assessing Your Strategy
+
+In this activity, you will identify the difference between reactive and proactive indicators for a specific service.
+
+. **Identify a failure mode:** Select a core service (e.g., an API gateway or a database).
+. **Define Reactive Indicators:** List the current alerts that fire when this service fails (e.g., "Pod CrashLoopBackOff" or "HTTP 5xx Errors").
+. **Define Proactive Experiments:** Design a Krkn scenario that mimics the failure mode defined in step 1.
+    *   *Example:* If the service fails due to high memory, use a Krkn memory-hog scenario to see if the Cluster Autoscaler triggers *before* the application reaches a crash state.
+. **Evaluate:** Run the Krkn experiment and compare the outcome against your reactive alert logs. Did the system survive? Did the alerts fire correctly? Use the findings to tune your thresholds or update your recovery SOPs.

@@ -1,19 +1,12 @@
 site:
-  title: FIXME Course Title
-  start_page: REPLACEREPONAME::index.adoc
-
-antora:
-  extensions:
-  - require: '@antora/lunr-extension'
-    index_latest_only: true
+  title:  Chaos Engineering with Krkn
+  start_page: krkn-operator::index.adoc
 
 content:
   sources:
   - url: ./
 
 asciidoc:
-  extensions:
-  - '@asciidoctor/tabs'
   attributes:
     page-pagination: true
 

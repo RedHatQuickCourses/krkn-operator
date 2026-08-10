@@ -1,0 +1,13 @@
+#  Krkn Operator fundamentals
+
+= Krkn Operator fundamentals
+
+The Krkn Operator serves as the central control plane for managing resilience experiments across Kubernetes clusters. It abstracts the complexity of orchestrating disruptions by providing a unified interface for scenario management and execution.
+
+Key operational capabilities include:
+
+*   **Cluster Management:** Facilitates discovery and target management using integration with ACM and OCM.
+*   **Scenario Execution:** Provides access to scenario registries to deploy and manage chaos jobs with defined parameters.
+*   **Observability:** Enables monitoring of experiment logs and status reports to track real-time failure progression.
+*   **Resiliency Analysis:** Integrates with Chaos Studio to visualize experiment outcomes and calculate Resiliency Scores.
+*   **Multi-cluster Orchestration:** Supports the configuration and execution of complex, multi-cluster disruption scenarios from a central control point.

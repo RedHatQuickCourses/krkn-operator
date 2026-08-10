@@ -1,0 +1,46 @@
+#  Navigating Chaos Studio and Resiliency Scores
+
+= Navigating Chaos Studio and Resiliency Scores
+
+Chaos Studio is the central command center for orchestrating complex failure scenarios within Krkn. It moves beyond simple, single-pod disruption by providing a visual, node-based interface to design, execute, and analyze multi-stage resilience workflows.
+
+== Understanding Chaos Studio
+Chaos Studio utilizes a graphical interface where every step of a failure injection is represented as a **node**.
+
+*   **Workflow Execution:** You can define workflows that execute scenarios in series (sequential) or parallel. This allows you to simulate cascading failures or simultaneous system stressors.
+*   **Graph Runs:** Every execution of a workflow is tracked as a "Graph Run." This provides a historical record where you can inspect the outcome, configuration, and logs for each individual node within the workflow independently.
+*   **Visual Validation:** By mapping nodes, you can visualize the dependency chain of your services and see how a disruption in one layer (e.g., node pressure) impacts higher-level application availability.
+
+== The Resiliency Score: Quantifying Stability
+The Resiliency Score is a critical advancement over binary "pass/fail" chaos testing. It provides a numeric representation of how well your application maintained its Service Level Objectives (SLOs) while under duress.
+
+=== How the Score Works
+The Resiliency Score is not a static measurement; it is derived from live PromQL metrics defined by the user.
+
+1.  **Metric Definition:** You identify the key performance indicators (KPIs) that represent your system’s health, such as API latency, HTTP 5xx error rates, or transaction throughput.
+2.  **PromQL Integration:** You define these metrics in a PromQL file, which is uploaded to Krkn via File Management.
+3.  **Real-time Evaluation:** During a Graph Run, Krkn executes these PromQL queries. The system compares the live metrics against the thresholds defined for your "steady state."
+4.  **Scoring:** The final score reflects the delta between your expected steady-state behavior and the behavior observed during the chaos injection.
+
+== Hands-on Activity: Configuring a Resiliency Score
+In this activity, you will prepare a workflow to generate a quantitative resilience metric.
+
+=== Prerequisites
+*   Access to the Krkn Operator dashboard.
+*   A pre-defined PromQL file containing your desired SLO metrics (e.g., `latency_threshold.yaml`).
+
+=== Steps
+1.  **Access Chaos Studio:** Navigate to the **Chaos Studio** tab in your Krkn environment.
+2.  **Create/Edit Workflow:** Select your target workflow or create a new one by dragging scenario nodes onto the canvas.
+3.  **Enable Resiliency:** Within the workflow configuration panel, toggle the **Resiliency Score** option to "Enabled."
+4.  **Attach Metrics:** 
+    *   Locate the **File Management** section in the UI.
+    *   Upload your PromQL configuration file if not already present.
+    *   In the workflow settings, mount the PromQL file to the execution environment.
+5.  **Execute:** Run the workflow. Once complete, navigate to the **Jobs** page.
+6.  **Analyze:** Click on your specific Graph Run. You will see the visual workflow alongside the calculated Resiliency Score. Compare the graph nodes against the spikes in your monitored metrics to identify which specific scenarios triggered the highest degradation in your score.
+
+== Best Practices for Interpretation
+*   **Define Baseline First:** Before relying on the Resiliency Score, ensure you have established a "steady state" baseline during normal operations. A score is only as accurate as the PromQL queries used to define your performance expectations.
+*   **Iterative Improvement:** Use low scores as a roadmap for architectural hardening. If a specific scenario causes a significant drop in the Resiliency Score, it indicates a lack of circuit breakers, inadequate replicas, or missing health check configurations in that service path.
+*   **Trend Analysis:** Do not look at scores in isolation. Compare scores across multiple Graph Runs to determine if recent code deployments have improved or regressed your platform's overall resilience.

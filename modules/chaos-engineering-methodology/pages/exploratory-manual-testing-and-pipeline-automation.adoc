@@ -1,0 +1,59 @@
+#  Exploratory manual testing and pipeline automation
+
+= Exploratory manual testing and pipeline automation
+
+Chaos engineering is not a one-size-fits-all discipline. To build a truly resilient system, you must balance the agility of **exploratory manual testing** with the consistency of **pipeline automation**.
+
+== Exploratory Manual Testing
+Exploratory testing is an ad-hoc, curiosity-driven approach. It is invaluable during the initial phases of service design or when investigating an obscure "heisenbug" that does not appear in automated logs.
+
+*   **When to use:** Use manual testing when you are first onboarding a service to Krkn, or when you want to "poke" a system to see how it reacts to unforeseen variables.
+*   **The Process:** 
+    1.  **Identify a Hypothesis:** "If I kill the primary database pod, will the secondary promote within 30 seconds?"
+    2.  **Execute via Krkn:** Use the Krkn CLI or UI to trigger a targeted disruption.
+    3.  **Observe:** Monitor dashboard metrics in real-time. 
+    4.  **Analyze:** Note the "blast radius"—did the failure cascade to unrelated services? Did the system self-heal?
+
+Manual testing provides the intuition required to define the boundaries for what should eventually become a recurring automated test.
+
+== Pipeline Automation
+While manual testing builds your understanding, **pipeline automation** provides the continuous validation necessary for high-velocity CI/CD environments. Integrating chaos experiments into your CI/CD pipeline ensures that new code deployments do not introduce regressions in system resiliency.
+
+*   **Standardizing Execution:** Automate the execution of Krkn scenarios as a gated step in your deployment pipeline.
+*   **Quality Gates:** Use the output of your chaos experiments (e.g., success/failure of recovery validation) to determine if a deployment should proceed. If a service fails to recover from a pod disruption within defined thresholds, the pipeline automatically halts the promotion to the next environment.
+*   **Consistency:** Automation removes the "human error" factor. By running the same disruption scenarios against every build, you establish a performance baseline over time.
+
+== Comparing Approaches
+
+| Feature | Exploratory Manual Testing | Pipeline Automation |
+| :--- | :--- | :--- |
+| **Purpose** | Discovery and learning | Verification and regression |
+| **Frequency** | Ad-hoc | Triggered by code changes/Schedule |
+| **Effort** | High (human-led) | Low (machine-led) |
+| **Outcome** | New insights/theories | Standardized resilience metrics |
+
+== Hands-on Lab: From Manual to Automated
+
+In this exercise, we will manually test a pod disruption and then define an automated sequence.
+
+=== Step 1: Exploratory Manual Execution
+1.  Navigate to your target cluster via the Krkn UI.
+2.  Select a `pod-disruption` scenario.
+3.  Set the `chaos_duration` to 60 seconds.
+4.  Execute the job and observe the logs.
+5.  Document the system behavior: How long did it take for the service to restore availability? 
+
+=== Step 2: Automating the Test
+Once you have validated the manual scenario, transition it to a workflow:
+1.  Open **Chaos Studio**.
+2.  Drag and drop the validated `pod-disruption` node onto the canvas.
+3.  Add a `recovery-validation` node.
+4.  Connect them with a dependency arrow (ensuring the validation runs immediately after the disruption).
+5.  Save this as a reusable workflow model.
+6.  Trigger this workflow using a CLI call within your CI/CD runner (e.g., Jenkins or GitHub Actions):
+    `krkn run --workflow-id <id> --pipeline-mode`
+
+[TIP]
+====
+Always start with exploratory testing to define your "steady state." Once you understand how your system reacts, wrap those specific parameters into an automated workflow to prevent future performance regressions.
+====

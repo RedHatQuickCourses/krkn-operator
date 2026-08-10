@@ -1,0 +1,55 @@
+#  Recommending remediation based on score analysis
+
+= Recommending Remediation Based on Score Analysis
+
+After executing a chaos experiment using Krkn, the resulting **Resiliency Score** acts as a diagnostic tool rather than just a final grade. A low score or a degradation in service metrics during a disruption identifies specific architectural weaknesses. 
+
+This section guides you through interpreting these scores to develop actionable remediation strategies.
+
+== Analyzing Score Degradation
+The Resiliency Score is derived from the PromQL queries defined in your experiment configuration. When the score drops, it indicates that your application's Service Level Indicators (SLIs)—such as latency, error rates, or throughput—deviated from the expected steady state during the chaos injection.
+
+To effectively recommend remediation, follow this investigative process:
+
+1.  **Correlate Timeframes:** Use the "Jobs" page in Chaos Studio to overlay your disruption timeline with the metrics captured in your PromQL file. 
+2.  **Identify the "Breaking Point":** Determine if the degradation began immediately upon fault injection or if it occurred during the recovery phase.
+3.  **Evaluate Dependency Impact:** If the cluster health signal (e.g., Cerberus) dropped, the issue likely resides in infrastructure dependencies or service mesh configurations rather than the application code itself.
+
+== Categorizing Remediation Strategies
+Based on your score analysis, remediation typically falls into one of three categories:
+
+[cols="1,3", options="header"]
+|===
+| Category | Remediation Approach
+| *Resource Tuning* | If metrics show resource exhaustion (CPU/Memory throttling), adjust Kubernetes HPA/VPA settings or increase requested/limit resources.
+| *Architectural Resilience* | If the score indicates service unavailability due to pod disruption, implement Pod Disruption Budgets (PDBs), anti-affinity rules, or increase replica counts.
+| *Observability/Alerting* | If the system recovered but the score remains low due to hidden errors, update your alerts or probes to detect failure modes faster.
+|===
+
+== Practical Step: Moving from Score to Action
+
+Follow these steps to generate a remediation plan based on your experiment results:
+
+. **Extract Metric Anomalies:**
+   Open the Prometheus UI or your dashboard and query the metrics used in your PromQL file for the specific duration of the chaos experiment. 
+   *Example Query:*
+   [source,promql]
+   ----
+   sum(rate(http_requests_total{status=~"5.."}[1m])) / sum(rate(http_requests_total[1m]))
+   ----
+   If this error rate exceeds your threshold during the experiment, your remediation target is service availability.
+
+. **Implement Circuit Breakers or Timeouts:**
+   If the score analysis shows that a single failing dependency caused a "cascading failure" (where the application waits indefinitely for a non-responsive service), recommend implementing circuit breakers in your service mesh or application logic.
+
+. **Refine Recovery Validation:**
+   If the application eventually recovered but took too long, the remediation may not be the application itself, but the *readiness probes*. Update probes to be more aggressive to ensure that traffic is routed away from unstable pods faster.
+
+. **Iterate and Re-test:**
+   After applying the recommended changes, execute the same chaos scenario again. A successful remediation should result in a higher Resiliency Score, demonstrating that the system's "Steady State" was maintained despite the disruption.
+
+== Troubleshooting Guidance
+If you find that the score does not improve after remediation, consider the following:
+* **Scope Creep:** Did the blast radius expand during the fix? Verify that your experiment is still targeting the exact same components.
+* **Metric Sensitivity:** Is your PromQL threshold too strict? If your system is technically resilient but the score is low, review the baseline expectations defined in your PromQL file to ensure they reflect realistic operational limits.
+* **External Noise:** Ensure no other deployments or performance tests were running simultaneously that could have skewed the baseline metrics used for the calculation.

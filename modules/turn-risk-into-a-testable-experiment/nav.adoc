@@ -1,0 +1,7 @@
+* xref:turn-risk-into-a-testable-experiment.adoc[]
+** xref:identifying-service-risks-and-failure-modes.adoc[]
+** xref:defining-steady-state-and-test-hypotheses.adoc[]
+** xref:setting-target-duration-and-blast-radius.adoc[]
+** xref:establishing-metrics-for-availability-latency-and-throughput.adoc[]
+** xref:planning-monitoring-stop-conditions-and-rollbacks.adoc[]
+** xref:mapping-risks-to-krkn-disruption-scenarios.adoc[]

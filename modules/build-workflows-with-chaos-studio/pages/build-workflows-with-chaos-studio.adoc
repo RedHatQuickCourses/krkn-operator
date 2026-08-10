@@ -1,0 +1,13 @@
+#  Build workflows with Chaos Studio
+
+= Build workflows with Chaos Studio
+
+Chaos Studio is a visual drag-and-drop editor designed to create complex, multi-stage resilience experiments. It allows you to model real-world infrastructure and service disruptions by defining sequences of events.
+
+Key capabilities include:
+
+*   **Visual Workflow Design:** Construct graphs of chaos scenarios using a drag-and-drop interface.
+*   **Execution Control:** Configure scenarios to run in either serial (sequential) or parallel modes to simulate complex failure patterns.
+*   **Workflow Reusability:** Create, save, and clone workflow models to ensure consistent testing across different environments.
+*   **Resiliency Measurement:** Integrate workflows with the Resiliency Score to quantify how effectively your system withstands orchestrated disruptions.
+*   **Complex Modeling:** Map multifaceted failure modes into structured workflows to validate system recovery and SLO compliance.

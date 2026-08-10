@@ -1,0 +1,59 @@
+#  Standardizing execution across managed clusters
+
+= Standardizing execution across managed clusters
+
+In large-scale Kubernetes environments, running isolated chaos experiments is rarely sufficient. To achieve true platform resiliency, organizations must transition from ad-hoc testing to a standardized model where chaos experiments are applied consistently across managed clusters. This ensures that infrastructure, security policies, and application availability remain predictable regardless of which cluster hosts the workload.
+
+== The Need for Standardization
+Standardizing chaos execution across managed clusters addresses several critical operational challenges:
+
+*   **Consistency:** Ensuring that all clusters meet the same baseline resiliency standards (e.g., verifying that pod disruptions in cluster A trigger the same recovery mechanisms as in cluster B).
+*   **Compliance:** Providing auditable proof that recovery validation has been performed across the entire fleet.
+*   **Efficiency:** Reducing the "toil" associated with configuring repetitive experiments by utilizing centralized registries and reusable workflow templates.
+*   **Blast Radius Control:** Applying standardized stop-conditions and rollback thresholds to prevent local experiments from escalating into global outages.
+
+== Strategies for Uniform Execution
+
+=== 1. Centralized Scenario Registries
+Rather than defining scenarios locally, leverage centralized scenario registries. By storing your disruption configurations in a shared repository:
+*   Teams can pull vetted, "approved" chaos scenarios.
+*   Version control is enforced, ensuring that updates to a disruption method are pushed across all clusters simultaneously.
+*   Configurations for parameters—such as target duration, resource saturation levels, or chaos interval—remain consistent across staging, QA, and production.
+
+=== 2. Multi-cluster Discovery and Targeting
+Using Krkn’s integration with ACM (Advanced Cluster Management) and OCM (Open Cluster Management), you can categorize clusters into logical groups (e.g., `prod-us-east`, `prod-eu-west`). When executing an experiment:
+*   Define a target group rather than individual nodes.
+*   Execute the scenario across all selected clusters simultaneously to observe global impact.
+*   Use standard tagging to ensure experiments only run on clusters that meet specific architectural prerequisites (e.g., node sizing or specific resource reservation policies).
+
+=== 3. Standardizing Recovery Validation (PromQL)
+To standardize how success is measured, move away from subjective observation to standardized PromQL queries stored within the Krkn file management system. 
+*   **Define Global SLOs:** Use consistent PromQL queries across all clusters to measure availability, latency, and throughput during a chaos event.
+*   **Resiliency Scores:** Normalize the "Resiliency Score" calculation so that an experiment in a dev cluster and a prod cluster produce comparable data points.
+
+== Hands-on Activity: Deploying a Standardized Experiment
+
+In this activity, you will execute a standardized pod-disruption scenario across multiple managed clusters using the Krkn interface.
+
+. **Step 1: Select Target Group**
+Navigate to the **Target Clusters** menu. Select your clusters based on the defined labels (e.g., `environment: production`). Ensure that the clusters are connected and reporting status.
+
+. **Step 2: Load the Standardized Scenario**
+Go to the **Scenario Registry**. Select the pre-configured `pod-disruption-standard` template. This template contains the pre-approved duration, target namespaces, and jitter settings required by your organization's compliance policy.
+
+. **Step 3: Define Execution Parameters**
+*   Set the `blast-radius` parameter to `15%` of total replicas.
+*   Attach the standardized PromQL query file `standard-slo-check.promql` to the experiment configuration.
+
+. **Step 4: Execute and Observe**
+Click **Execute**. Monitor the experiment progress via the **Jobs** tab. Because this is a multi-cluster execution, observe the log streaming from all target clusters in a unified dashboard view.
+
+. **Step 5: Compare Results**
+Once the experiment completes, navigate to the **Resiliency Score** dashboard. Compare the scores of your target clusters. 
+*   *Observation:* If one cluster shows a significantly lower score, investigate if it deviates from the standard node sizing or resource reservation best practices identified in your system baseline.
+
+== Best Practice: Guardrails for Standardization
+To maintain stability while standardizing:
+*   **Hard-code Stop Conditions:** Always include a mandatory stop-condition in your standard workflow template (e.g., `if latency > 500ms, abort experiment`).
+*   **Immutable Configurations:** Once a workflow is validated in a test environment, promote it to a read-only registry for production use.
+*   **Audit Logging:** Ensure that all executions across managed clusters are logged with the user ID, timestamp, and the specific version of the registry used.

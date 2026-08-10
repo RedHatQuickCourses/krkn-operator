@@ -1,0 +1,7 @@
+* xref:krkn-operator-fundamentals.adoc[]
+** xref:managing-target-clusters-and-user-permissions.adoc[]
+** xref:working-with-scenario-registries.adoc[]
+** xref:executing-jobs-and-managing-logs.adoc[]
+** xref:utilizing-acm-and-ocm-cluster-discovery.adoc[]
+** xref:configuring-multi-cluster-scenario-execution.adoc[]
+** xref:navigating-chaos-studio-and-resiliency-scores.adoc[]

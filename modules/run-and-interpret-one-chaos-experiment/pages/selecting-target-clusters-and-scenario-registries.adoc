@@ -1,0 +1,51 @@
+#  Selecting target clusters and scenario registries
+
+= Selecting target clusters and scenario registries
+
+In the Krkn ecosystem, the foundation of any chaos experiment lies in defining where the disruption will occur and which specific failure modes will be injected. Properly selecting target clusters and scenario registries ensures that your chaos engineering initiatives are both controlled and impactful.
+
+== Understanding Target Clusters
+
+A "target cluster" is the Kubernetes environment where the Krkn chaos scenario will be executed. Krkn supports both single-cluster and multi-cluster targeting, allowing for localized testing or wide-scale stress testing of an entire fleet.
+
+=== Key Considerations for Cluster Selection
+*   **Environment Parity:** Ensure the target cluster mirrors the configuration of your production environment to obtain meaningful data.
+*   **Blast Radius Management:** When selecting multiple clusters, remember that Krkn executes the scenario on all selected targets simultaneously. Verify that your system dependencies can withstand a broad-spectrum disruption.
+*   **Cluster Discovery:** Utilize integrations with Advanced Cluster Management (ACM) or Open Cluster Management (OCM) to dynamically discover and group clusters based on labels or health status.
+
+== Scenario Registries
+
+Scenario registries act as the centralized repository for chaos scenarios. They contain the pre-defined logic (the "what" and "how") of the disruption, such as network latency, pod kills, or resource exhaustion.
+
+*   **Version Control:** Registries allow you to version your chaos experiments, ensuring consistency across different teams and environments.
+*   **Reusability:** By maintaining a standardized registry, you can ensure that the "Pod Disruption" scenario run in the development environment is identical to the one run in staging.
+*   **Abstraction:** Registries hide the underlying complexity of the Krkn disruption engine, allowing operators to select scenarios by name or capability rather than manual script configuration.
+
+== Hands-on Activity: Configuring Experiment Targets
+
+This lab guides you through the process of selecting target clusters and choosing a scenario using the Krkn interface.
+
+=== Prerequisites
+*   Access to the Krkn dashboard or CLI.
+*   Registered clusters accessible within the Krkn control plane.
+*   An active connection to the scenario registry.
+
+=== Step 1: Selecting Target Clusters
+1.  Navigate to the **Run Scenario** wizard in your Krkn console.
+2.  In the **Target Selection** panel, view the list of discovered clusters.
+3.  Select the desired cluster(s) from the list.
+    *   *Tip:* Use the search or filter functionality if managing a large fleet of managed clusters.
+4.  Confirm the connection status for each selected cluster to ensure Krkn has the required permissions to execute pods within those namespaces.
+
+=== Step 2: Selecting a Scenario from the Registry
+1.  Proceed to the **Scenario Selection** step.
+2.  Browse the available **Scenario Registries**. You will see categories like `network`, `pod-chaos`, or `node-disruption`.
+3.  Select a scenario (e.g., `pod-random-kill`).
+4.  Review the **Scenario Metadata** to understand:
+    *   **Description:** What the scenario specifically does.
+    *   **Parameters:** Editable fields such as `duration`, `percentage`, or `label_selector`.
+5.  Click **Next** to proceed to the configuration phase, where you will set the specific blast radius parameters for the selected target.
+
+=== Troubleshooting
+*   **Cluster not appearing?** Verify that the Krkn operator has been correctly deployed and that the cluster is correctly registered with the ACM/OCM source.
+*   **Registry empty?** Check the configuration of your scenario registry URL. Ensure that your network allows egress traffic from the Krkn controller to the registry endpoint.

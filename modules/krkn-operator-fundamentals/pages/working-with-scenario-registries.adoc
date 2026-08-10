@@ -1,0 +1,63 @@
+#  Working with scenario registries
+
+= Working with scenario registries
+
+In the Krkn ecosystem, **Scenario Registries** serve as the centralized repository for disruption logic. They act as a catalog of pre-defined chaos experiments that you can version, share, and deploy across your managed clusters. Understanding how to interact with these registries is fundamental to ensuring consistent and reproducible chaos engineering practices.
+
+== Understanding Scenario Registries
+
+A scenario registry is essentially a collection of YAML-based configuration files that define the "how" and "what" of a chaos experiment. By utilizing registries, teams can move away from ad-hoc, manual script execution toward a standardized library of vetted failure modes.
+
+Registries allow you to:
+* **Centralize:** Maintain a single source of truth for chaos scenarios.
+* **Version:** Track changes to experiments over time, ensuring auditability.
+* **Reuse:** Apply the same validated disruption across multiple development, staging, and production environments.
+
+== Anatomy of a Scenario Configuration
+
+Each scenario within a registry is structured to provide the Krkn Operator with the necessary instructions to induce a specific failure. Configuration parameters are generally categorized into:
+
+* **Mandatory:** Parameters required for the scenario to execute (e.g., target namespace, pod labels).
+* **Optional:** Fine-grained controls that allow you to tune the behavior, such as specific timing intervals or packet loss percentages in a Network Chaos scenario.
+* **Global:** Framework-level settings that affect how the scenario interacts with external observability tools like Prometheus, Elasticsearch, or Cerberus.
+
+== File Management and Customization
+
+Krkn provides a robust interface for managing these configurations. You can upload and manage text-based configuration files directly within the platform, making them immediately available for use in Chaos Studio workflows or direct job execution.
+
+[IMPORTANT]
+====
+Always validate your configuration files against your organizational standards before committing them to a shared registry. Ensure that mandatory fields are correctly defined to prevent "silent failures" during experiment execution.
+====
+
+== Hands-on Activity: Exploring and Configuring a Scenario
+
+This lab activity guides you through the process of locating a scenario in the registry and preparing it for execution.
+
+. **Navigate to the Scenario Catalog**
+   Log into the Krkn dashboard and locate the **Scenarios** tab. Browse the available library, noting categories like `Pod Network Scenario` or `Persistent Volume Fill`.
+
+. **Select and Inspect**
+   Click on the `Pod Network Scenario` documentation link. Review the parameters required:
+   * Identify the **Mandatory** fields (e.g., `label_selector`).
+   * Identify the **Optional** fields (e.g., `duration`, `traffic_type`).
+
+. **Upload a Custom Configuration**
+   If you have a specific requirement (e.g., a 60-second network latency injection), create a `network-latency.yaml` file:
+   [source,yaml]
+   ----
+   scenario: network-latency
+   duration: 60s
+   latency: 100ms
+   target_label: app=my-service
+   ----
+   Navigate to the **File Management** section and upload this file to the registry.
+
+. **Validate the Configuration**
+   Once uploaded, select the scenario and use the configuration panel to verify that the Krkn operator correctly parses your YAML fields. Ensure all mandatory labels are properly mapped to your cluster's actual deployment labels.
+
+. **Prepare for Execution**
+   Save your configuration as a preset. This enables you to reuse this exact failure mode in future workflows without re-entering the parameters manually.
+
+== Next Steps
+After configuring your scenario, you are ready to transition to the **Run** phase. By triggering a job from your configured registry entry, you can monitor the real-time impact of the disruption through the **Jobs** dashboard and observe how your application's steady state is affected.

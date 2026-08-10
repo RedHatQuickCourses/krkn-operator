@@ -1,0 +1,64 @@
+#  Understanding the chaos engineering lifecycle
+
+= Understanding the chaos engineering lifecycle
+
+Chaos engineering is not simply "breaking things." It is a disciplined, scientific approach to identifying weaknesses in distributed systems before they manifest as outages. By adopting a formal lifecycle, teams can transition from reactive firefighting to proactive system hardening.
+
+== The Chaos Engineering Lifecycle
+
+The lifecycle of a chaos experiment consists of five iterative phases designed to ensure safety, repeatability, and meaningful data collection.
+
+[plantuml, chaos-lifecycle, svg]
+....
+@startuml
+[*] --> DefineSteadyState
+DefineSteadyState --> Hypothesis
+Hypothesis --> RunExperiment
+RunExperiment --> AnalyzeResults
+AnalyzeResults --> Remediate
+Remediate --> [*]
+@enduml
+....
+
+=== 1. Define Steady State
+Before introducing disruption, you must quantify "normal." A steady state is defined by a set of measurable metrics (KPIs) that represent the healthy operation of your service.
+* **Metrics:** Identify latency, throughput, error rates, and resource utilization.
+* **Baseline:** Establish these values during a period of typical traffic to ensure the experiment is measured against an accurate reference point.
+
+=== 2. Hypothesis Generation
+Translate a potential risk into a testable experiment.
+* **The "What if":** Ask, "What happens to our user login service if the underlying database cluster experiences a node failure?"
+* **Expected Outcome:** Predict the behavior. *Example: "If the database primary fails, the system should trigger a failover within 30 seconds with no data loss."*
+
+=== 3. Running the Experiment
+Execute the disruption within a controlled environment, adhering to the principles of **Blast Radius management**.
+* **Targeting:** Specify the cluster, namespace, or specific set of pods.
+* **Observability:** Ensure monitoring tools (e.g., Prometheus/Grafana) are capturing high-resolution data during the event.
+* **Stop Conditions:** Pre-define automated "kill switches" that immediately halt the experiment if metrics cross a critical safety threshold.
+
+=== 4. Analysis and Comparison
+Compare the results of the experiment against your baseline steady state.
+* **Validation:** Did the system recover as predicted?
+* **Gap Identification:** Did the failure propagate to unexpected components? Was there a "cascading failure" where one service outage took down dependent services?
+
+=== 5. Remediation and Iteration
+Use the insights gathered to improve system resiliency.
+* **Improvements:** This might involve tuning Kubernetes readiness probes, adjusting circuit breaker patterns, or increasing replica counts.
+* **Repeat:** Once changes are implemented, run the experiment again to verify that the remediation was successful and did not introduce new risks.
+
+== Proactive vs. Reactive Testing
+
+| Strategy | Focus | Outcome |
+| :--- | :--- | :--- |
+| **Reactive** | Responding to outages after they occur. | Higher Mean Time to Recovery (MTTR); unpredictable downtime. |
+| **Proactive** | Injecting faults to discover hidden weaknesses. | Reduced risk of production failure; improved system architecture. |
+
+[NOTE]
+====
+In the context of Krkn, we aim for **proactive** testing by automating these lifecycle stages. By mapping specific failure modes—such as pod deletions or network latency—to your service risks, Krkn allows you to transform abstract concerns into repeatable, quantifiable experiments.
+====
+
+== Key Principles for Success
+* **Manage the Blast Radius:** Always start with a small, contained blast radius before expanding to larger components.
+* **Automation:** To make chaos engineering part of your culture, these lifecycle stages should eventually be integrated into your CI/CD pipelines to ensure that every code deployment is inherently resilient.
+* **Observability is Non-negotiable:** Without clear metrics, an experiment is just an outage. Ensure your observability stack is configured to capture the moment of disruption and the subsequent recovery phase.

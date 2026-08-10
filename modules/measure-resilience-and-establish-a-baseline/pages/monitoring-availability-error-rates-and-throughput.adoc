@@ -1,0 +1,66 @@
+#  Monitoring availability, error rates, and throughput
+
+= Monitoring Availability, Error Rates, and Throughput
+
+To effectively evaluate system resilience during Krkn chaos experiments, you must move beyond simple "up/down" checks. You must establish a baseline for your steady state by monitoring three fundamental pillars of service health: **Availability**, **Error Rates**, and **Throughput**.
+
+== Defining the Metrics
+
+When injecting chaos, these metrics serve as your primary indicators for whether the system is successfully absorbing the disruption or if the user experience is suffering.
+
+*   **Availability:** The percentage of time a system is functional and reachable. In a Kubernetes environment, this is often measured by the success rate of HTTP requests or the ratio of healthy pods to total pods.
+*   **Error Rates:** The frequency of failed requests or internal server errors (e.g., HTTP 5xx codes). Spikes in error rates during a Krkn scenario usually indicate that the service or its dependencies are failing to handle the injected disruption.
+*   **Throughput:** The amount of work the system performs over a specific time, such as requests per second (RPS) or transactions per second (TPS). A drop in throughput often reveals bottlenecks in resource handling or queuing mechanisms.
+
+== Establishing a Baseline using PromQL
+
+Before executing a Krkn scenario, use Prometheus Query Language (PromQL) to define your "normal" behavior. These queries will be used to generate alerts or stop conditions if the system deviates from your established baseline.
+
+=== Availability Query
+To monitor the availability of an HTTP service based on response codes:
+
+[source,promql]
+----
+(sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m]))) * 100
+----
+
+=== Error Rate Query
+To monitor the rate of 5xx errors:
+
+[source,promql]
+----
+sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+----
+
+=== Throughput Query
+To monitor the requests per second hitting your application:
+
+[source,promql]
+----
+sum(rate(http_requests_total[5m]))
+----
+
+== Hands-on Lab: Observing Metrics during Disruption
+
+In this activity, you will monitor these metrics while Krkn executes a pod-disruption scenario.
+
+=== Prerequisites
+*   A target cluster with `Krkn` installed.
+*   A sample application (e.g., `http-echo`) deployed with monitoring enabled.
+*   Access to a Grafana dashboard or Prometheus instance configured for the target cluster.
+
+=== Step-by-Step Execution
+
+1.  **Establish Steady State:** Access your monitoring dashboard and observe the metrics for 5 minutes. Document the baseline throughput and verify that error rates are near zero.
+2.  **Initiate Krkn Scenario:** Execute a pod-disruption experiment using the Krkn scenario registry to terminate a percentage of your application pods.
+    *   *Example Command:* `krkn run pod-disruption --scenario-config=config.yaml`
+3.  **Real-Time Monitoring:** Observe the dashboard as the chaos is injected:
+    *   **Availability:** Does it dip? If so, by how much, and for how long?
+    *   **Error Rates:** Observe if the 5xx rate increases immediately upon pod termination.
+    *   **Throughput:** Look for a correlation between the pod outage and the drop in throughput.
+4.  **Analyze Recovery:** Once the Krkn scenario concludes and the pods are recreated, watch the metrics return to their pre-experiment baseline. This "recovery curve" is vital for calculating your system's resilience.
+
+== Troubleshooting Tips
+*   **False Positives:** Ensure your Prometheus scrape intervals are frequent enough (e.g., 15s) to capture the transient spikes during the chaos injection.
+*   **Metric Granularity:** If throughput is monitored at too high a level (e.g., cluster-wide), you may miss micro-outages at the individual service level. Ensure you apply labels (e.g., `service="my-app"`) to your PromQL queries.
+*   **Dependency Impact:** If error rates spike in a service that is *not* the target of the Krkn scenario, you have successfully identified a critical downstream dependency. Use this to inform your recovery validation planning.

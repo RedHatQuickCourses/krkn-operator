@@ -1,0 +1,81 @@
+#  Automating resilience validation in test environments
+
+= Automating resilience validation in test environments
+
+As systems grow in complexity, manual chaos testing becomes unsustainable. Automating resilience validation allows you to move from "point-in-time" testing to continuous verification. By integrating Krkn scenarios into your CI/CD pipelines, you ensure that infrastructure or application changes do not introduce regressions in system stability.
+
+== The Role of Continuous Resilience
+Automating resilience means treating "Chaos as Code." When a deployment triggers a test pipeline, the pipeline should not only verify functional requirements but also validate the system’s ability to recover from simulated failures.
+
+Key benefits of automation include:
+* **Consistency:** Every release is subjected to the same baseline of stress testing.
+* **Early Detection:** Discovering circular dependencies or inadequate timeout configurations during the PR stage rather than in production.
+* **Feedback Loops:** Automatically generating Resiliency Scores for every build to track degradation over time.
+
+== Integrating Krkn into CI/CD
+To automate Krkn, you move away from manual dashboard triggers and utilize the Krkn API or CLI-driven execution within your pipeline runners (e.g., Jenkins, Tekton, or GitHub Actions).
+
+=== Pipeline Integration Strategy
+1. **Trigger:** The CI/CD pipeline deploys the target application to a pre-production environment.
+2. **Setup:** The pipeline triggers a Krkn scenario via the command line or an API call.
+3. **Execution:** Krkn injects the disruption (e.g., killing pods, inducing network latency).
+4. **Monitoring/Wait:** The pipeline waits for a signal that the recovery phase has concluded.
+5. **Evaluation:** The system queries PromQL metrics to evaluate the "Steady State" and compares the results against the established Resilience Score.
+6. **Gate:** If the Resilience Score falls below the acceptable threshold, the pipeline marks the build as failed.
+
+== Hands-on Lab: Automating a Pod-Disruption Gate
+In this lab, you will configure a simple pipeline step to execute a pod disruption and fail the build if the system does not recover within the expected timeframe.
+
+[IMPORTANT]
+====
+Ensure you have the `krkn` CLI tool installed and your `kubeconfig` pointing to your test environment.
+====
+
+=== Step 1: Define the Scenario Configuration
+Create a file named `pod-failure-ci.yaml`. This configuration dictates the blast radius and the duration of the test.
+
+[source,yaml]
+----
+scenario:
+  name: "automated-pod-failure"
+  duration: 60
+  instance_count: 3
+  label_selector: "app=frontend"
+----
+
+=== Step 2: Execute and Validate
+In your pipeline script (e.g., `Jenkinsfile` or `task.yaml`), call Krkn as part of the validation stage.
+
+[source,bash]
+----
+# Trigger the chaos experiment
+krkn run pod-disruption -c pod-failure-ci.yaml --report-dir=./reports
+
+# Analyze the results
+# Here we check if the system recovered successfully
+if grep -q "recovered" ./reports/status.log; then
+    echo "Resilience validation passed."
+else
+    echo "Resilience validation failed: System did not recover."
+    exit 1
+fi
+----
+
+=== Step 3: Verify Metrics with PromQL
+To fully automate the gate, use the Krkn PromQL integration to query the steady state during the experiment. Add this check to your automation script to ensure availability remained above 99% during the disruption:
+
+[source,bash]
+----
+# PromQL check for error rate
+query="sum(rate(http_requests_total{status=~'5..'}[1m])) / sum(rate(http_requests_total[1m])) < 0.01"
+
+# Execute check against Prometheus API
+result=$(curl -G 'http://prometheus-url/api/v1/query' --data-urlencode "query=$query")
+
+# If result is empty or false, fail the build
+----
+
+== Best Practices for Automated Resilience
+* **Small Blast Radius:** In CI/CD, keep the blast radius limited to the service being tested to avoid cascading failures in shared test environments.
+* **Short Durations:** Automated tests should be fast. Focus on whether the service *recovers*, not how long it can stay in a degraded state.
+* **Stop Conditions:** Always configure "Kill Switches" in your automation. If critical infrastructure metrics (e.g., node pressure) hit a defined limit, the automation must abort the chaos scenario immediately to prevent permanent environment damage.

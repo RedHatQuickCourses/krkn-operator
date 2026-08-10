@@ -1,0 +1,63 @@
+#  Modeling multi-stage failure workflows
+
+= Modeling multi-stage failure workflows
+
+In complex distributed systems, failures rarely happen in isolation. A cascading failure—where one component’s degradation triggers a chain reaction—is often more damaging than a single node outage. Modeling **multi-stage failure workflows** allows you to simulate these complex, real-world failure patterns to validate that your system’s observability, self-healing mechanisms, and fallback strategies function as expected.
+
+== Anatomy of a Multi-Stage Workflow
+
+A multi-stage workflow in Chaos Studio is a directed graph of disruption scenarios. By chaining these scenarios, you move beyond simple "pod kill" tests to simulate sophisticated incidents such as:
+
+*   **Dependency Cascades:** Disrupting a downstream service (e.g., a database) followed by an upstream service (e.g., a cache layer).
+*   **Resource Contention:** Injecting latency into a network segment, followed by a memory leak simulation on the nodes serving that segment.
+*   **Recovery Validation:** Injecting a failure, pausing to allow for automated remediation, and then injecting a second failure to see if the system remains resilient under cumulative pressure.
+
+== Designing Workflows in Chaos Studio
+
+Chaos Studio provides a visual drag-and-drop editor to define these sequences. You can configure nodes to execute in two primary patterns:
+
+*   **Sequential Execution:** Scenarios execute one after another. Stage B begins only after Stage A completes (or after a defined delay). This is ideal for testing how a system recovers from one failure before another is introduced.
+*   **Parallel Execution:** Multiple disruption scenarios occur simultaneously. This is used to test "storm" scenarios, such as simultaneous high CPU load across multiple zones coupled with network partitioning.
+
+== Hands-on Lab: Modeling a Cascading Failure
+
+This lab guides you through the creation of a two-stage workflow that simulates a service degradation followed by a partial network outage.
+
+=== Prerequisites
+*   Access to the Krkn Operator dashboard.
+*   Two defined disruption scenarios: `pod-memory-leak` and `network-latency`.
+*   A target namespace/cluster configured in your Registry.
+
+=== Steps to Create the Workflow
+
+1.  **Initialize the Canvas:**
+    Navigate to **Chaos Studio** and create a new workflow titled `cascading-failure-simulation`.
+
+2.  **Add Stage 1 (Memory Pressure):**
+    *   Drag the `pod-memory-leak` scenario onto the canvas.
+    *   Configure the duration (e.g., 5 minutes) and the target labels.
+    *   Set the "Blast Radius" to specific worker nodes to ensure local impact.
+
+3.  **Add Stage 2 (Network Latency):**
+    *   Drag the `network-latency` scenario onto the canvas.
+    *   Connect the output of the first node to the input of the second node.
+    *   Configure the latency parameters (e.g., 500ms delay) to target the same application pods affected by the memory leak.
+
+4.  **Configure Orchestration:**
+    *   Select the connector between the two nodes.
+    *   Choose **Sequential** execution.
+    *   Add a "Wait" step (e.g., 60 seconds) between the nodes to verify if the application attempted a recovery between stages.
+
+5.  **Enable Resiliency Scoring:**
+    *   Select the workflow settings.
+    *   Enable the **Resiliency Score**.
+    *   Attach your pre-defined `slos.promql` file to monitor throughput and error rates during both stages of the experiment.
+
+6.  **Execute and Observe:**
+    *   Click **Run**.
+    *   Monitor the **Jobs** tab. Observe how the Resiliency Score fluctuates as the second stage of the workflow initiates.
+
+== Troubleshooting Tips
+*   **Check Stop Conditions:** If your system hits a critical SLO threshold early, ensure you have defined "Stop Conditions" in the workflow settings to halt the experiment and prevent a total outage.
+*   **Analyze the Logs:** If a stage fails to start, verify the `target-cluster` permissions in the Krkn Operator to ensure it has the necessary RBAC to execute the requested disruption on the target pods.
+*   **Review Recovery:** After the workflow ends, check if your `machine health checks` successfully remediated the nodes or if manual intervention was required. Use the discrepancy between expected and actual recovery time to refine your automation settings.

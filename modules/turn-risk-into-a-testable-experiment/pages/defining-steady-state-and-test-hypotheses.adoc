@@ -1,0 +1,68 @@
+#  Defining steady state and test hypotheses
+
+= Defining steady state and test hypotheses
+
+In Chaos Engineering, the "steady state" is your baseline for normal operations. Without a clearly defined steady state, it is impossible to determine whether an injected failure caused a meaningful service degradation or if the system was already underperforming.
+
+== Understanding Steady State
+The steady state represents the expected behavior of your system under normal operating conditions. It is not defined by the absence of errors, but by the performance boundaries within which your system fulfills its business requirements.
+
+To define your steady state, focus on these key pillars:
+*   **Availability:** Is the service reachable? (e.g., uptime, pod health).
+*   **Latency:** How long does it take for a request to be fulfilled? (e.g., P99 response time).
+*   **Throughput:** How much traffic is the system processing? (e.g., requests per second).
+*   **Error Rates:** What is the ratio of successful to failed requests? (e.g., HTTP 5xx codes).
+
+=== Defining Metrics for Evaluation
+Before running any Krkn experiment, you must establish the metrics that represent your steady state. Use PromQL to define these in your monitoring system (such as Prometheus or Thanos). 
+
+*Example: Defining an API Latency Baseline*
+[source,promql]
+----
+# Average request duration over the last 5 minutes
+rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])
+----
+
+== Formulating a Test Hypothesis
+A test hypothesis is a structured prediction of how your system will react to a specific disruption. It follows a scientific approach: "If we perform *[Action]*, then *[System]* will *[Expected Result]*."
+
+=== The Hypothesis Framework
+When using Krkn to inject chaos, structure your hypothesis around the **Blast Radius** and **Recovery Validation**:
+
+1.  **Observation:** "Our API service currently maintains a P99 latency of < 200ms."
+2.  **Disruption:** "If we terminate 50% of the API pods in one availability zone..."
+3.  **Expected Outcome:** "...the system will automatically reschedule pods, and the P99 latency will not exceed 500ms for more than 60 seconds."
+4.  **Stop Condition:** "If the error rate exceeds 5% or the latency remains high for > 3 minutes, the experiment must abort and rollback."
+
+== Hands-on Activity: Defining Your Experiment Baseline
+
+Follow these steps to establish your steady state before triggering a Krkn experiment.
+
+**Step 1: Document the "Golden Signals"**
+Choose one service you intend to test. Record the following values during a period of normal traffic:
+*   *Current P99 Latency:* `_____ ms`
+*   *Current Request Throughput:* `_____ req/s`
+*   *Current Error Rate:* `_____ %`
+
+**Step 2: Define the Hypothesis in your Krkn Configuration**
+When configuring your Krkn scenario, ensure your YAML includes clear criteria for success.
+
+[source,yaml]
+----
+# Example structure for hypothesis definition
+chaos_experiment:
+  name: api-pod-disruption
+  hypothesis: "System should recover within 60s"
+  steady_state_metrics:
+    - name: api-latency
+      query: "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))"
+      threshold: 0.5 # 500ms limit
+  stop_conditions:
+    - error_rate > 0.05
+----
+
+**Step 3: Establish the "Blast Radius"**
+Identify which specific services, namespaces, or nodes will be affected. Limiting the blast radius allows you to test hypotheses in a controlled manner without impacting the entire production environment.
+
+**Verification:**
+After running your experiment, compare the recorded metrics from Step 1 against the metrics gathered during the disruption. If the deviation is within your established threshold, your system is considered resilient to this specific failure mode.

@@ -1,0 +1,10 @@
+#  Measure resilience and establish a baseline
+
+= Measure resilience and establish a baseline
+
+Measuring resilience shifts testing from binary pass/fail outcomes to data-driven insights. By establishing a baseline of normal operation, you can quantify how effectively a system maintains performance under stress.
+
+*   **PromQL Integration:** Utilize PromQL files to define and monitor critical metrics such as latency, error rates, and throughput against predefined thresholds.
+*   **Resiliency Score Calculation:** Generate a numeric Resilience Score by evaluating application metrics throughout a chaos workflow, providing a quantifiable measure of how well the system withstood disruption.
+*   **Performance Benchmarking:** Compare scores across different environments and time periods to track resilience trends and identify performance degradation relative to Service Level Objectives (SLOs).
+*   **Evidence-based Remediation:** Use objective score analysis to pinpoint architectural weaknesses and provide actionable recommendations for system hardening.
