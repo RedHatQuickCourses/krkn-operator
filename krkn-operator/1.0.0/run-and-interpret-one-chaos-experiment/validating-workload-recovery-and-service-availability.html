@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Validating workload recovery and service availability :: Chaos Engineering with Krkn</title>
+    <link rel="prev" href="analyzing-logs-and-status-reports.html">
+    <link rel="next" href="verifying-alerts-and-dependent-component-impact.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Chaos Engineering with Krkn</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Chaos Engineering with Krkn</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../chaos-engineering-methodology/chaos-engineering-methodology.html">Chaos engineering methodology</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/understanding-the-chaos-engineering-lifecycle.html">Understanding the chaos engineering lifecycle</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/proactive-versus-reactive-testing-strategies.html">Proactive versus reactive testing strategies</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/evaluating-system-performance-under-disruption.html">Evaluating system performance under disruption</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/implementing-recovery-validation-and-observability.html">Implementing recovery validation and observability</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/managing-blast-radius-and-rollback-planning.html">Managing blast radius and rollback planning</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/exploratory-manual-testing-and-pipeline-automation.html">Exploratory manual testing and pipeline automation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/turn-risk-into-a-testable-experiment.html">Turn risk into a testable experiment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/identifying-service-risks-and-failure-modes.html">Identifying service risks and failure modes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/defining-steady-state-and-test-hypotheses.html">Defining steady state and test hypotheses</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/setting-target-duration-and-blast-radius.html">Setting target, duration, and blast radius</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/establishing-metrics-for-availability-latency-and-throughput.html">Establishing metrics for availability, latency, and throughput</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/planning-monitoring-stop-conditions-and-rollbacks.html">Planning monitoring, stop conditions, and rollbacks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/mapping-risks-to-krkn-disruption-scenarios.html">Mapping risks to Krkn disruption scenarios</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../krkn-operator-fundamentals/krkn-operator-fundamentals.html">Krkn Operator fundamentals</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/managing-target-clusters-and-user-permissions.html">Managing target clusters and user permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/working-with-scenario-registries.html">Working with scenario registries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/executing-jobs-and-managing-logs.html">Executing jobs and managing logs</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/utilizing-acm-and-ocm-cluster-discovery.html">Utilizing ACM and OCM cluster discovery</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/configuring-multi-cluster-scenario-execution.html">Configuring multi-cluster scenario execution</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/navigating-chaos-studio-and-resiliency-scores.html">Navigating Chaos Studio and Resiliency Scores</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="run-and-interpret-one-chaos-experiment.html">Run and interpret one chaos experiment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="selecting-target-clusters-and-scenario-registries.html">Selecting target clusters and scenario registries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="configuring-experiment-parameters-and-attachments.html">Configuring experiment parameters and attachments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="reviewing-configurations-and-executing-experiments.html">Reviewing configurations and executing experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="analyzing-logs-and-status-reports.html">Analyzing logs and status reports</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="validating-workload-recovery-and-service-availability.html">Validating workload recovery and service availability</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="verifying-alerts-and-dependent-component-impact.html">Verifying alerts and dependent component impact</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/build-workflows-with-chaos-studio.html">Build workflows with Chaos Studio</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/creating-reusable-chaos-workflows.html">Creating reusable chaos workflows</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/configuring-sequential-and-parallel-scenario-execution.html">Configuring sequential and parallel scenario execution</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/connecting-and-cloning-workflow-nodes.html">Connecting and cloning workflow nodes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/validating-and-reusing-workflow-models.html">Validating and reusing workflow models</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/modeling-complex-platform-and-service-disruptions.html">Modeling complex platform and service disruptions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/measure-resilience-and-establish-a-baseline.html">Measure resilience and establish a baseline</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/using-promql-for-slo-definition.html">Using PromQL for SLO definition</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/monitoring-availability-error-rates-and-throughput.html">Monitoring availability, error rates, and throughput</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/calculating-and-interpreting-the-resilience-score.html">Calculating and interpreting the Resilience Score</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/comparing-scores-across-environments-and-time.html">Comparing scores across environments and time</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/identifying-slo-degradation-and-performance-trends.html">Identifying SLO degradation and performance trends</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/recommending-remediation-based-on-score-analysis.html">Recommending remediation based on score analysis</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../operationalize-resilience-validation/operationalize-resilience-validation.html">Operationalize resilience validation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/validating-infrastructure-and-application-upgrades.html">Validating infrastructure and application upgrades</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/integrating-chaos-testing-into-cicd-pipelines.html">Integrating chaos testing into CI/CD pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/running-chaos-during-performance-and-scale-testing.html">Running chaos during performance and scale testing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/standardizing-execution-across-managed-clusters.html">Standardizing execution across managed clusters</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/storing-and-comparing-long-term-results.html">Storing and comparing long-term results</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/combining-recovery-checks-with-system-health-metrics.html">Combining recovery checks with system health metrics</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../hands-on-labs/hands-on-labs.html">Hands-on Labs</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/executing-pod-disruption-experiments.html">Executing pod-disruption experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/modeling-multi-stage-failure-workflows.html">Modeling multi-stage failure workflows</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/calculating-and-analyzing-resilience-scores.html">Calculating and analyzing Resilience Scores</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/automating-resilience-validation-in-test-environments.html">Automating resilience validation in test environments</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Chaos Engineering with Krkn</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Chaos Engineering with Krkn</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Chaos Engineering with Krkn</a></li>
+    <li><a href="run-and-interpret-one-chaos-experiment.html">Run and interpret one chaos experiment</a></li>
+    <li><a href="validating-workload-recovery-and-service-availability.html">Validating workload recovery and service availability</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Validating workload recovery and service availability</h1>
+<h1 id="_validating_workload_recovery_and_service_availability" class="sect0"><a class="anchor" href="#_validating_workload_recovery_and_service_availability"></a>Validating Workload Recovery and Service Availability</h1>
+<div class="paragraph">
+<p>After injecting a disruption using Krkn, the most critical phase of the chaos engineering lifecycle is evaluating how your system responds. Validation ensures that the "steady state" is restored and that your automated remediation strategies function as expected.</p>
+</div>
+<div class="sect1">
+<h2 id="_understanding_recovery_validation"><a class="anchor" href="#_understanding_recovery_validation"></a>Understanding Recovery Validation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Validation is the process of confirming that your services return to their expected performance levels—Service Level Indicators (SLIs)—after a disruption. Relying on "self-healing" mechanisms without active verification is a common operational pitfall.</p>
+</div>
+<div class="paragraph">
+<p>To validate recovery, you must monitor three distinct phases:
+1. <strong>Disruption Phase:</strong> The period where the Krkn scenario (e.g., pod kill or network latency) is active.
+2. <strong>Impact Phase:</strong> The duration where metrics deviate from the established baseline.
+3. <strong>Recovery Phase:</strong> The duration from the cessation of the disruption until metrics return to the defined steady state.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_defining_success_criteria"><a class="anchor" href="#_defining_success_criteria"></a>Defining Success Criteria</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before executing a disruption, define what "recovery" looks like. Use your established metrics (latency, error rates, throughput) to create validation gates:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Self-Healing Verification:</strong> Ensure that Machine Health Checks have successfully remediated unhealthy nodes or that the Kubernetes scheduler has successfully restarted pods.</p>
+</li>
+<li>
+<p><strong>Service Level Objective (SLO) Adherence:</strong> Confirm that even during recovery, the impact on user-facing latency remained within the defined SLO buffers.</p>
+</li>
+<li>
+<p><strong>Data Integrity:</strong> Verify that during the recovery phase, no data was corrupted or lost due to abrupt process termination.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hands_on_lab_validating_pod_disruption_recovery"><a class="anchor" href="#_hands_on_lab_validating_pod_disruption_recovery"></a>Hands-on Lab: Validating Pod-Disruption Recovery</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this lab, you will use Krkn to disrupt a deployment and validate that the application recovers without human intervention.</p>
+</div>
+<div class="sect2">
+<h3 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>A running Kubernetes cluster with Krkn Operator installed.</p>
+</li>
+<li>
+<p>A target deployment (e.g., <code>nginx-deployment</code>) with at least 3 replicas.</p>
+</li>
+<li>
+<p>Prometheus/Grafana configured to track the <code>kube_pod_status_ready</code> metric.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_1_establish_the_steady_state"><a class="anchor" href="#_step_1_establish_the_steady_state"></a>Step 1: Establish the Steady State</h3>
+<div class="paragraph">
+<p>Execute a PromQL query to ensure the service is stable before starting.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-promql hljs" data-lang="promql">sum(kube_pod_status_ready{namespace="my-app", condition="true"})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Ensure this returns a value of 3 before proceeding.</strong></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_inject_the_disruption"><a class="anchor" href="#_step_2_inject_the_disruption"></a>Step 2: Inject the Disruption</h3>
+<div class="paragraph">
+<p>Create a Krkn scenario configuration to kill pods within the <code>my-app</code> namespace.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">scenario:
+  name: pod-disruption
+  duration: 60s
+  namespace: my-app
+  instance_count: 2</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_observe_recovery_metrics"><a class="anchor" href="#_step_3_observe_recovery_metrics"></a>Step 3: Observe Recovery Metrics</h3>
+<div class="paragraph">
+<p>Once the disruption starts, observe the recovery in your monitoring dashboard. Look for the following events:
+1. <strong>Detection:</strong> The <code>kube_pod_status_ready</code> count drops to 1.
+2. <strong>Scheduling:</strong> The controller detects the missing pods and creates new ones.
+3. <strong>Recovery:</strong> The count returns to 3.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_4_validate_and_analyze"><a class="anchor" href="#_step_4_validate_and_analyze"></a>Step 4: Validate and Analyze</h3>
+<div class="paragraph">
+<p>Compare the time taken for recovery against your expectations. If recovery takes longer than anticipated, evaluate the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Readiness Probes:</strong> Were the readiness probes too strict, delaying the "Ready" status of new pods?</p>
+</li>
+<li>
+<p><strong>Resource Constraints:</strong> Did the cluster have enough capacity to schedule new pods immediately, or was it blocked by resource starvation?</p>
+</li>
+<li>
+<p><strong>Automated Remediation:</strong> Did the Machine Health Checks trigger as expected to replace faulty nodes?</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting_recovery_failures"><a class="anchor" href="#_troubleshooting_recovery_failures"></a>Troubleshooting Recovery Failures</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If your service fails to return to the steady state:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Check Pending Pods:</strong> If pods are stuck in <code>Pending</code>, examine the events: <code>kubectl describe pod &lt;pod-name&gt;</code>. This often indicates a lack of cluster resources.</p>
+</li>
+<li>
+<p><strong>Review CrashLoopBackOff:</strong> If pods are failing to start, check the logs for dependency issues: <code>kubectl logs &lt;pod-name&gt; --previous</code>.</p>
+</li>
+<li>
+<p><strong>Inspect Topology:</strong> If using multi-zone clusters, verify if the disruption caused a zone-wide failure that prevented recovery due to cross-zone latency or policy restrictions.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="analyzing-logs-and-status-reports.html">Analyzing logs and status reports</a></span>
+  <span class="next"><a href="verifying-alerts-and-dependent-component-impact.html">Verifying alerts and dependent component impact</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

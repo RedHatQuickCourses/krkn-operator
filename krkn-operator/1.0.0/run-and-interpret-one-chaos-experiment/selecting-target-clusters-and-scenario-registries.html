@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Selecting target clusters and scenario registries :: Chaos Engineering with Krkn</title>
+    <link rel="prev" href="run-and-interpret-one-chaos-experiment.html">
+    <link rel="next" href="configuring-experiment-parameters-and-attachments.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Chaos Engineering with Krkn</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Chaos Engineering with Krkn</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../chaos-engineering-methodology/chaos-engineering-methodology.html">Chaos engineering methodology</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/understanding-the-chaos-engineering-lifecycle.html">Understanding the chaos engineering lifecycle</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/proactive-versus-reactive-testing-strategies.html">Proactive versus reactive testing strategies</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/evaluating-system-performance-under-disruption.html">Evaluating system performance under disruption</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/implementing-recovery-validation-and-observability.html">Implementing recovery validation and observability</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/managing-blast-radius-and-rollback-planning.html">Managing blast radius and rollback planning</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/exploratory-manual-testing-and-pipeline-automation.html">Exploratory manual testing and pipeline automation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/turn-risk-into-a-testable-experiment.html">Turn risk into a testable experiment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/identifying-service-risks-and-failure-modes.html">Identifying service risks and failure modes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/defining-steady-state-and-test-hypotheses.html">Defining steady state and test hypotheses</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/setting-target-duration-and-blast-radius.html">Setting target, duration, and blast radius</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/establishing-metrics-for-availability-latency-and-throughput.html">Establishing metrics for availability, latency, and throughput</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/planning-monitoring-stop-conditions-and-rollbacks.html">Planning monitoring, stop conditions, and rollbacks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/mapping-risks-to-krkn-disruption-scenarios.html">Mapping risks to Krkn disruption scenarios</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../krkn-operator-fundamentals/krkn-operator-fundamentals.html">Krkn Operator fundamentals</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/managing-target-clusters-and-user-permissions.html">Managing target clusters and user permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/working-with-scenario-registries.html">Working with scenario registries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/executing-jobs-and-managing-logs.html">Executing jobs and managing logs</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/utilizing-acm-and-ocm-cluster-discovery.html">Utilizing ACM and OCM cluster discovery</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/configuring-multi-cluster-scenario-execution.html">Configuring multi-cluster scenario execution</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../krkn-operator-fundamentals/navigating-chaos-studio-and-resiliency-scores.html">Navigating Chaos Studio and Resiliency Scores</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="run-and-interpret-one-chaos-experiment.html">Run and interpret one chaos experiment</a>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="selecting-target-clusters-and-scenario-registries.html">Selecting target clusters and scenario registries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="configuring-experiment-parameters-and-attachments.html">Configuring experiment parameters and attachments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="reviewing-configurations-and-executing-experiments.html">Reviewing configurations and executing experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="analyzing-logs-and-status-reports.html">Analyzing logs and status reports</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="validating-workload-recovery-and-service-availability.html">Validating workload recovery and service availability</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="verifying-alerts-and-dependent-component-impact.html">Verifying alerts and dependent component impact</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/build-workflows-with-chaos-studio.html">Build workflows with Chaos Studio</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/creating-reusable-chaos-workflows.html">Creating reusable chaos workflows</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/configuring-sequential-and-parallel-scenario-execution.html">Configuring sequential and parallel scenario execution</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/connecting-and-cloning-workflow-nodes.html">Connecting and cloning workflow nodes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/validating-and-reusing-workflow-models.html">Validating and reusing workflow models</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/modeling-complex-platform-and-service-disruptions.html">Modeling complex platform and service disruptions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/measure-resilience-and-establish-a-baseline.html">Measure resilience and establish a baseline</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/using-promql-for-slo-definition.html">Using PromQL for SLO definition</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/monitoring-availability-error-rates-and-throughput.html">Monitoring availability, error rates, and throughput</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/calculating-and-interpreting-the-resilience-score.html">Calculating and interpreting the Resilience Score</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/comparing-scores-across-environments-and-time.html">Comparing scores across environments and time</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/identifying-slo-degradation-and-performance-trends.html">Identifying SLO degradation and performance trends</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/recommending-remediation-based-on-score-analysis.html">Recommending remediation based on score analysis</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../operationalize-resilience-validation/operationalize-resilience-validation.html">Operationalize resilience validation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/validating-infrastructure-and-application-upgrades.html">Validating infrastructure and application upgrades</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/integrating-chaos-testing-into-cicd-pipelines.html">Integrating chaos testing into CI/CD pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/running-chaos-during-performance-and-scale-testing.html">Running chaos during performance and scale testing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/standardizing-execution-across-managed-clusters.html">Standardizing execution across managed clusters</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/storing-and-comparing-long-term-results.html">Storing and comparing long-term results</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/combining-recovery-checks-with-system-health-metrics.html">Combining recovery checks with system health metrics</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../hands-on-labs/hands-on-labs.html">Hands-on Labs</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/executing-pod-disruption-experiments.html">Executing pod-disruption experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/modeling-multi-stage-failure-workflows.html">Modeling multi-stage failure workflows</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/calculating-and-analyzing-resilience-scores.html">Calculating and analyzing Resilience Scores</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/automating-resilience-validation-in-test-environments.html">Automating resilience validation in test environments</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Chaos Engineering with Krkn</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Chaos Engineering with Krkn</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Chaos Engineering with Krkn</a></li>
+    <li><a href="run-and-interpret-one-chaos-experiment.html">Run and interpret one chaos experiment</a></li>
+    <li><a href="selecting-target-clusters-and-scenario-registries.html">Selecting target clusters and scenario registries</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Selecting target clusters and scenario registries</h1>
+<h1 id="_selecting_target_clusters_and_scenario_registries" class="sect0"><a class="anchor" href="#_selecting_target_clusters_and_scenario_registries"></a>Selecting target clusters and scenario registries</h1>
+<div class="paragraph">
+<p>In the Krkn ecosystem, the foundation of any chaos experiment lies in defining where the disruption will occur and which specific failure modes will be injected. Properly selecting target clusters and scenario registries ensures that your chaos engineering initiatives are both controlled and impactful.</p>
+</div>
+<div class="sect1">
+<h2 id="_understanding_target_clusters"><a class="anchor" href="#_understanding_target_clusters"></a>Understanding Target Clusters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A "target cluster" is the Kubernetes environment where the Krkn chaos scenario will be executed. Krkn supports both single-cluster and multi-cluster targeting, allowing for localized testing or wide-scale stress testing of an entire fleet.</p>
+</div>
+<div class="sect2">
+<h3 id="_key_considerations_for_cluster_selection"><a class="anchor" href="#_key_considerations_for_cluster_selection"></a>Key Considerations for Cluster Selection</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Environment Parity:</strong> Ensure the target cluster mirrors the configuration of your production environment to obtain meaningful data.</p>
+</li>
+<li>
+<p><strong>Blast Radius Management:</strong> When selecting multiple clusters, remember that Krkn executes the scenario on all selected targets simultaneously. Verify that your system dependencies can withstand a broad-spectrum disruption.</p>
+</li>
+<li>
+<p><strong>Cluster Discovery:</strong> Utilize integrations with Advanced Cluster Management (ACM) or Open Cluster Management (OCM) to dynamically discover and group clusters based on labels or health status.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_scenario_registries"><a class="anchor" href="#_scenario_registries"></a>Scenario Registries</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Scenario registries act as the centralized repository for chaos scenarios. They contain the pre-defined logic (the "what" and "how") of the disruption, such as network latency, pod kills, or resource exhaustion.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Version Control:</strong> Registries allow you to version your chaos experiments, ensuring consistency across different teams and environments.</p>
+</li>
+<li>
+<p><strong>Reusability:</strong> By maintaining a standardized registry, you can ensure that the "Pod Disruption" scenario run in the development environment is identical to the one run in staging.</p>
+</li>
+<li>
+<p><strong>Abstraction:</strong> Registries hide the underlying complexity of the Krkn disruption engine, allowing operators to select scenarios by name or capability rather than manual script configuration.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hands_on_activity_configuring_experiment_targets"><a class="anchor" href="#_hands_on_activity_configuring_experiment_targets"></a>Hands-on Activity: Configuring Experiment Targets</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This lab guides you through the process of selecting target clusters and choosing a scenario using the Krkn interface.</p>
+</div>
+<div class="sect2">
+<h3 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Access to the Krkn dashboard or CLI.</p>
+</li>
+<li>
+<p>Registered clusters accessible within the Krkn control plane.</p>
+</li>
+<li>
+<p>An active connection to the scenario registry.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_1_selecting_target_clusters"><a class="anchor" href="#_step_1_selecting_target_clusters"></a>Step 1: Selecting Target Clusters</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Navigate to the <strong>Run Scenario</strong> wizard in your Krkn console.</p>
+</li>
+<li>
+<p>In the <strong>Target Selection</strong> panel, view the list of discovered clusters.</p>
+</li>
+<li>
+<p>Select the desired cluster(s) from the list.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Tip:</strong> Use the search or filter functionality if managing a large fleet of managed clusters.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Confirm the connection status for each selected cluster to ensure Krkn has the required permissions to execute pods within those namespaces.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_selecting_a_scenario_from_the_registry"><a class="anchor" href="#_step_2_selecting_a_scenario_from_the_registry"></a>Step 2: Selecting a Scenario from the Registry</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Proceed to the <strong>Scenario Selection</strong> step.</p>
+</li>
+<li>
+<p>Browse the available <strong>Scenario Registries</strong>. You will see categories like <code>network</code>, <code>pod-chaos</code>, or <code>node-disruption</code>.</p>
+</li>
+<li>
+<p>Select a scenario (e.g., <code>pod-random-kill</code>).</p>
+</li>
+<li>
+<p>Review the <strong>Scenario Metadata</strong> to understand:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Description:</strong> What the scenario specifically does.</p>
+</li>
+<li>
+<p><strong>Parameters:</strong> Editable fields such as <code>duration</code>, <code>percentage</code>, or <code>label_selector</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Click <strong>Next</strong> to proceed to the configuration phase, where you will set the specific blast radius parameters for the selected target.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_troubleshooting"><a class="anchor" href="#_troubleshooting"></a>Troubleshooting</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Cluster not appearing?</strong> Verify that the Krkn operator has been correctly deployed and that the cluster is correctly registered with the ACM/OCM source.</p>
+</li>
+<li>
+<p><strong>Registry empty?</strong> Check the configuration of your scenario registry URL. Ensure that your network allows egress traffic from the Krkn controller to the registry endpoint.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="run-and-interpret-one-chaos-experiment.html">Run and interpret one chaos experiment</a></span>
+  <span class="next"><a href="configuring-experiment-parameters-and-attachments.html">Configuring experiment parameters and attachments</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

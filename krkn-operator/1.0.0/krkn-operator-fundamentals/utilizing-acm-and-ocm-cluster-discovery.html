@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Utilizing ACM and OCM cluster discovery :: Chaos Engineering with Krkn</title>
+    <link rel="prev" href="executing-jobs-and-managing-logs.html">
+    <link rel="next" href="configuring-multi-cluster-scenario-execution.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Chaos Engineering with Krkn</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Chaos Engineering with Krkn</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../chaos-engineering-methodology/chaos-engineering-methodology.html">Chaos engineering methodology</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/understanding-the-chaos-engineering-lifecycle.html">Understanding the chaos engineering lifecycle</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/proactive-versus-reactive-testing-strategies.html">Proactive versus reactive testing strategies</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/evaluating-system-performance-under-disruption.html">Evaluating system performance under disruption</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/implementing-recovery-validation-and-observability.html">Implementing recovery validation and observability</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/managing-blast-radius-and-rollback-planning.html">Managing blast radius and rollback planning</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chaos-engineering-methodology/exploratory-manual-testing-and-pipeline-automation.html">Exploratory manual testing and pipeline automation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/turn-risk-into-a-testable-experiment.html">Turn risk into a testable experiment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/identifying-service-risks-and-failure-modes.html">Identifying service risks and failure modes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/defining-steady-state-and-test-hypotheses.html">Defining steady state and test hypotheses</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/setting-target-duration-and-blast-radius.html">Setting target, duration, and blast radius</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/establishing-metrics-for-availability-latency-and-throughput.html">Establishing metrics for availability, latency, and throughput</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/planning-monitoring-stop-conditions-and-rollbacks.html">Planning monitoring, stop conditions, and rollbacks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../turn-risk-into-a-testable-experiment/mapping-risks-to-krkn-disruption-scenarios.html">Mapping risks to Krkn disruption scenarios</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="krkn-operator-fundamentals.html">Krkn Operator fundamentals</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="managing-target-clusters-and-user-permissions.html">Managing target clusters and user permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="working-with-scenario-registries.html">Working with scenario registries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="executing-jobs-and-managing-logs.html">Executing jobs and managing logs</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="utilizing-acm-and-ocm-cluster-discovery.html">Utilizing ACM and OCM cluster discovery</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="configuring-multi-cluster-scenario-execution.html">Configuring multi-cluster scenario execution</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="navigating-chaos-studio-and-resiliency-scores.html">Navigating Chaos Studio and Resiliency Scores</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/run-and-interpret-one-chaos-experiment.html">Run and interpret one chaos experiment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/selecting-target-clusters-and-scenario-registries.html">Selecting target clusters and scenario registries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/configuring-experiment-parameters-and-attachments.html">Configuring experiment parameters and attachments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/reviewing-configurations-and-executing-experiments.html">Reviewing configurations and executing experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/analyzing-logs-and-status-reports.html">Analyzing logs and status reports</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/validating-workload-recovery-and-service-availability.html">Validating workload recovery and service availability</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../run-and-interpret-one-chaos-experiment/verifying-alerts-and-dependent-component-impact.html">Verifying alerts and dependent component impact</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/build-workflows-with-chaos-studio.html">Build workflows with Chaos Studio</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/creating-reusable-chaos-workflows.html">Creating reusable chaos workflows</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/configuring-sequential-and-parallel-scenario-execution.html">Configuring sequential and parallel scenario execution</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/connecting-and-cloning-workflow-nodes.html">Connecting and cloning workflow nodes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/validating-and-reusing-workflow-models.html">Validating and reusing workflow models</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../build-workflows-with-chaos-studio/modeling-complex-platform-and-service-disruptions.html">Modeling complex platform and service disruptions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/measure-resilience-and-establish-a-baseline.html">Measure resilience and establish a baseline</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/using-promql-for-slo-definition.html">Using PromQL for SLO definition</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/monitoring-availability-error-rates-and-throughput.html">Monitoring availability, error rates, and throughput</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/calculating-and-interpreting-the-resilience-score.html">Calculating and interpreting the Resilience Score</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/comparing-scores-across-environments-and-time.html">Comparing scores across environments and time</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/identifying-slo-degradation-and-performance-trends.html">Identifying SLO degradation and performance trends</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../measure-resilience-and-establish-a-baseline/recommending-remediation-based-on-score-analysis.html">Recommending remediation based on score analysis</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../operationalize-resilience-validation/operationalize-resilience-validation.html">Operationalize resilience validation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/validating-infrastructure-and-application-upgrades.html">Validating infrastructure and application upgrades</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/integrating-chaos-testing-into-cicd-pipelines.html">Integrating chaos testing into CI/CD pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/running-chaos-during-performance-and-scale-testing.html">Running chaos during performance and scale testing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/standardizing-execution-across-managed-clusters.html">Standardizing execution across managed clusters</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/storing-and-comparing-long-term-results.html">Storing and comparing long-term results</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../operationalize-resilience-validation/combining-recovery-checks-with-system-health-metrics.html">Combining recovery checks with system health metrics</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../hands-on-labs/hands-on-labs.html">Hands-on Labs</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/executing-pod-disruption-experiments.html">Executing pod-disruption experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/modeling-multi-stage-failure-workflows.html">Modeling multi-stage failure workflows</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/calculating-and-analyzing-resilience-scores.html">Calculating and analyzing Resilience Scores</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-labs/automating-resilience-validation-in-test-environments.html">Automating resilience validation in test environments</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Chaos Engineering with Krkn</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Chaos Engineering with Krkn</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Chaos Engineering with Krkn</a></li>
+    <li><a href="krkn-operator-fundamentals.html">Krkn Operator fundamentals</a></li>
+    <li><a href="utilizing-acm-and-ocm-cluster-discovery.html">Utilizing ACM and OCM cluster discovery</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Utilizing ACM and OCM cluster discovery</h1>
+<h1 id="_utilizing_acm_and_ocm_cluster_discovery" class="sect0"><a class="anchor" href="#_utilizing_acm_and_ocm_cluster_discovery"></a>Utilizing ACM and OCM Cluster Discovery</h1>
+<div class="paragraph">
+<p>In large-scale Kubernetes environments, manually managing chaos experiment targets can become an administrative burden. The Krkn Operator simplifies this by integrating with <strong>Open Cluster Management (OCM)</strong> and <strong>Red Hat Advanced Cluster Management (ACM)</strong>, enabling automated discovery of managed clusters.</p>
+</div>
+<div class="sect1">
+<h2 id="_understanding_ocmacm_integration"><a class="anchor" href="#_understanding_ocmacm_integration"></a>Understanding OCM/ACM Integration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Krkn Operator does not strictly require ACM or OCM to function; manual cluster registration is fully supported and offers feature parity. However, integrating with OCM/ACM provides:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Automated Discovery:</strong> Automatically populates your available targets without manual configuration.</p>
+</li>
+<li>
+<p><strong>Centralized Management:</strong> Leverages your existing multi-cluster governance infrastructure.</p>
+</li>
+<li>
+<p><strong>Operational Efficiency:</strong> Reduces the risk of human error when onboarding new clusters for chaos testing.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The integration with OCM/ACM is optional. It is designed to automate the discovery process, not to provide additional chaos functionality. All clusters—whether discovered via ACM/OCM or added manually—possess the same capabilities within the Krkn Operator.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enabling_cluster_discovery_via_helm"><a class="anchor" href="#_enabling_cluster_discovery_via_helm"></a>Enabling Cluster Discovery via Helm</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To enable the integration during the installation of the Krkn Operator, you must set the <code>acm.enabled</code> flag to <code>true</code> in your Helm deployment.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace \
+  --set acm.enabled=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_compatibility_and_requirements"><a class="anchor" href="#_compatibility_and_requirements"></a>Compatibility and Requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before enabling integration, ensure your environment meets the tested compatibility requirements. Using unsupported versions may lead to discovery failures or inconsistent behavior.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Verified OCM Compatibility Matrix</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OCM Version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Status</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tested</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tested</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.3.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tested</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you are running an older version of ACM not listed in the table, the integration may still function; however, it is not actively tested or supported. We recommend upgrading to one of the validated versions above to ensure stability in your chaos experiments.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hands_on_activity_verifying_cluster_discovery"><a class="anchor" href="#_hands_on_activity_verifying_cluster_discovery"></a>Hands-on Activity: Verifying Cluster Discovery</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this activity, you will verify that your clusters are correctly being identified by the Krkn Operator.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Check Pod Status:</strong> Ensure the <code>krkn-operator</code> is running in the <code>krkn-operator-system</code> namespace.
+<code>kubectl get pods -n krkn-operator-system</code></p>
+</li>
+<li>
+<p><strong>Verify Configuration:</strong> Inspect the operator deployment configuration to confirm that the OCM integration is active.
+<code>kubectl get deployment krkn-operator-controller-manager -n krkn-operator-system -o yaml | grep -A 2 acm</code></p>
+</li>
+<li>
+<p><strong>Validate Discovery:</strong> Use the Krkn Operator CLI or API to list the discovered clusters.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If using the Chaos Studio interface, navigate to the <strong>Clusters</strong> tab.</p>
+</li>
+<li>
+<p>If using the CLI, run the command: <code>krkn-cli list-clusters</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Troubleshooting:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>If clusters do not appear, verify that the <code>krkn-operator</code> has the necessary <code>ClusterRole</code> permissions to read the OCM/ACM resources.</p>
+</li>
+<li>
+<p>Ensure the <code>ManagedCluster</code> custom resources in the OCM hub cluster are in the <code>Ready</code> state.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>By successfully integrating OCM/ACM, you lay the foundation for automated, multi-cluster resilience testing, allowing you to scale your chaos engineering efforts across the entire fleet seamlessly.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="executing-jobs-and-managing-logs.html">Executing jobs and managing logs</a></span>
+  <span class="next"><a href="configuring-multi-cluster-scenario-execution.html">Configuring multi-cluster scenario execution</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>
