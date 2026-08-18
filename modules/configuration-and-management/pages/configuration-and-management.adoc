@@ -1,0 +1,10 @@
+#  Configuration and Management
+
+= Configuration and Management
+
+The Configuration and Management module provides the tools required to govern user access, infrastructure settings, and chaos experiment execution within the Krkn-operator platform.
+
+*   **User and Access Control:** Administrators manage users and groups, assigning permissions to ensure secure access to clusters and operational features.
+*   **Infrastructure Setup:** Configure core platform components, including target providers, private registries, and cluster registration.
+*   **Chaos Experimentation:** Define and manage reusable configuration files for chaos experiments and orchestrate complex scenarios directly through the web interface.
+*   **Resource Administration:** Utilize file management capabilities to organize text-based configurations for consistent use across Chaos Studio workflows.

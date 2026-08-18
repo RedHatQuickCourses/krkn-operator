@@ -1,0 +1,46 @@
+#  Architecture and core components
+
+= Architecture and core components
+
+The Krkn-operator is designed as a Kubernetes-native controller, leveraging the Operator pattern to manage the lifecycle of chaos engineering experiments directly within the cluster. By utilizing custom resource definitions (CRDs) and a control loop, it provides a declarative way to orchestrate complex failure scenarios.
+
+== Architectural Overview
+
+The architecture follows the standard Kubernetes controller pattern, ensuring that the desired state of chaos experiments is continuously reconciled with the actual state of the cluster.
+
+[mermaid]
+....
+graph TD
+    A[User/Admin] -->|Apply CRD| B[Kubernetes API Server]
+    B --> C[Krkn-Operator Controller]
+    C -->|Orchestrates| D[Chaos Experiments]
+    D -->|Injects Faults| E[Target Workloads/Nodes]
+    C -->|Monitors| F[Cluster Health/Metrics]
+    F -->|Feedback Loop| C
+....
+
+=== Core Components
+
+The functionality of the Krkn-operator is powered by several internal building blocks:
+
+*   **Controller Manager:** The central brain of the operator. It watches for changes to Krkn-specific custom resources. When a new chaos scenario is defined, the controller triggers the execution logic.
+*   **Chaos Engine:** The execution engine responsible for the lifecycle of an experiment. It handles the injection of faults (e.g., CPU/Memory hogs, namespace deletions) and ensures that the system returns to its original state after the experiment duration expires.
+*   **Reconciliation Loop:** This component constantly monitors the health of the target environment. It ensures that if a component fails—whether due to infrastructure issues, application bugs, or dependencies—the system recognizes the failure immediately to avoid extended downtime.
+*   **Target Provider Interface:** An abstraction layer that allows the operator to interface with different infrastructure environments, such as standalone Kubernetes clusters or clusters managed via Advanced Cluster Management (ACM).
+
+== Design Principles
+
+To ensure reliability during chaos injection, the operator is built on these foundational principles:
+
+[cols="1,3"]
+|===
+| Principle | Description |
+| **High Availability** | The operator is designed for HA deployment, ensuring that the control plane for chaos engineering remains resilient even when the underlying infrastructure is under stress. |
+| **Minimal Recovery Time** | The operator logic prioritizes fast recovery. Once an experiment is concluded, the controller initiates recovery logic to restore normal operations, preventing "chaos residue." |
+| **Declarative Configuration** | Chaos scenarios are defined as Kubernetes objects. This allows teams to store, version, and audit chaos experiments using standard GitOps workflows. |
+| **Observability Integration** | The operator integrates with monitoring systems to verify that the system detects failures as soon as they are injected, validating the effectiveness of existing alerts and self-healing mechanisms. |
+|===
+
+== Component Responsibilities
+
+The separation of concerns within the Krkn-operator architecture allows it to handle diverse failure modes—ranging from resource starvation (CPU/Memory Hogs) to systemic disruptions (Namespace Failures or Time Skewing). By offloading the execution to the controller, the operator ensures that even if the primary interface is disconnected, the scheduled experiments or recovery tasks remain active, maintaining control over the chaos.

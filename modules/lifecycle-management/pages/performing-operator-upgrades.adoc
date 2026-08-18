@@ -1,0 +1,64 @@
+#  Performing operator upgrades
+
+= Performing operator upgrades
+
+Upgrading the `krkn-operator` is a critical administrative task to ensure your chaos engineering environment benefits from the latest features, security patches, and experiment definitions. As a Kubernetes-native tool, the operator lifecycle is managed primarily through Helm, allowing for seamless updates within your cluster.
+
+== Prerequisites for Upgrades
+
+Before performing an upgrade, ensure the following conditions are met:
+* **Helm CLI:** Ensure you have the latest version of Helm installed locally.
+* **Cluster Access:** You must have `cluster-admin` or appropriate namespace-level permissions to modify the operator resources.
+* **Backup:** While the operator is stateless, ensure your custom chaos scenarios and experiment definitions are backed up or stored in version control (e.g., Git).
+* **Network Connectivity:** Ensure your cluster can reach the container registry at `quay.io` to pull the updated chart versions.
+
+== Performing the Upgrade
+
+The `krkn-operator` is distributed as an OCI-compliant Helm chart. To upgrade the operator, you will point your local Helm client to the OCI registry and specify the desired version.
+
+=== Step-by-Step Upgrade Procedure
+
+1. **Verify Current Installation:**
+   Check the currently installed version to confirm the release name and namespace:
+   [source,bash]
+   ----
+   helm list -n krkn-operator-system
+   ----
+
+2. **Execute the Upgrade Command:**
+   Use the `helm upgrade` command to pull the latest version from the OCI registry. Replace `0.4.5-beta` with your target version:
+   [source,bash]
+   ----
+   helm upgrade krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+     --version 0.4.5-beta \
+     --namespace krkn-operator-system
+   ----
+
+3. **Validate the Upgrade:**
+   After the command completes, verify that the operator pods have restarted and are running the new image:
+   [source,bash]
+   ----
+   kubectl get pods -n krkn-operator-system
+   ----
+
+== Troubleshooting Upgrade Issues
+
+If the upgrade process encounters issues, follow these diagnostic steps:
+
+* **Check Rollout Status:** If the operator fails to start, check the logs of the manager pod:
+  [source,bash]
+  ----
+  kubectl logs -l control-plane=controller-manager -n krkn-operator-system
+  ----
+* **Inspect Helm History:** If you need to revert to a previous working state, use the rollback feature:
+  [source,bash]
+  ----
+  helm rollback krkn-operator <revision_number> -n krkn-operator-system
+  ----
+* **Permission Errors:** If you receive "Access Denied" errors, verify that your service account or kubeconfig has the necessary permissions to update deployments and cluster roles within the `krkn-operator-system` namespace.
+
+== Best Practices
+
+* **Version Pinning:** Always specify a `--version` flag to avoid accidental updates to unstable or incompatible releases.
+* **Read Release Notes:** Before upgrading, consult the official release notes for any breaking changes in the Custom Resource Definitions (CRDs) or configuration schema.
+* **Testing:** Perform upgrades in a non-production staging cluster before applying them to your production chaos orchestration environment.

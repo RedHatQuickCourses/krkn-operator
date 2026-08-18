@@ -1,5 +1,5 @@
 site:
-  title:  Chaos Engineering with Krkn
+  title:  Krkn-operator
   start_page: krkn-operator::index.adoc
 
 content:

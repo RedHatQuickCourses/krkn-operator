@@ -1,0 +1,4 @@
+* xref:hands-on-lab.adoc[]
+** xref:deploying-the-krkn-operator-in-a-kubernetes-cluster.adoc[]
+** xref:executing-a-sample-chaos-experiment.adoc[]
+** xref:upgrading-the-operator-to-a-newer-version.adoc[]

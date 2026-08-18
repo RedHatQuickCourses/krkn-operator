@@ -1,0 +1,82 @@
+#  Configuring chaos experiments
+
+= Configuring Chaos Experiments
+
+Chaos experiments are the fundamental unit of work within the `Krkn-operator`. They define the "fault" or "stress" to be injected into your Kubernetes environment. Configuring these experiments requires a clear understanding of the experiment definition, the target scope, and the desired steady-state hypothesis.
+
+== Anatomy of a Chaos Experiment
+
+In the context of the `Krkn-operator`, a chaos experiment is typically managed through custom resources (CRs) that define the parameters of the disruption. When configuring these, focus on three primary pillars:
+
+1. **Targeting:** Identifying the specific resources (Pods, Nodes, Deployments, or Network policies) that will be subjected to the fault.
+2. **Disruption Parameters:** Defining the type of stress (e.g., CPU/Memory hogging, network latency, pod kills) and its intensity.
+3. **Guardrails:** Defining constraints to ensure the chaos does not exceed the acceptable impact boundaries, potentially using the Krkn signaling feature to pause or stop if health checks fail.
+
+== Best Practices for Configuration
+
+When drafting your experiment configurations, adhere to the following principles:
+
+* **Define the Scope:** Avoid broad, cluster-wide impacts unless explicitly testing global resiliency. Use label selectors to pin experiments to specific subsets of your infrastructure.
+* **Observe, Don't Just Break:** Always pair your experiment with observability tools. A chaos experiment without telemetry is simply a system outage.
+* **Steady-State Hypothesis:** Before configuring the experiment, define what "normal" looks like. The experiment configuration should be designed to validate that the system returns to this state after the disruption ceases.
+* **Environment Sensitivity:** As noted in our testing guide, experiments configured for staging may need different thresholds than those intended for production.
+
+== Hands-on Lab: Configuring a Basic Pod-Kill Experiment
+
+This activity guides you through creating a simple chaos experiment configuration to terminate pods within a specific namespace.
+
+=== Prerequisites
+* A running Kubernetes cluster.
+* `Krkn-operator` installed and running.
+* A target application deployed in a namespace (e.g., `my-app`).
+
+=== Step 1: Create the Experiment Manifest
+Create a file named `pod-kill-experiment.yaml`. This configuration instructs the operator to target a deployment by its label.
+
+[source,yaml]
+----
+apiVersion: krkn.redhat.com/v1beta1
+kind: ChaosExperiment
+metadata:
+  name: pod-killer-demo
+  namespace: krkn-installer
+spec:
+  experiment:
+    type: "pod-kill"
+    labelSelector: "app=my-web-service"
+    namespace: "my-app"
+    duration: "60s"
+    count: 2 # Kill 2 pods
+----
+
+=== Step 2: Apply the Configuration
+Apply the manifest to your cluster using `kubectl`:
+
+[source,bash]
+----
+kubectl apply -f pod-kill-experiment.yaml
+----
+
+=== Step 3: Verify Execution
+Monitor the status of your experiment using the custom resource status field:
+
+[source,bash]
+----
+kubectl get chaosexperiment pod-killer-demo -n krkn-installer -o yaml
+----
+
+Observe the `status` block. You should see the progression from `Pending` to `Running`, and finally `Completed`. 
+
+=== Step 4: Validate Impact
+Check your target namespace to verify the pods were restarted:
+
+[source,bash]
+----
+kubectl get pods -n my-app
+# Look for the 'Age' column to confirm pod recreation
+----
+
+[TIP]
+====
+If the experiment does not trigger as expected, check the `krkn-operator` controller logs. Use `kubectl logs -l name=krkn-operator -n krkn-installer` to identify potential permission issues or invalid label selectors.
+====

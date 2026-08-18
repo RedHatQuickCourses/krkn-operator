@@ -1,0 +1,9 @@
+#  Lifecycle Management
+
+= Lifecycle Management
+
+Lifecycle management ensures the ongoing reliability and operational integrity of the Krkn-operator within a Kubernetes environment. Key activities include:
+
+*   **Upgrades:** Performing seamless operator updates to incorporate new features and performance improvements.
+*   **Version Control:** Managing releases and compatibility to ensure consistency across chaos experiment environments.
+*   **Maintenance:** Monitoring operator health to ensure stable execution of chaos scenarios and continued adherence to defined service level indicators.

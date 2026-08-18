@@ -1,0 +1,60 @@
+#  Managing users and permissions
+
+= Managing Users and Permissions
+
+The Krkn-operator utilizes a robust, group-based access control model to ensure secure multi-tenant chaos engineering. By decoupling permissions from individual users and associating them with functional groups, administrators can maintain a scalable security posture across multiple Kubernetes clusters.
+
+== The Permission Model
+
+The security architecture is built on a hierarchical structure where the **Group** acts as the primary container for access policies. Every user within the platform must be assigned to at least one group; a user without a group assignment will have no visibility or operational access to the platform.
+
+=== Key Components
+
+*   **Groups:** Logical entities created by Administrators that define the scope of interaction. A group configuration specifies:
+    *   **Cluster Accessibility:** Which target clusters are available to members.
+    *   **Permissions:** The granular operations allowed (View, Run, Delete).
+    *   **Registry Visibility:** Which image registries can be accessed by the chaos experiments.
+
+*   **Users:** Individuals who inherit all permissions associated with their assigned group.
+
+== Role Definitions
+
+Permissions are tailored to specific personas within your organization:
+
+[cols="1,3", options="header"]
+|===
+| Role | Responsibilities
+| **Administrator** | Manages the infrastructure, registers target clusters, creates groups, maps users to groups, and configures private registries and target providers (such as ACM).
+| **User** | Performs operational tasks based on group membership. This includes managing experiment jobs, accessing cluster terminals, executing chaos scenarios, and designing workflows in Chaos Studio.
+|===
+
+== Operational Capabilities
+
+The scope of a user's activity is determined by the permissions granted to their group:
+
+*   **View and Manage:** Ability to observe and interact with existing chaos jobs (requires View/Delete permissions).
+*   **Terminal Access:** Ability to open a shell into a target cluster (requires Run permission).
+*   **Scenario Execution:** Ability to trigger chaos experiments on assigned clusters (requires Run permission).
+*   **Chaos Studio:** Ability to design, modify, and save complex chaos workflows (requires Run permission).
+*   **File Management:** Ability to upload and manage files, scoped strictly by the group's visibility settings.
+
+== Admin Configuration Workflow
+
+To manage the environment effectively, administrators follow this standard lifecycle:
+
+1.  **Define the Group:** Create a group and designate the specific target clusters that the group will interact with.
+2.  **Assign Permissions:** Select the appropriate permission level (View, Run, Delete) to define the group's capability on the assigned clusters.
+3.  **Assign Users:** Add users to the group. Upon assignment, the user immediately inherits the group's security context.
+
+[TIP]
+====
+To ensure the principle of least privilege, audit your group assignments regularly. A user’s access is strictly defined by their group—if a user needs access to a new cluster, add that cluster to their existing group or assign them to an additional group with the required access.
+====
+
+== Troubleshooting Permission Issues
+
+If a user reports that they cannot see a cluster or execute a command, verify the following:
+
+*   **Group Membership:** Ensure the user is explicitly assigned to a group.
+*   **Group Policies:** Check if the target cluster is correctly mapped to the user's group.
+*   **Permission Level:** Confirm that the user has the 'Run' permission, as this is a prerequisite for executing scenarios and using terminal features.

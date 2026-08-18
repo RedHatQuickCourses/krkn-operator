@@ -1,0 +1,9 @@
+#  Installation
+
+= Installation
+
+The `krkn-operator` is deployed on Kubernetes or OpenShift clusters primarily using Helm charts. 
+
+* **Prerequisites:** Ensure your environment meets the necessary cluster requirements before deployment.
+* **Deployment Method:** Use Helm to install the operator, ensuring proper namespace management and creation to maintain an organized cluster environment.
+* **Configuration:** Optionally attach configuration files via the File Management interface to customize your deployment parameters.

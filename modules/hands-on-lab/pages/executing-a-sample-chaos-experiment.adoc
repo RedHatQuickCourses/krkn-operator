@@ -1,0 +1,79 @@
+#  Executing a sample chaos experiment
+
+= Executing a sample chaos experiment
+
+This section guides you through the execution of a baseline chaos experiment using the `Krkn-operator`. We will trigger a pod-failure scenario to observe how your application and cluster infrastructure respond to unexpected disruptions.
+
+== Prerequisites
+Before executing the experiment, ensure:
+* The `Krkn-operator` is successfully deployed in your cluster.
+* You have access to the Kubernetes namespace where the target application resides.
+* The `krkn` CLI tool or the operator's Custom Resource Definition (CRD) interface is configured.
+
+== Understanding the Experiment Workflow
+Chaos experiments in the `Krkn-operator` are defined as Kubernetes Custom Resources (CRs). When you apply a chaos CR, the operator reconciles the state, coordinates the execution of the fault, and monitors the target resources.
+
+== Hands-on Lab: Executing a Pod-Failure Experiment
+
+In this exercise, we will induce a controlled pod-failure within a specific deployment to test the resilience of your service.
+
+=== Step 1: Create the Chaos Experiment Manifest
+Create a file named `pod-failure-experiment.yaml`. This manifest instructs the operator to terminate pods matching a specific label.
+
+[source,yaml]
+----
+apiVersion: krkn.redhat.com/v1beta1
+kind: ChaosExperiment
+metadata:
+  name: sample-pod-failure
+  namespace: krkn-operator-system
+spec:
+  experiment_type: "pod-failure"
+  target_namespace: "my-app-namespace"
+  label_selector: "app=frontend"
+  duration: "60s"
+  instances: 1
+----
+
+=== Step 2: Trigger the Experiment
+Apply the manifest to your cluster to initiate the chaos orchestration.
+
+[source,bash]
+----
+kubectl apply -f pod-failure-experiment.yaml
+----
+
+=== Step 3: Monitor Execution
+Use the following commands to observe the operator's progress and the state of your target application:
+
+1. **Check Operator logs:**
++
+[source,bash]
+----
+kubectl logs -f deployment/krkn-operator-controller-manager -n krkn-operator-system
+----
+
+2. **Observe the target pods:**
++
+[source,bash]
+----
+kubectl get pods -n my-app-namespace -w
+----
+
+=== Step 4: Analyze Resilience
+Once the duration defined in the YAML has elapsed, the operator will stop the experiment. Review the results:
+
+* **Observation:** Did the application deployment automatically spin up a new pod? 
+* **Monitoring:** Check your observability dashboard (e.g., Prometheus/Grafana) to see if latency spiked or if health checks failed during the pod termination.
+* **Learning:** Remember that the goal is not to "pass" or "fail" the test, but to understand if the system recovers gracefully without manual intervention.
+
+[TIP]
+====
+If you have configured the Kraken **Signaling feature**, you can use it here to pause other performance or scalability tests running in the background until the pod-failure experiment completes, ensuring that you isolate the chaos impact from other telemetry data.
+====
+
+=== Troubleshooting
+If the experiment fails to start:
+* Verify that the `target_namespace` and `label_selector` match active resources in your cluster.
+* Ensure the service account used by the `Krkn-operator` has sufficient RBAC permissions to delete pods in the target namespace.
+* Check the status of the `ChaosExperiment` CR: `kubectl describe chaosexperiment sample-pod-failure -n krkn-operator-system`.

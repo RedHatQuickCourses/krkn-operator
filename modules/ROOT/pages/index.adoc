@@ -1,9 +1,9 @@
-=  Chaos Engineering with Krkn
+=  Krkn-operator
 :navtitle: Home
 
 == Introduction
 
-Course Title:  Chaos Engineering with Krkn
+Course Title:  Krkn-operator
 
 Description:
 Course description FIXME
@@ -13,21 +13,15 @@ Duration: FIXME hours
 == Topics covered in this course
 
 
-*  Chaos engineering methodology
+*  Introduction to Krkn-operator
 
-*  Turn risk into a testable experiment
+*  Installation
 
-*  Krkn Operator fundamentals
+*  Configuration and Management
 
-*  Run and interpret one chaos experiment
+*  Lifecycle Management
 
-*  Build workflows with Chaos Studio
-
-*  Measure resilience and establish a baseline
-
-*  Operationalize resilience validation
-
-*  Hands-on Labs
+*  Hands-on Lab
 
 
 

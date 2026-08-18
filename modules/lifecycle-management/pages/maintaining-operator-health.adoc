@@ -1,0 +1,51 @@
+#  Maintaining operator health
+
+= Maintaining Operator Health
+
+Maintaining the health of the `krkn-operator` is critical to ensuring that chaos experiments are executed reliably without compromising the stability of the management plane. A healthy operator ensures that chaos scenarios are orchestrated correctly, resources are cleaned up post-experiment, and the system remains observable.
+
+== Health Monitoring Best Practices
+
+To ensure the `krkn-operator` functions within expected parameters, consider the following maintenance strategies:
+
+*   **Resource Monitoring:** Monitor the memory and CPU utilization of the `krkn-controller-manager` pods. Excessive resource consumption may indicate memory leaks or an unoptimized reconciliation loop.
+*   **Log Analysis:** Regularly inspect operator logs for errors related to API connectivity or permission denials. Using `kubectl logs -n krkn-namespace deployment/krkn-controller-manager` is standard practice.
+*   **Condition Tracking:** Leverage Kubernetes status conditions. Ensure the operator reports `Ready` and `Available` statuses. If the operator enters a `CrashLoopBackOff`, investigate the configuration map for syntax errors or invalid experiment parameters.
+*   **Event Auditing:** Watch for Kubernetes events within the namespace where the operator is deployed to catch early warnings regarding resource quota exhaustion or RBAC failures.
+
+== Ensuring System Stability
+
+The stability of the operator is intrinsically linked to the underlying cluster health. Apply the following administration standards:
+
+[IMPORTANT]
+====
+**Machine Health Checks:** Always deploy machine health checks with appropriate conditions to remediate unhealthy nodes. This ensures that even if a chaos experiment targets infrastructure, the cluster maintains enough capacity to run without total downtime, preventing the operator from struggling to reconcile state on degraded hardware.
+====
+
+=== Proactive Maintenance Steps
+
+1.  **Reconciliation Audits:** Periodically check the number of active chaos resources. An accumulation of orphaned `ChaosExperiment` custom resources (CRs) can bloat the etcd database and slow down the controller reconciliation loop.
+2.  **RBAC Verification:** If you modify service accounts or cluster roles, ensure the operator retains the necessary permissions to interact with target resources. Use `kubectl auth can-i` to verify that the operator's service account has the required verb access (e.g., `list`, `patch`, `delete`) to the target namespaces.
+3.  **Dependency Updates:** Periodically verify that the underlying Kubernetes API versions supported by the operator are compatible with your current cluster version.
+
+== Troubleshooting Health Issues
+
+If the operator exhibits unexpected behavior, follow this diagnostic workflow:
+
+. **Check Pod Status:**
++
+[source,bash]
+----
+kubectl get pods -n krkn-operator-system
+----
++
+. **Inspect Operator Logs:** Look for stack traces or connection timeouts.
++
+[source,bash]
+----
+kubectl logs -n krkn-operator-system -l control-plane=controller-manager --tail=100
+----
++
+. **Verify Resource Limits:** Ensure that the `LimitRanges` and `ResourceQuotas` in the namespace do not restrict the operator from spawning the necessary pods to execute chaos experiments.
+
+By integrating these maintenance tasks into your standard platform administration routine, you ensure that the `krkn-operator` remains a resilient tool for validating your service level indicators (SLIs) and key performance indicators (KPIs) under duress.

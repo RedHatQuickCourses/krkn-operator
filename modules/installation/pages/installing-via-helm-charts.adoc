@@ -1,0 +1,70 @@
+#  Installing via Helm charts
+
+= Installing via Helm charts
+
+The `krkn-operator` is distributed as a Helm chart, facilitating standardized deployments across Kubernetes and OpenShift environments. By leveraging Helm, you can manage the operator lifecycle, perform version rollouts, and customize configurations through `values.yaml` files.
+
+== Prerequisites
+Before initiating the installation, ensure your environment meets the following requirements:
+
+* **Kubernetes Cluster:** Version 1.19 or higher, or OpenShift 4.x.
+* **Helm:** Version 3.0 or higher must be installed and configured in your local environment.
+* **Cluster Access:** `cluster-admin` privileges (or sufficient permissions to create namespaces and CRDs) are required to install the operator.
+
+== Installation Methods
+
+The installation approach depends on how you intend to expose the operator's web interface for scenario orchestration.
+
+[cols="1,2", options="header"]
+|===
+| Environment | Recommended Access Method
+| **Kubernetes** | Gateway API (preferred) or Ingress
+| **OpenShift** | Routes (native)
+|===
+
+== Quick Start Deployment
+For a standard installation using default settings, you can deploy the latest version (v0.4.5-beta) directly from the project's OCI registry. This command automatically creates the necessary namespace and deploys the operator components.
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace
+----
+
+== Production Deployment with Custom Configuration
+For production workloads, it is best practice to manage configuration via a custom `values.yaml` file. This allows you to define specific resource limits, replica counts, and exposure methods tailored to your cluster architecture.
+
+1. Create a `values.yaml` file locally:
++
+[source,yaml]
+----
+# values.yaml example
+replicaCount: 1
+image:
+  repository: quay.io/krkn-chaos/krkn-operator
+  tag: 0.4.5-beta
+# Add environment-specific overrides here
+----
+
+2. Deploy the operator referencing your configuration file:
++
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace \
+  -f values.yaml
+----
+
+== Verification
+Once the Helm command completes, verify that the operator pods are running correctly:
+
+[source,bash]
+----
+kubectl get pods -n krkn-operator-system
+----
+
+Ensure the pods are in the `Running` state and that all containers have passed their readiness probes before attempting to configure chaos experiments.

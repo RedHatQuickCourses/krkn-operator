@@ -1,0 +1,9 @@
+#  Hands-on Lab
+
+= Hands-on Lab
+
+The hands-on lab provides a practical environment to apply Krkn-operator concepts through real-world scenarios. It focuses on the following key activities:
+
+* **Deployment:** Installing the Krkn-operator within a Kubernetes cluster to establish the testing environment.
+* **Experimentation:** Executing sample chaos experiments to observe system behavior and validate resilience.
+* **Maintenance:** Performing operator upgrades to manage versioning and ensure the platform remains up-to-date with the latest features.

@@ -1,0 +1,79 @@
+#  Namespace management and creation
+
+= Namespace Management and Creation
+
+In the context of the Krkn-operator, namespaces serve as the primary logical boundary for both the operator’s control plane and the scope of chaos experiments. Proper namespace management is critical to ensuring that the Krkn-operator remains isolated, secure, and performant within your Kubernetes environment.
+
+== Overview of Namespace Strategy
+
+The Krkn-operator requires a dedicated namespace to host its controller, web interface, and associated backend services. By isolating the operator, you prevent accidental interference with production workloads and ensure that Role-Based Access Control (RBAC) policies can be scoped effectively.
+
+Key considerations for namespace management include:
+* **Isolation:** Keeping the operator separate from application workloads.
+* **Resource Quotas:** Applying resource limits to the operator namespace to ensure the chaos orchestration platform does not consume excessive cluster resources.
+* **RBAC Scoping:** Defining `RoleBindings` that allow the operator to manage resources in target namespaces without granting cluster-wide administrative privileges.
+
+== Managing Namespaces for Krkn-operator
+
+To manage namespaces effectively, follow these best practices for setup and configuration:
+
+=== 1. Creating the Operator Namespace
+Before deploying the Krkn-operator, you must create a dedicated namespace. This acts as the home for the operator’s pods.
+
+[source,bash]
+----
+kubectl create namespace krkn-operator-system
+----
+
+=== 2. Labeling for Security and Integration
+If your cluster employs security policies (such as Pod Security Admission), ensure the namespace is labeled correctly to allow the operator pods to run with the necessary privileges.
+
+[source,bash]
+----
+kubectl label namespace krkn-operator-system pod-security.kubernetes.io/enforce=privileged
+----
+
+== Hands-on Lab: Namespace Provisioning
+
+In this activity, you will prepare your cluster by creating the required namespace for the Krkn-operator.
+
+=== Prerequisites
+* A running Kubernetes cluster.
+* `kubectl` configured with cluster-admin privileges.
+
+=== Step 1: Create the Operator Namespace
+Execute the following command to create the workspace for the Krkn-operator:
+
+[source,bash]
+----
+kubectl create namespace krkn-operator
+----
+
+=== Step 2: Verify Namespace Readiness
+Ensure the namespace exists and is ready to accept resource deployments:
+
+[source,bash]
+----
+kubectl get namespace krkn-operator
+----
+
+=== Step 3: Verify Permissions
+As per the permission model, ensure that your administrative user has access to this namespace. If you are integrating this with the Krkn-operator's web interface later, you will need to map this namespace to a specific user group.
+
+[NOTE]
+====
+If you intend to run "Namespace Failures" (as defined in our documentation context), be aware that the Krkn-operator will require `delete` permissions on the target namespaces you designate for experimentation. Ensure your `ClusterRole` definitions reflect these requirements.
+====
+
+=== Step 4: Cleanup
+If you need to remove the operator and clean up the namespace, use the following command:
+
+[source,bash]
+----
+kubectl delete namespace krkn-operator
+----
+
+[WARNING]
+====
+Deleting a namespace is destructive and will remove all custom resource definitions (CRDs), chaos scenario configurations, and logs stored within that namespace. Always back up your configuration files before proceeding with deletion.
+====

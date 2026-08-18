@@ -1,0 +1,45 @@
+#  Handling versioning and releases
+
+= Handling versioning and releases
+
+As the `krkn-operator` evolves to support new Kubernetes primitives and advanced chaos scenarios, maintaining a clear versioning strategy is essential for cluster stability. The operator follows standard software lifecycle practices to ensure that updates do not inadvertently trigger destructive chaos events or interrupt observability pipelines.
+
+== Understanding Versioning Strategy
+
+The `krkn-operator` follows [Semantic Versioning (SemVer)](https://semver.org/), which uses the format `MAJOR.MINOR.PATCH` (e.g., `1.2.4`). This structure allows users to anticipate the impact of an upgrade:
+
+*   **MAJOR version (X.0.0):** Indicates breaking changes. This often involves changes to the Custom Resource Definitions (CRDs) or architectural shifts in how the operator interacts with the `krkn-lib`. Upgrading across major versions may require manual intervention or reconfiguration of existing chaos scenarios.
+*   **MINOR version (x.Y.0):** Introduces new features, such as new chaos scenarios or expanded support for cloud-provider-specific disruptions, while maintaining backward compatibility.
+*   **PATCH version (x.y.Z):** Focuses on bug fixes, performance optimizations for `krkn-lib` integrations, or security patches. These are generally safe to apply in production environments.
+
+== Release Lifecycle
+
+Releases for the `krkn-operator` are managed through the GitHub repository ecosystem. When a new release is cut, the following artifacts are updated:
+
+1.  **Helm Charts:** The repository's Helm chart version is incremented to match the operator image tag.
+2.  **Container Images:** New images are pushed to the container registry, tagged with the specific release version and a `latest` tag (though pinning to specific versions is recommended for production).
+3.  **Changelog:** Each release includes a detailed changelog highlighting new features, deprecated items, and fixed issues.
+
+== Best Practices for Upgrades
+
+Before performing an upgrade in a production-grade cluster, we recommend the following workflow:
+
+*   **Review the Changelog:** Always check the release notes for "Breaking Changes." If you are using custom CRDs, ensure they remain compatible with the new operator version.
+*   **Use a Staging Environment:** Test the upgrade in a non-production cluster where `krkn-demos` can be run to verify that chaos scenarios execute as expected.
+*   **Verify CRD Compatibility:** Since the operator relies on Kubernetes-native objects, verify if the new release requires a `kubectl apply` of new or updated CRD manifests before updating the Helm deployment.
+*   **Monitor Operator Health:** Following an upgrade, observe the operator logs for initialization errors. Ensure the `krkn-lib` dependencies are correctly initialized and the operator is able to communicate with the Kubernetes API server.
+
+== Rollback Strategy
+
+In the event that a new version introduces unexpected behavior, the operator can be reverted using Helm:
+
+[source,bash]
+----
+# List history of releases
+helm history krkn-operator -n krkn-namespace
+
+# Rollback to the previous stable release
+helm rollback krkn-operator [REVISION_NUMBER] -n krkn-namespace
+----
+
+By maintaining strict version control and following the release lifecycle, teams can safely integrate Chaos Engineering into their continuous delivery pipelines while ensuring the `krkn-operator` remains a stable and predictable component of the infrastructure stack.

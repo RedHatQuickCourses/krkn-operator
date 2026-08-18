@@ -1,0 +1,46 @@
+#  Use cases for chaos orchestration
+
+= Use cases for chaos orchestration
+
+Chaos orchestration is the systematic practice of injecting controlled failures into a system to verify its resilience against the inherent uncertainties of distributed environments. By leveraging the **Krkn-operator**, teams can move beyond manual testing and transition into automated, repeatable resilience validation.
+
+== Why Chaos Orchestration Matters
+
+Distributed systems often fail due to assumptions that rarely hold true in production, such as the reliability of the network or the infinite availability of shared resources. Chaos orchestration addresses these by proactively challenging the system’s design.
+
+=== Key Use Cases
+
+Through the Krkn-operator, you can implement the following strategic use cases:
+
+[cols="1,3"]
+|===
+| Use Case | Description
+
+| **Validation of High Availability (HA)**
+| Simulate the loss of individual nodes or pods to ensure that orchestration layers (like Kubernetes) correctly reschedule workloads and that service traffic reroutes without user-facing downtime.
+
+| **Dependency Resilience Testing**
+| Inject network latency or packet loss between microservices to evaluate how application code handles timeouts and circuit breaking. This ensures that a degradation in one component does not trigger a cascading failure across the entire system.
+
+| **Resource Exhaustion Profiling**
+| Artificially induce memory or CPU spikes on specific deployments. This helps verify that Horizontal Pod Autoscalers (HPA) trigger correctly and that the application behaves gracefully under load rather than crashing unexpectedly.
+
+| **Resiliency Score Benchmarking**
+| Use the Krkn-operator to measure your system against a "Steady State." By defining critical SLOs (e.g., API server latency), you can quantify how much your system's performance degrades during an experiment, providing a measurable **Resiliency Score**.
+
+| **Automated Compliance Verification**
+| Integrate chaos experiments into your CI/CD pipelines to ensure that every release maintains the required reliability standards before being promoted to production.
+|===
+
+== Mapping Chaos to Business Goals
+
+Chaos orchestration is not just about breaking things; it is about validating the *corrective* mechanisms built into your architecture. 
+
+* **Defining the Steady State:** Before orchestration begins, you must establish the "normal" behavioral baseline. Without this, you cannot objectively measure the impact of an experiment.
+* **Analyzing Metrics:** During orchestration, the Krkn-operator allows you to monitor key KPIs. By comparing these against your established steady state, you can identify "blind spots" where monitoring or alerting might be insufficient.
+* **Continuous Improvement:** Use the data gathered from orchestrated experiments to prioritize architectural changes. If an experiment proves a service is not resilient, the output provides the specific data needed to justify remediation efforts to stakeholders.
+
+[TIP]
+====
+For complex environments, use **Chaos Studio**—a core feature of the Krkn ecosystem—to build visual workflows. This allows you to design scenarios that execute in series or parallel, enabling you to simulate multi-stage failure modes, such as a node failure occurring simultaneously with a network partition.
+====

@@ -1,0 +1,59 @@
+#  Orchestrating scenarios via the web interface
+
+= Orchestrating scenarios via the web interface
+
+The Krkn-operator web interface provides a centralized control plane for chaos orchestration, moving beyond command-line execution to a visual, intuitive workflow management system. This interface allows operators to configure, execute, and monitor resilience tests across Kubernetes clusters seamlessly.
+
+== Core Interface Components
+
+The web interface is designed to streamline the lifecycle of a chaos experiment through the following key modules:
+
+*   **Run Scenarios:** The primary gateway for executing single chaos scenarios. It allows for quick testing of specific failure injections without the overhead of complex workflow design.
+*   **Chaos Studio:** A drag-and-drop environment for designing sophisticated chaos experiments. It supports both serial and parallel execution, enabling the construction of complex failure graphs to simulate real-world production outages.
+*   **Jobs:** A real-time monitoring dashboard where you can inspect scenario execution progress, logs, and final results.
+*   **File Management:** A built-in repository for uploading and managing custom configuration files (YAML/JSON) required for specific experiments.
+*   **Cluster Terminal:** A read-only utility that allows you to explore target clusters, providing visibility into the state of your infrastructure during or after chaos execution.
+
+== Configuring Scenario Parameters
+
+Before launching any scenario, you must define the operational parameters. These are categorized into three distinct levels:
+
+1.  **Mandatory:** Parameters required for the scenario to function (e.g., target namespace, duration). The operator will flag these as "must-configure" before the launch button is enabled.
+2.  **Optional:** Settings that provide fine-grained control over the experiment, such as specific label selectors, resource filters, or timing delays.
+3.  **Global:** Framework-level settings that govern the overall environment. This includes integration points like Prometheus for metrics, Elasticsearch for logging, and Cerberus for status monitoring.
+
+== Executing and Monitoring
+
+Once the parameters are defined, orchestration follows a simple two-step process:
+
+1.  **Launch:** Initiate the scenario or workflow via the web interface. 
+2.  **Monitor:** You will be automatically redirected to the **Jobs** page. Here, you can watch the scenario's execution in real-time, inspect resource transitions, and verify if the resiliency score meets your organizational thresholds.
+
+== Hands-on Lab: Executing a Scenario
+
+In this exercise, you will trigger a sample chaos scenario using the web interface.
+
+=== Prerequisites
+*   Krkn-operator successfully deployed in your cluster.
+*   Access to the web interface URL.
+
+=== Step 1: Accessing the Run Scenarios Module
+1. Navigate to the Krkn-operator dashboard.
+2. Select **Run Scenarios** from the sidebar.
+3. Select a pre-loaded scenario (e.g., `pod-kill`) from the library.
+
+=== Step 2: Configuring Parameters
+1. In the configuration panel, ensure all **Mandatory** fields are filled.
+2. Under the **Optional** tab, add a `label selector` to target only the `app=frontend` pods.
+3. Verify that the **Global** settings are connected to your monitoring stack.
+
+=== Step 3: Launch and Observe
+1. Click the **Run** button.
+2. Immediately observe the **Jobs** page. 
+3. Watch as the status transitions from `Pending` to `Running` and finally to `Completed`.
+4. Click on the job name to view the detailed logs and the resiliency output. 
+
+[NOTE]
+====
+If a job fails, use the **Cluster Terminal** to inspect the target resource logs to ensure the chaos injection reached the intended pod or node.
+====

@@ -1,0 +1,59 @@
+#  Upgrading the operator to a newer version
+
+= Upgrading the Krkn-operator
+
+As your chaos engineering requirements evolve, keeping the `krkn-operator` up to date ensures you have access to the latest chaos scenarios, performance improvements, and security patches. This section guides you through the process of upgrading the operator within your Kubernetes environment.
+
+== Prerequisites
+
+*   **Helm CLI**: Ensure you have the latest version of Helm installed.
+*   **Cluster Access**: You must have `cluster-admin` or appropriate permissions to modify resources within the `krkn-operator-system` namespace.
+*   **Version Verification**: Identify the target version you intend to upgrade to by checking the [Krkn-chaos repository](https://github.com/krkn-chaos/krkn-operator) or the OCI registry.
+
+== Upgrade Procedure
+
+Upgrading the `krkn-operator` is a straightforward process using the Helm CLI. Since the operator is distributed via OCI-compliant charts, you can perform an in-place upgrade without removing the existing installation.
+
+[IMPORTANT]
+====
+Before performing an upgrade in a production-like environment, it is recommended to verify the release notes of the target version to identify any potential breaking changes in CRD (Custom Resource Definition) schemas or configuration parameters.
+====
+
+=== Step-by-Step Upgrade
+
+1.  **Update your local Helm repositories** (if applicable) to ensure you are referencing the latest metadata.
+2.  **Execute the upgrade command** using the `helm upgrade` directive. Ensure you point to the same namespace used during the initial installation.
+
+[source,bash]
+----
+helm upgrade krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system
+----
+
+*   `--version`: Specifies the target release version.
+*   `--namespace`: Must match the namespace where the operator is currently deployed.
+
+== Verifying the Upgrade
+
+After executing the upgrade command, verify that the operator pods have rolled out successfully and are running the new image version.
+
+1.  **Check the status of the release:**
++
+[source,bash]
+----
+helm status krkn-operator -n krkn-operator-system
+----
+
+2.  **Monitor the operator pod rollout:**
++
+[source,bash]
+----
+kubectl rollout status deployment/krkn-operator-controller-manager -n krkn-operator-system
+----
+
+== Troubleshooting Common Issues
+
+*   **Namespace Mismatch**: If you receive a "release not found" error, verify that the namespace provided in the `upgrade` command matches the namespace where the operator was originally installed.
+*   **CRD Conflicts**: If the upgrade fails due to CRD changes, ensure that you have the necessary cluster-level permissions to update Kubernetes custom resources.
+*   **Image Pull Errors**: If the pods are stuck in `ImagePullBackOff`, ensure your cluster has network connectivity to `quay.io` and that the OCI registry remains accessible.

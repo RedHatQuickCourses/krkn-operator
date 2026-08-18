@@ -1,24 +1,18 @@
 name: krkn-operator
-title:  Chaos Engineering with Krkn
+title:  Krkn-operator
 version: 1.0.0
 nav:
 - modules/ROOT/nav.adoc
 - modules/LABENV/nav.adoc
 
-- modules/chaos-engineering-methodology/nav.adoc
+- modules/introduction-to-krkn-operator/nav.adoc
 
-- modules/turn-risk-into-a-testable-experiment/nav.adoc
+- modules/installation/nav.adoc
 
-- modules/krkn-operator-fundamentals/nav.adoc
+- modules/configuration-and-management/nav.adoc
 
-- modules/run-and-interpret-one-chaos-experiment/nav.adoc
+- modules/lifecycle-management/nav.adoc
 
-- modules/build-workflows-with-chaos-studio/nav.adoc
-
-- modules/measure-resilience-and-establish-a-baseline/nav.adoc
-
-- modules/operationalize-resilience-validation/nav.adoc
-
-- modules/hands-on-labs/nav.adoc
+- modules/hands-on-lab/nav.adoc
 
 - modules/appendix/nav.adoc

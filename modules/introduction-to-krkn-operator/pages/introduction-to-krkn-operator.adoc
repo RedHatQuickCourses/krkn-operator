@@ -1,0 +1,12 @@
+#  Introduction to Krkn-operator
+
+= Introduction to Krkn-operator
+
+The Krkn-operator is a Kubernetes-native platform designed to streamline Chaos Engineering by centralizing the deployment, configuration, and execution of experiments. It moves beyond manual scenario execution by providing an integrated web interface for comprehensive cluster and chaos orchestration.
+
+Key features and capabilities include:
+
+*   **Centralized Orchestration:** Manage chaos experiments, user permissions, and cluster configurations from a single, unified web console.
+*   **Kubernetes-Native Architecture:** Built to operate directly within Kubernetes environments, leveraging native resources for seamless integration.
+*   **Chaos Management:** Simplifies the lifecycle of chaos engineering, from initial deployment to the execution and monitoring of complex experiments.
+*   **Operational Efficiency:** Eliminates the need for manual command-line execution by offering a robust management platform for chaos scenarios.

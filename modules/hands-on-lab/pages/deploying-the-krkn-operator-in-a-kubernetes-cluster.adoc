@@ -1,0 +1,74 @@
+#  Deploying the Krkn-operator in a Kubernetes cluster
+
+= Deploying the Krkn-operator in a Kubernetes cluster
+
+This section provides the procedure to deploy the Krkn-operator within your Kubernetes environment. The Krkn-operator acts as a centralized control plane for managing your chaos engineering experiments, allowing you to orchestrate scenarios through a unified web interface rather than managing manual executions.
+
+== Prerequisites
+
+Before deploying the Krkn-operator, ensure your environment meets the following requirements:
+
+*   **Kubernetes Cluster:** A functional cluster (Kubernetes or OpenShift).
+*   **Helm:** Ensure Helm 3.x is installed on your local machine to manage the deployment.
+*   **External Access:** Decide on your access strategy. For Kubernetes environments, it is recommended to use the **Gateway API** or **Ingress** to expose the web interface.
+*   **Permissions:** You must have `cluster-admin` privileges to create namespaces and manage Custom Resource Definitions (CRDs) required by the operator.
+
+== Installation Procedure
+
+The Krkn-operator is distributed via OCI-compliant Helm charts. Use the following steps to deploy the operator into your cluster.
+
+=== Step 1: Create the Namespace
+It is best practice to isolate the operator in its own namespace to maintain cluster hygiene.
+
+[source,bash]
+----
+kubectl create namespace krkn-operator-system
+----
+
+=== Step 2: Prepare the Configuration
+While you can use default settings, a production-grade deployment typically requires a `values.yaml` file to define your specific ingress controller settings and persistent storage requirements.
+
+Create a file named `values.yaml` and configure your parameters. For example, to enable OCM/ACM integration for automatic cluster discovery, include the following:
+
+[source,yaml]
+----
+acm:
+  enabled: true
+# Add additional configuration for ingress or resource limits here
+----
+
+=== Step 3: Deploy via Helm
+Execute the following command to install the Krkn-operator. This command pulls the chart directly from the official Krkn repository.
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  -f values.yaml
+----
+
+[NOTE]
+====
+If you are not using a `values.yaml` file, you can pass parameters directly via the command line. For instance, to enable ACM integration without a file:
+`--set acm.enabled=true`
+====
+
+== Verification
+
+Once the Helm installation completes, verify that the operator components are running correctly by checking the status of the pods in the `krkn-operator-system` namespace:
+
+[source,bash]
+----
+kubectl get pods -n krkn-operator-system
+----
+
+Ensure all pods are in the `Running` or `Completed` state. If the pods are failing to start, inspect the logs for configuration errors:
+
+[source,bash]
+----
+kubectl logs -l app.kubernetes.io/name=krkn-operator -n krkn-operator-system
+----
+
+== Post-Deployment: Accessing the Interface
+After the pods are stable, retrieve the address for the web interface based on the Ingress or Gateway API configuration provided in your `values.yaml`. You can then navigate to the provided URL to begin managing your chaos experiments.

@@ -1,0 +1,4 @@
+* xref:lifecycle-management.adoc[]
+** xref:performing-operator-upgrades.adoc[]
+** xref:handling-versioning-and-releases.adoc[]
+** xref:maintaining-operator-health.adoc[]
