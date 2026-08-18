@@ -1,11 +1,11 @@
 {
-  "totalSeconds": 1769,
-  "pageCount": 23,
+  "totalSeconds": 10746,
+  "pageCount": 53,
   "pages": [
     {
       "module": "ROOT",
       "page": "index.adoc",
-      "seconds": 12
+      "seconds": 17
     },
     {
       "module": "LABENV",
@@ -15,102 +15,252 @@
     {
       "module": "introduction-to-krkn-operator",
       "page": "introduction-to-krkn-operator.adoc",
-      "seconds": 34
+      "seconds": 90
     },
     {
       "module": "introduction-to-krkn-operator",
       "page": "overview-of-kubernetes-native-chaos-engineering.adoc",
-      "seconds": 126
+      "seconds": 375
     },
     {
       "module": "introduction-to-krkn-operator",
       "page": "architecture-and-core-components.adoc",
-      "seconds": 133
+      "seconds": 439
     },
     {
       "module": "introduction-to-krkn-operator",
       "page": "use-cases-for-chaos-orchestration.adoc",
-      "seconds": 115
+      "seconds": 382
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "introduction-to-krkn-operator.adoc",
+      "seconds": 90
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "overview-of-kubernetes-native-chaos-engineering.adoc",
+      "seconds": 375
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "architecture-and-core-components.adoc",
+      "seconds": 439
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "use-cases-for-chaos-orchestration.adoc",
+      "seconds": 382
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "introduction-to-krkn-operator.adoc",
+      "seconds": 90
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "overview-of-kubernetes-native-chaos-engineering.adoc",
+      "seconds": 375
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "architecture-and-core-components.adoc",
+      "seconds": 439
+    },
+    {
+      "module": "introduction-to-krkn-operator",
+      "page": "use-cases-for-chaos-orchestration.adoc",
+      "seconds": 382
     },
     {
       "module": "installation",
       "page": "installation.adoc",
-      "seconds": 18
+      "seconds": 65
     },
     {
       "module": "installation",
       "page": "prerequisites-for-cluster-deployment.adoc",
-      "seconds": 137
+      "seconds": 393
     },
     {
       "module": "installation",
       "page": "installing-via-helm-charts.adoc",
-      "seconds": 62
+      "seconds": 196
     },
     {
       "module": "installation",
       "page": "namespace-management-and-creation.adoc",
-      "seconds": 83
+      "seconds": 162
+    },
+    {
+      "module": "installation",
+      "page": "installation.adoc",
+      "seconds": 65
+    },
+    {
+      "module": "installation",
+      "page": "prerequisites-for-cluster-deployment.adoc",
+      "seconds": 393
+    },
+    {
+      "module": "installation",
+      "page": "installing-via-helm-charts.adoc",
+      "seconds": 196
+    },
+    {
+      "module": "installation",
+      "page": "namespace-management-and-creation.adoc",
+      "seconds": 162
+    },
+    {
+      "module": "installation",
+      "page": "installation.adoc",
+      "seconds": 65
+    },
+    {
+      "module": "installation",
+      "page": "prerequisites-for-cluster-deployment.adoc",
+      "seconds": 393
+    },
+    {
+      "module": "installation",
+      "page": "installing-via-helm-charts.adoc",
+      "seconds": 196
+    },
+    {
+      "module": "installation",
+      "page": "namespace-management-and-creation.adoc",
+      "seconds": 162
     },
     {
       "module": "configuration-and-management",
       "page": "configuration-and-management.adoc",
-      "seconds": 29
+      "seconds": 89
     },
     {
       "module": "configuration-and-management",
       "page": "managing-users-and-permissions.adoc",
-      "seconds": 128
+      "seconds": 345
     },
     {
       "module": "configuration-and-management",
       "page": "configuring-chaos-experiments.adoc",
-      "seconds": 105
+      "seconds": 240
     },
     {
       "module": "configuration-and-management",
       "page": "orchestrating-scenarios-via-the-web-interface.adoc",
-      "seconds": 134
+      "seconds": 266
+    },
+    {
+      "module": "configuration-and-management",
+      "page": "configuration-and-management.adoc",
+      "seconds": 89
+    },
+    {
+      "module": "configuration-and-management",
+      "page": "managing-users-and-permissions.adoc",
+      "seconds": 345
+    },
+    {
+      "module": "configuration-and-management",
+      "page": "configuration-and-management.adoc",
+      "seconds": 89
+    },
+    {
+      "module": "configuration-and-management",
+      "page": "managing-users-and-permissions.adoc",
+      "seconds": 345
+    },
+    {
+      "module": "configuration-and-management",
+      "page": "configuring-chaos-experiments.adoc",
+      "seconds": 240
+    },
+    {
+      "module": "configuration-and-management",
+      "page": "orchestrating-scenarios-via-the-web-interface.adoc",
+      "seconds": 266
     },
     {
       "module": "lifecycle-management",
       "page": "lifecycle-management.adoc",
-      "seconds": 20
+      "seconds": 41
     },
     {
       "module": "lifecycle-management",
       "page": "performing-operator-upgrades.adoc",
-      "seconds": 117
+      "seconds": 194
     },
     {
       "module": "lifecycle-management",
       "page": "handling-versioning-and-releases.adoc",
-      "seconds": 133
+      "seconds": 162
     },
     {
       "module": "lifecycle-management",
       "page": "maintaining-operator-health.adoc",
-      "seconds": 101
+      "seconds": 240
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "lifecycle-management.adoc",
+      "seconds": 41
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "performing-operator-upgrades.adoc",
+      "seconds": 194
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "handling-versioning-and-releases.adoc",
+      "seconds": 162
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "maintaining-operator-health.adoc",
+      "seconds": 240
     },
     {
       "module": "hands-on-lab",
       "page": "hands-on-lab.adoc",
-      "seconds": 20
+      "seconds": 35
     },
     {
       "module": "hands-on-lab",
       "page": "deploying-the-krkn-operator-in-a-kubernetes-cluster.adoc",
-      "seconds": 79
+      "seconds": 92
     },
     {
       "module": "hands-on-lab",
       "page": "executing-a-sample-chaos-experiment.adoc",
-      "seconds": 98
+      "seconds": 197
     },
     {
       "module": "hands-on-lab",
       "page": "upgrading-the-operator-to-a-newer-version.adoc",
-      "seconds": 80
+      "seconds": 91
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "hands-on-lab.adoc",
+      "seconds": 35
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "deploying-the-krkn-operator-in-a-kubernetes-cluster.adoc",
+      "seconds": 92
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "executing-a-sample-chaos-experiment.adoc",
+      "seconds": 197
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "upgrading-the-operator-to-a-newer-version.adoc",
+      "seconds": 91
     },
     {
       "module": "appendix",
