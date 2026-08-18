@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Executing a sample chaos experiment :: Krkn-operator</title>
+    <link rel="prev" href="deploying-the-krkn-operator-in-a-kubernetes-cluster.html">
+    <link rel="next" href="upgrading-the-operator-to-a-newer-version.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Krkn-operator</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Krkn-operator</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../introduction-to-krkn-operator/introduction-to-krkn-operator.html">Introduction to Krkn-operator</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/overview-of-kubernetes-native-chaos-engineering.html">Overview of Kubernetes-native Chaos Engineering</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/architecture-and-core-components.html">Architecture and core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/use-cases-for-chaos-orchestration.html">Use cases for chaos orchestration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/installation.html">Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/prerequisites-for-cluster-deployment.html">Prerequisites for cluster deployment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/installing-via-helm-charts.html">Installing via Helm charts</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/namespace-management-and-creation.html">Namespace management and creation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../configuration-and-management/configuration-and-management.html">Configuration and Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/managing-users-and-permissions.html">Managing users and permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/configuring-chaos-experiments.html">Configuring chaos experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/orchestrating-scenarios-via-the-web-interface.html">Orchestrating scenarios via the web interface</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../lifecycle-management/lifecycle-management.html">Lifecycle Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/performing-operator-upgrades.html">Performing operator upgrades</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/handling-versioning-and-releases.html">Handling versioning and releases</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/maintaining-operator-health.html">Maintaining operator health</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="hands-on-lab.html">Hands-on Lab</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="deploying-the-krkn-operator-in-a-kubernetes-cluster.html">Deploying the Krkn-operator in a Kubernetes cluster</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="executing-a-sample-chaos-experiment.html">Executing a sample chaos experiment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="upgrading-the-operator-to-a-newer-version.html">Upgrading the operator to a newer version</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Krkn-operator</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Krkn-operator</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Krkn-operator</a></li>
+    <li><a href="hands-on-lab.html">Hands-on Lab</a></li>
+    <li><a href="executing-a-sample-chaos-experiment.html">Executing a sample chaos experiment</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Executing a sample chaos experiment</h1>
+<h1 id="_executing_a_sample_chaos_experiment" class="sect0"><a class="anchor" href="#_executing_a_sample_chaos_experiment"></a>Executing a sample chaos experiment</h1>
+<div class="paragraph">
+<p>This section guides you through the execution of a baseline chaos experiment using the <code>Krkn-operator</code>. We will trigger a pod-failure scenario to observe how your application and cluster infrastructure respond to unexpected disruptions.</p>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before executing the experiment, ensure:
+* The <code>Krkn-operator</code> is successfully deployed in your cluster.
+* You have access to the Kubernetes namespace where the target application resides.
+* The <code>krkn</code> CLI tool or the operator&#8217;s Custom Resource Definition (CRD) interface is configured.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_understanding_the_experiment_workflow"><a class="anchor" href="#_understanding_the_experiment_workflow"></a>Understanding the Experiment Workflow</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Chaos experiments in the <code>Krkn-operator</code> are defined as Kubernetes Custom Resources (CRs). When you apply a chaos CR, the operator reconciles the state, coordinates the execution of the fault, and monitors the target resources.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hands_on_lab_executing_a_pod_failure_experiment"><a class="anchor" href="#_hands_on_lab_executing_a_pod_failure_experiment"></a>Hands-on Lab: Executing a Pod-Failure Experiment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this exercise, we will induce a controlled pod-failure within a specific deployment to test the resilience of your service.</p>
+</div>
+<div class="sect2">
+<h3 id="_step_1_create_the_chaos_experiment_manifest"><a class="anchor" href="#_step_1_create_the_chaos_experiment_manifest"></a>Step 1: Create the Chaos Experiment Manifest</h3>
+<div class="paragraph">
+<p>Create a file named <code>pod-failure-experiment.yaml</code>. This manifest instructs the operator to terminate pods matching a specific label.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: krkn.redhat.com/v1beta1
+kind: ChaosExperiment
+metadata:
+  name: sample-pod-failure
+  namespace: krkn-operator-system
+spec:
+  experiment_type: "pod-failure"
+  target_namespace: "my-app-namespace"
+  label_selector: "app=frontend"
+  duration: "60s"
+  instances: 1</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_trigger_the_experiment"><a class="anchor" href="#_step_2_trigger_the_experiment"></a>Step 2: Trigger the Experiment</h3>
+<div class="paragraph">
+<p>Apply the manifest to your cluster to initiate the chaos orchestration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl apply -f pod-failure-experiment.yaml</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_monitor_execution"><a class="anchor" href="#_step_3_monitor_execution"></a>Step 3: Monitor Execution</h3>
+<div class="paragraph">
+<p>Use the following commands to observe the operator&#8217;s progress and the state of your target application:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Check Operator logs:</strong></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl logs -f deployment/krkn-operator-controller-manager -n krkn-operator-system</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Observe the target pods:</strong></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl get pods -n my-app-namespace -w</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_4_analyze_resilience"><a class="anchor" href="#_step_4_analyze_resilience"></a>Step 4: Analyze Resilience</h3>
+<div class="paragraph">
+<p>Once the duration defined in the YAML has elapsed, the operator will stop the experiment. Review the results:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Observation:</strong> Did the application deployment automatically spin up a new pod?</p>
+</li>
+<li>
+<p><strong>Monitoring:</strong> Check your observability dashboard (e.g., Prometheus/Grafana) to see if latency spiked or if health checks failed during the pod termination.</p>
+</li>
+<li>
+<p><strong>Learning:</strong> Remember that the goal is not to "pass" or "fail" the test, but to understand if the system recovers gracefully without manual intervention.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you have configured the Kraken <strong>Signaling feature</strong>, you can use it here to pause other performance or scalability tests running in the background until the pod-failure experiment completes, ensuring that you isolate the chaos impact from other telemetry data.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_troubleshooting"><a class="anchor" href="#_troubleshooting"></a>Troubleshooting</h3>
+<div class="paragraph">
+<p>If the experiment fails to start:
+* Verify that the <code>target_namespace</code> and <code>label_selector</code> match active resources in your cluster.
+* Ensure the service account used by the <code>Krkn-operator</code> has sufficient RBAC permissions to delete pods in the target namespace.
+* Check the status of the <code>ChaosExperiment</code> CR: <code>kubectl describe chaosexperiment sample-pod-failure -n krkn-operator-system</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="deploying-the-krkn-operator-in-a-kubernetes-cluster.html">Deploying the Krkn-operator in a Kubernetes cluster</a></span>
+  <span class="next"><a href="upgrading-the-operator-to-a-newer-version.html">Upgrading the operator to a newer version</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Managing users and permissions :: Krkn-operator</title>
+    <link rel="prev" href="configuration-and-management.html">
+    <link rel="next" href="configuring-chaos-experiments.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Krkn-operator</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Krkn-operator</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../introduction-to-krkn-operator/introduction-to-krkn-operator.html">Introduction to Krkn-operator</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/overview-of-kubernetes-native-chaos-engineering.html">Overview of Kubernetes-native Chaos Engineering</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/architecture-and-core-components.html">Architecture and core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/use-cases-for-chaos-orchestration.html">Use cases for chaos orchestration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/installation.html">Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/prerequisites-for-cluster-deployment.html">Prerequisites for cluster deployment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/installing-via-helm-charts.html">Installing via Helm charts</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/namespace-management-and-creation.html">Namespace management and creation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="configuration-and-management.html">Configuration and Management</a>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="managing-users-and-permissions.html">Managing users and permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="configuring-chaos-experiments.html">Configuring chaos experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="orchestrating-scenarios-via-the-web-interface.html">Orchestrating scenarios via the web interface</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../lifecycle-management/lifecycle-management.html">Lifecycle Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/performing-operator-upgrades.html">Performing operator upgrades</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/handling-versioning-and-releases.html">Handling versioning and releases</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/maintaining-operator-health.html">Maintaining operator health</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../hands-on-lab/hands-on-lab.html">Hands-on Lab</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/deploying-the-krkn-operator-in-a-kubernetes-cluster.html">Deploying the Krkn-operator in a Kubernetes cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/executing-a-sample-chaos-experiment.html">Executing a sample chaos experiment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/upgrading-the-operator-to-a-newer-version.html">Upgrading the operator to a newer version</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Krkn-operator</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Krkn-operator</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Krkn-operator</a></li>
+    <li><a href="configuration-and-management.html">Configuration and Management</a></li>
+    <li><a href="managing-users-and-permissions.html">Managing users and permissions</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Managing users and permissions</h1>
+<h1 id="_managing_users_and_permissions" class="sect0"><a class="anchor" href="#_managing_users_and_permissions"></a>Managing Users and Permissions</h1>
+<div class="paragraph">
+<p>The Krkn-operator utilizes a robust, group-based access control model to ensure secure multi-tenant chaos engineering. By decoupling permissions from individual users and associating them with functional groups, administrators can maintain a scalable security posture across multiple Kubernetes clusters.</p>
+</div>
+<div class="sect1">
+<h2 id="_the_permission_model"><a class="anchor" href="#_the_permission_model"></a>The Permission Model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The security architecture is built on a hierarchical structure where the <strong>Group</strong> acts as the primary container for access policies. Every user within the platform must be assigned to at least one group; a user without a group assignment will have no visibility or operational access to the platform.</p>
+</div>
+<div class="sect2">
+<h3 id="_key_components"><a class="anchor" href="#_key_components"></a>Key Components</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Groups:</strong> Logical entities created by Administrators that define the scope of interaction. A group configuration specifies:</p>
+</li>
+<li>
+<p><strong>Cluster Accessibility:</strong> Which target clusters are available to members.</p>
+</li>
+<li>
+<p><strong>Permissions:</strong> The granular operations allowed (View, Run, Delete).</p>
+</li>
+<li>
+<p><strong>Registry Visibility:</strong> Which image registries can be accessed by the chaos experiments.</p>
+</li>
+<li>
+<p><strong>Users:</strong> Individuals who inherit all permissions associated with their assigned group.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_role_definitions"><a class="anchor" href="#_role_definitions"></a>Role Definitions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Permissions are tailored to specific personas within your organization:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Role</th>
+<th class="tableblock halign-left valign-top">Responsibilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Administrator</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Manages the infrastructure, registers target clusters, creates groups, maps users to groups, and configures private registries and target providers (such as ACM).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>User</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Performs operational tasks based on group membership. This includes managing experiment jobs, accessing cluster terminals, executing chaos scenarios, and designing workflows in Chaos Studio.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_operational_capabilities"><a class="anchor" href="#_operational_capabilities"></a>Operational Capabilities</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The scope of a user&#8217;s activity is determined by the permissions granted to their group:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>View and Manage:</strong> Ability to observe and interact with existing chaos jobs (requires View/Delete permissions).</p>
+</li>
+<li>
+<p><strong>Terminal Access:</strong> Ability to open a shell into a target cluster (requires Run permission).</p>
+</li>
+<li>
+<p><strong>Scenario Execution:</strong> Ability to trigger chaos experiments on assigned clusters (requires Run permission).</p>
+</li>
+<li>
+<p><strong>Chaos Studio:</strong> Ability to design, modify, and save complex chaos workflows (requires Run permission).</p>
+</li>
+<li>
+<p><strong>File Management:</strong> Ability to upload and manage files, scoped strictly by the group&#8217;s visibility settings.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_admin_configuration_workflow"><a class="anchor" href="#_admin_configuration_workflow"></a>Admin Configuration Workflow</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To manage the environment effectively, administrators follow this standard lifecycle:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Define the Group:</strong> Create a group and designate the specific target clusters that the group will interact with.</p>
+</li>
+<li>
+<p><strong>Assign Permissions:</strong> Select the appropriate permission level (View, Run, Delete) to define the group&#8217;s capability on the assigned clusters.</p>
+</li>
+<li>
+<p><strong>Assign Users:</strong> Add users to the group. Upon assignment, the user immediately inherits the group&#8217;s security context.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>To ensure the principle of least privilege, audit your group assignments regularly. A user’s access is strictly defined by their group—if a user needs access to a new cluster, add that cluster to their existing group or assign them to an additional group with the required access.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting_permission_issues"><a class="anchor" href="#_troubleshooting_permission_issues"></a>Troubleshooting Permission Issues</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If a user reports that they cannot see a cluster or execute a command, verify the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Group Membership:</strong> Ensure the user is explicitly assigned to a group.</p>
+</li>
+<li>
+<p><strong>Group Policies:</strong> Check if the target cluster is correctly mapped to the user&#8217;s group.</p>
+</li>
+<li>
+<p><strong>Permission Level:</strong> Confirm that the user has the 'Run' permission, as this is a prerequisite for executing scenarios and using terminal features.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="configuration-and-management.html">Configuration and Management</a></span>
+  <span class="next"><a href="configuring-chaos-experiments.html">Configuring chaos experiments</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

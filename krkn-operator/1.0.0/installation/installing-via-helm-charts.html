@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Installing via Helm charts :: Krkn-operator</title>
+    <link rel="prev" href="prerequisites-for-cluster-deployment.html">
+    <link rel="next" href="namespace-management-and-creation.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Krkn-operator</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Krkn-operator</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../introduction-to-krkn-operator/introduction-to-krkn-operator.html">Introduction to Krkn-operator</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/overview-of-kubernetes-native-chaos-engineering.html">Overview of Kubernetes-native Chaos Engineering</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/architecture-and-core-components.html">Architecture and core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/use-cases-for-chaos-orchestration.html">Use cases for chaos orchestration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="installation.html">Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="prerequisites-for-cluster-deployment.html">Prerequisites for cluster deployment</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="installing-via-helm-charts.html">Installing via Helm charts</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="namespace-management-and-creation.html">Namespace management and creation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../configuration-and-management/configuration-and-management.html">Configuration and Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/managing-users-and-permissions.html">Managing users and permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/configuring-chaos-experiments.html">Configuring chaos experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/orchestrating-scenarios-via-the-web-interface.html">Orchestrating scenarios via the web interface</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../lifecycle-management/lifecycle-management.html">Lifecycle Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/performing-operator-upgrades.html">Performing operator upgrades</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/handling-versioning-and-releases.html">Handling versioning and releases</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../lifecycle-management/maintaining-operator-health.html">Maintaining operator health</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../hands-on-lab/hands-on-lab.html">Hands-on Lab</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/deploying-the-krkn-operator-in-a-kubernetes-cluster.html">Deploying the Krkn-operator in a Kubernetes cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/executing-a-sample-chaos-experiment.html">Executing a sample chaos experiment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/upgrading-the-operator-to-a-newer-version.html">Upgrading the operator to a newer version</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Krkn-operator</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Krkn-operator</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Krkn-operator</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li><a href="installing-via-helm-charts.html">Installing via Helm charts</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Installing via Helm charts</h1>
+<h1 id="_installing_via_helm_charts" class="sect0"><a class="anchor" href="#_installing_via_helm_charts"></a>Installing via Helm charts</h1>
+<div class="paragraph">
+<p>The <code>krkn-operator</code> is distributed as a Helm chart, facilitating standardized deployments across Kubernetes and OpenShift environments. By leveraging Helm, you can manage the operator lifecycle, perform version rollouts, and customize configurations through <code>values.yaml</code> files.</p>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before initiating the installation, ensure your environment meets the following requirements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Kubernetes Cluster:</strong> Version 1.19 or higher, or OpenShift 4.x.</p>
+</li>
+<li>
+<p><strong>Helm:</strong> Version 3.0 or higher must be installed and configured in your local environment.</p>
+</li>
+<li>
+<p><strong>Cluster Access:</strong> <code>cluster-admin</code> privileges (or sufficient permissions to create namespaces and CRDs) are required to install the operator.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation_methods"><a class="anchor" href="#_installation_methods"></a>Installation Methods</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The installation approach depends on how you intend to expose the operator&#8217;s web interface for scenario orchestration.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Environment</th>
+<th class="tableblock halign-left valign-top">Recommended Access Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Kubernetes</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gateway API (preferred) or Ingress</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>OpenShift</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Routes (native)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_start_deployment"><a class="anchor" href="#_quick_start_deployment"></a>Quick Start Deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For a standard installation using default settings, you can deploy the latest version (v0.4.5-beta) directly from the project&#8217;s OCI registry. This command automatically creates the necessary namespace and deploys the operator components.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_production_deployment_with_custom_configuration"><a class="anchor" href="#_production_deployment_with_custom_configuration"></a>Production Deployment with Custom Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For production workloads, it is best practice to manage configuration via a custom <code>values.yaml</code> file. This allows you to define specific resource limits, replica counts, and exposure methods tailored to your cluster architecture.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a <code>values.yaml</code> file locally:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml"># values.yaml example
+replicaCount: 1
+image:
+  repository: quay.io/krkn-chaos/krkn-operator
+  tag: 0.4.5-beta
+# Add environment-specific overrides here</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Deploy the operator referencing your configuration file:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace \
+  -f values.yaml</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_verification"><a class="anchor" href="#_verification"></a>Verification</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once the Helm command completes, verify that the operator pods are running correctly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl get pods -n krkn-operator-system</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ensure the pods are in the <code>Running</code> state and that all containers have passed their readiness probes before attempting to configure chaos experiments.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="prerequisites-for-cluster-deployment.html">Prerequisites for cluster deployment</a></span>
+  <span class="next"><a href="namespace-management-and-creation.html">Namespace management and creation</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

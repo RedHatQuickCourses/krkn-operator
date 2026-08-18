@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Handling versioning and releases :: Krkn-operator</title>
+    <link rel="prev" href="performing-operator-upgrades.html">
+    <link rel="next" href="maintaining-operator-health.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Krkn-operator</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="krkn-operator" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Krkn-operator</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../introduction-to-krkn-operator/introduction-to-krkn-operator.html">Introduction to Krkn-operator</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/overview-of-kubernetes-native-chaos-engineering.html">Overview of Kubernetes-native Chaos Engineering</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/architecture-and-core-components.html">Architecture and core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../introduction-to-krkn-operator/use-cases-for-chaos-orchestration.html">Use cases for chaos orchestration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/installation.html">Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/prerequisites-for-cluster-deployment.html">Prerequisites for cluster deployment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/installing-via-helm-charts.html">Installing via Helm charts</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/namespace-management-and-creation.html">Namespace management and creation</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../configuration-and-management/configuration-and-management.html">Configuration and Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/managing-users-and-permissions.html">Managing users and permissions</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/configuring-chaos-experiments.html">Configuring chaos experiments</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configuration-and-management/orchestrating-scenarios-via-the-web-interface.html">Orchestrating scenarios via the web interface</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="lifecycle-management.html">Lifecycle Management</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="performing-operator-upgrades.html">Performing operator upgrades</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="handling-versioning-and-releases.html">Handling versioning and releases</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="maintaining-operator-health.html">Maintaining operator health</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../hands-on-lab/hands-on-lab.html">Hands-on Lab</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/deploying-the-krkn-operator-in-a-kubernetes-cluster.html">Deploying the Krkn-operator in a Kubernetes cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/executing-a-sample-chaos-experiment.html">Executing a sample chaos experiment</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../hands-on-lab/upgrading-the-operator-to-a-newer-version.html">Upgrading the operator to a newer version</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/appendix.html">Appendix</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Krkn-operator</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Krkn-operator</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Krkn-operator</a></li>
+    <li><a href="lifecycle-management.html">Lifecycle Management</a></li>
+    <li><a href="handling-versioning-and-releases.html">Handling versioning and releases</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Handling versioning and releases</h1>
+<h1 id="_handling_versioning_and_releases" class="sect0"><a class="anchor" href="#_handling_versioning_and_releases"></a>Handling versioning and releases</h1>
+<div class="paragraph">
+<p>As the <code>krkn-operator</code> evolves to support new Kubernetes primitives and advanced chaos scenarios, maintaining a clear versioning strategy is essential for cluster stability. The operator follows standard software lifecycle practices to ensure that updates do not inadvertently trigger destructive chaos events or interrupt observability pipelines.</p>
+</div>
+<div class="sect1">
+<h2 id="_understanding_versioning_strategy"><a class="anchor" href="#_understanding_versioning_strategy"></a>Understanding Versioning Strategy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>krkn-operator</code> follows [Semantic Versioning (SemVer)](<a href="https://semver.org/" class="bare">https://semver.org/</a>), which uses the format <code>MAJOR.MINOR.PATCH</code> (e.g., <code>1.2.4</code>). This structure allows users to anticipate the impact of an upgrade:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MAJOR version (X.0.0):</strong> Indicates breaking changes. This often involves changes to the Custom Resource Definitions (CRDs) or architectural shifts in how the operator interacts with the <code>krkn-lib</code>. Upgrading across major versions may require manual intervention or reconfiguration of existing chaos scenarios.</p>
+</li>
+<li>
+<p><strong>MINOR version (x.Y.0):</strong> Introduces new features, such as new chaos scenarios or expanded support for cloud-provider-specific disruptions, while maintaining backward compatibility.</p>
+</li>
+<li>
+<p><strong>PATCH version (x.y.Z):</strong> Focuses on bug fixes, performance optimizations for <code>krkn-lib</code> integrations, or security patches. These are generally safe to apply in production environments.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_lifecycle"><a class="anchor" href="#_release_lifecycle"></a>Release Lifecycle</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Releases for the <code>krkn-operator</code> are managed through the GitHub repository ecosystem. When a new release is cut, the following artifacts are updated:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Helm Charts:</strong> The repository&#8217;s Helm chart version is incremented to match the operator image tag.</p>
+</li>
+<li>
+<p><strong>Container Images:</strong> New images are pushed to the container registry, tagged with the specific release version and a <code>latest</code> tag (though pinning to specific versions is recommended for production).</p>
+</li>
+<li>
+<p><strong>Changelog:</strong> Each release includes a detailed changelog highlighting new features, deprecated items, and fixed issues.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_best_practices_for_upgrades"><a class="anchor" href="#_best_practices_for_upgrades"></a>Best Practices for Upgrades</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before performing an upgrade in a production-grade cluster, we recommend the following workflow:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Review the Changelog:</strong> Always check the release notes for "Breaking Changes." If you are using custom CRDs, ensure they remain compatible with the new operator version.</p>
+</li>
+<li>
+<p><strong>Use a Staging Environment:</strong> Test the upgrade in a non-production cluster where <code>krkn-demos</code> can be run to verify that chaos scenarios execute as expected.</p>
+</li>
+<li>
+<p><strong>Verify CRD Compatibility:</strong> Since the operator relies on Kubernetes-native objects, verify if the new release requires a <code>kubectl apply</code> of new or updated CRD manifests before updating the Helm deployment.</p>
+</li>
+<li>
+<p><strong>Monitor Operator Health:</strong> Following an upgrade, observe the operator logs for initialization errors. Ensure the <code>krkn-lib</code> dependencies are correctly initialized and the operator is able to communicate with the Kubernetes API server.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rollback_strategy"><a class="anchor" href="#_rollback_strategy"></a>Rollback Strategy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the event that a new version introduces unexpected behavior, the operator can be reverted using Helm:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># List history of releases
+helm history krkn-operator -n krkn-namespace
+
+# Rollback to the previous stable release
+helm rollback krkn-operator [REVISION_NUMBER] -n krkn-namespace</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By maintaining strict version control and following the release lifecycle, teams can safely integrate Chaos Engineering into their continuous delivery pipelines while ensuring the <code>krkn-operator</code> remains a stable and predictable component of the infrastructure stack.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="performing-operator-upgrades.html">Performing operator upgrades</a></span>
+  <span class="next"><a href="maintaining-operator-health.html">Maintaining operator health</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

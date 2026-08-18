@@ -1,11 +1,11 @@
 {
-  "totalSeconds": 6782,
-  "pageCount": 56,
+  "totalSeconds": 1769,
+  "pageCount": 23,
   "pages": [
     {
       "module": "ROOT",
       "page": "index.adoc",
-      "seconds": 20
+      "seconds": 12
     },
     {
       "module": "LABENV",
@@ -13,269 +13,104 @@
       "seconds": 4
     },
     {
-      "module": "chaos-engineering-methodology",
-      "page": "chaos-engineering-methodology.adoc",
-      "seconds": 39
-    },
-    {
-      "module": "chaos-engineering-methodology",
-      "page": "understanding-the-chaos-engineering-lifecycle.adoc",
-      "seconds": 135
-    },
-    {
-      "module": "chaos-engineering-methodology",
-      "page": "proactive-versus-reactive-testing-strategies.adoc",
-      "seconds": 134
-    },
-    {
-      "module": "chaos-engineering-methodology",
-      "page": "evaluating-system-performance-under-disruption.adoc",
-      "seconds": 167
-    },
-    {
-      "module": "chaos-engineering-methodology",
-      "page": "implementing-recovery-validation-and-observability.adoc",
-      "seconds": 135
-    },
-    {
-      "module": "chaos-engineering-methodology",
-      "page": "managing-blast-radius-and-rollback-planning.adoc",
-      "seconds": 151
-    },
-    {
-      "module": "chaos-engineering-methodology",
-      "page": "exploratory-manual-testing-and-pipeline-automation.adoc",
-      "seconds": 140
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "turn-risk-into-a-testable-experiment.adoc",
-      "seconds": 35
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "identifying-service-risks-and-failure-modes.adoc",
-      "seconds": 149
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "defining-steady-state-and-test-hypotheses.adoc",
-      "seconds": 82
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "setting-target-duration-and-blast-radius.adoc",
-      "seconds": 145
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "establishing-metrics-for-availability-latency-and-throughput.adoc",
-      "seconds": 151
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "planning-monitoring-stop-conditions-and-rollbacks.adoc",
-      "seconds": 161
-    },
-    {
-      "module": "turn-risk-into-a-testable-experiment",
-      "page": "mapping-risks-to-krkn-disruption-scenarios.adoc",
-      "seconds": 143
-    },
-    {
-      "module": "krkn-operator-fundamentals",
-      "page": "krkn-operator-fundamentals.adoc",
+      "module": "introduction-to-krkn-operator",
+      "page": "introduction-to-krkn-operator.adoc",
       "seconds": 34
     },
     {
-      "module": "krkn-operator-fundamentals",
-      "page": "managing-target-clusters-and-user-permissions.adoc",
-      "seconds": 140
+      "module": "introduction-to-krkn-operator",
+      "page": "overview-of-kubernetes-native-chaos-engineering.adoc",
+      "seconds": 126
     },
     {
-      "module": "krkn-operator-fundamentals",
-      "page": "working-with-scenario-registries.adoc",
-      "seconds": 140
+      "module": "introduction-to-krkn-operator",
+      "page": "architecture-and-core-components.adoc",
+      "seconds": 133
     },
     {
-      "module": "krkn-operator-fundamentals",
-      "page": "executing-jobs-and-managing-logs.adoc",
-      "seconds": 138
+      "module": "introduction-to-krkn-operator",
+      "page": "use-cases-for-chaos-orchestration.adoc",
+      "seconds": 115
     },
     {
-      "module": "krkn-operator-fundamentals",
-      "page": "utilizing-acm-and-ocm-cluster-discovery.adoc",
-      "seconds": 110
+      "module": "installation",
+      "page": "installation.adoc",
+      "seconds": 18
     },
     {
-      "module": "krkn-operator-fundamentals",
-      "page": "configuring-multi-cluster-scenario-execution.adoc",
-      "seconds": 122
-    },
-    {
-      "module": "krkn-operator-fundamentals",
-      "page": "navigating-chaos-studio-and-resiliency-scores.adoc",
-      "seconds": 169
-    },
-    {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "run-and-interpret-one-chaos-experiment.adoc",
-      "seconds": 42
-    },
-    {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "selecting-target-clusters-and-scenario-registries.adoc",
-      "seconds": 148
-    },
-    {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "configuring-experiment-parameters-and-attachments.adoc",
-      "seconds": 146
-    },
-    {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "reviewing-configurations-and-executing-experiments.adoc",
-      "seconds": 148
-    },
-    {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "analyzing-logs-and-status-reports.adoc",
+      "module": "installation",
+      "page": "prerequisites-for-cluster-deployment.adoc",
       "seconds": 137
     },
     {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "validating-workload-recovery-and-service-availability.adoc",
-      "seconds": 142
+      "module": "installation",
+      "page": "installing-via-helm-charts.adoc",
+      "seconds": 62
     },
     {
-      "module": "run-and-interpret-one-chaos-experiment",
-      "page": "verifying-alerts-and-dependent-component-impact.adoc",
-      "seconds": 124
+      "module": "installation",
+      "page": "namespace-management-and-creation.adoc",
+      "seconds": 83
     },
     {
-      "module": "build-workflows-with-chaos-studio",
-      "page": "build-workflows-with-chaos-studio.adoc",
-      "seconds": 35
-    },
-    {
-      "module": "build-workflows-with-chaos-studio",
-      "page": "creating-reusable-chaos-workflows.adoc",
-      "seconds": 158
-    },
-    {
-      "module": "build-workflows-with-chaos-studio",
-      "page": "configuring-sequential-and-parallel-scenario-execution.adoc",
-      "seconds": 167
-    },
-    {
-      "module": "build-workflows-with-chaos-studio",
-      "page": "connecting-and-cloning-workflow-nodes.adoc",
-      "seconds": 129
-    },
-    {
-      "module": "build-workflows-with-chaos-studio",
-      "page": "validating-and-reusing-workflow-models.adoc",
-      "seconds": 160
-    },
-    {
-      "module": "build-workflows-with-chaos-studio",
-      "page": "modeling-complex-platform-and-service-disruptions.adoc",
-      "seconds": 143
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "measure-resilience-and-establish-a-baseline.adoc",
-      "seconds": 37
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "using-promql-for-slo-definition.adoc",
-      "seconds": 134
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "monitoring-availability-error-rates-and-throughput.adoc",
-      "seconds": 156
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "calculating-and-interpreting-the-resilience-score.adoc",
-      "seconds": 130
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "comparing-scores-across-environments-and-time.adoc",
-      "seconds": 149
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "identifying-slo-degradation-and-performance-trends.adoc",
-      "seconds": 157
-    },
-    {
-      "module": "measure-resilience-and-establish-a-baseline",
-      "page": "recommending-remediation-based-on-score-analysis.adoc",
-      "seconds": 160
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "operationalize-resilience-validation.adoc",
-      "seconds": 36
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "validating-infrastructure-and-application-upgrades.adoc",
-      "seconds": 164
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "integrating-chaos-testing-into-cicd-pipelines.adoc",
-      "seconds": 132
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "running-chaos-during-performance-and-scale-testing.adoc",
-      "seconds": 116
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "standardizing-execution-across-managed-clusters.adoc",
-      "seconds": 174
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "storing-and-comparing-long-term-results.adoc",
-      "seconds": 162
-    },
-    {
-      "module": "operationalize-resilience-validation",
-      "page": "combining-recovery-checks-with-system-health-metrics.adoc",
-      "seconds": 120
-    },
-    {
-      "module": "hands-on-labs",
-      "page": "hands-on-labs.adoc",
+      "module": "configuration-and-management",
+      "page": "configuration-and-management.adoc",
       "seconds": 29
     },
     {
-      "module": "hands-on-labs",
-      "page": "executing-pod-disruption-experiments.adoc",
-      "seconds": 121
+      "module": "configuration-and-management",
+      "page": "managing-users-and-permissions.adoc",
+      "seconds": 128
     },
     {
-      "module": "hands-on-labs",
-      "page": "modeling-multi-stage-failure-workflows.adoc",
-      "seconds": 169
+      "module": "configuration-and-management",
+      "page": "configuring-chaos-experiments.adoc",
+      "seconds": 105
     },
     {
-      "module": "hands-on-labs",
-      "page": "calculating-and-analyzing-resilience-scores.adoc",
-      "seconds": 172
+      "module": "configuration-and-management",
+      "page": "orchestrating-scenarios-via-the-web-interface.adoc",
+      "seconds": 134
     },
     {
-      "module": "hands-on-labs",
-      "page": "automating-resilience-validation-in-test-environments.adoc",
-      "seconds": 140
+      "module": "lifecycle-management",
+      "page": "lifecycle-management.adoc",
+      "seconds": 20
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "performing-operator-upgrades.adoc",
+      "seconds": 117
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "handling-versioning-and-releases.adoc",
+      "seconds": 133
+    },
+    {
+      "module": "lifecycle-management",
+      "page": "maintaining-operator-health.adoc",
+      "seconds": 101
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "hands-on-lab.adoc",
+      "seconds": 20
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "deploying-the-krkn-operator-in-a-kubernetes-cluster.adoc",
+      "seconds": 79
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "executing-a-sample-chaos-experiment.adoc",
+      "seconds": 98
+    },
+    {
+      "module": "hands-on-lab",
+      "page": "upgrading-the-operator-to-a-newer-version.adoc",
+      "seconds": 80
     },
     {
       "module": "appendix",
