@@ -23,6 +23,22 @@ Duration: FIXME hours
 
 *  Hands-on Lab
 
+*  Introduction to Krkn-operator
+
+*  Installation
+
+*  Configuration and Management
+
+*  Introduction to Krkn-operator
+
+*  Installation
+
+*  Configuration and Management
+
+*  Lifecycle Management
+
+*  Hands-on Lab
+
 
 
 == Prerequisites

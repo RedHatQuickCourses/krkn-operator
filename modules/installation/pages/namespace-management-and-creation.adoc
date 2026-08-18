@@ -76,4 +76,130 @@ kubectl delete namespace krkn-operator
 [WARNING]
 ====
 Deleting a namespace is destructive and will remove all custom resource definitions (CRDs), chaos scenario configurations, and logs stored within that namespace. Always back up your configuration files before proceeding with deletion.
+====#  Namespace management and creation
+
+= Namespace Management and Creation
+
+In the context of the `krkn-operator`, effective namespace management is critical for operational security, resource isolation, and scope definition. By isolating chaos experiments within dedicated namespaces, administrators can prevent unintended "blast radius" expansion during testing.
+
+== Namespace Strategy for Krkn-operator
+
+The `krkn-operator` follows Kubernetes best practices by utilizing namespaces to segregate the operator's control plane from the workload clusters and the specific chaos scenarios being executed.
+
+[NOTE]
 ====
+Before deploying the operator, ensure your target clusters have a designated namespace ready to host the controller and its associated resources.
+====
+
+=== Best Practices for Namespace Allocation
+*   **Isolation:** Deploy the `krkn-operator` in a restricted namespace (e.g., `krkn-system`) to separate it from the applications it intends to disrupt.
+*   **RBAC Alignment:** Since the operator requires permissions to modify objects in target namespaces (like deleting namespaces during a `Namespace Failure` scenario), use dedicated namespaces to apply the principle of least privilege.
+*   **Resource Quotas:** When running high-intensity experiments, such as CPU or Memory Hogs, define resource quotas on the target namespaces to prevent the experiment from starving the underlying Kubernetes node.
+
+== Hands-on Lab: Preparing Namespaces
+
+In this lab, you will prepare the environment by creating a dedicated namespace for the `krkn-operator` and a target namespace for your chaos experiments.
+
+### Step 1: Create the Operator Namespace
+To begin, create a dedicated namespace to house the `krkn-operator` installation.
+
+[source,bash]
+----
+kubectl create namespace krkn-system
+kubectl label namespace krkn-system name=krkn-operator
+----
+
+### Step 2: Create a Target Namespace
+It is recommended to create a separate namespace for testing scenarios. This allows you to safely perform experiments, such as `Namespace Failures`, without affecting production workloads.
+
+[source,bash]
+----
+kubectl create namespace chaos-targets
+----
+
+### Step 3: Verify Namespace Status
+Ensure that the namespaces are active and ready for the operator deployment.
+
+[source,bash]
+----
+kubectl get namespaces | grep -E 'krkn-system|chaos-targets'
+----
+
+== Managing Permissions per Namespace
+As outlined in the *Permission Model*, the Admin must define group access for these namespaces. When configuring users, ensure that the groups assigned to your users include the necessary permissions (`View`, `Run`, `Delete`) for the `chaos-targets` namespace specifically.
+
+[TIP]
+====
+If you are performing a `Namespace Failure` experiment, ensure the user executing the scenario has sufficient `Delete` permissions on the target namespace; otherwise, the `krkn-operator` will be blocked by the Kubernetes API.
+====#  Namespace management and creation
+
+= Namespace Management and Creation
+
+In Kubernetes, namespaces provide a mechanism for isolating groups of resources within a single cluster. For the **Krkn-operator**, proper namespace management is critical to ensure that chaos experiments are contained, permissions are scoped correctly, and cluster resources are organized effectively.
+
+== Why Namespaces Matter for Krkn-operator
+
+When deploying the Krkn-operator, namespaces serve three primary functions:
+
+1.  **Isolation:** Keeping the operator and its associated chaos experiments separate from application workloads.
+2.  **Resource Quotas:** Preventing a chaos experiment (e.g., a CPU or Memory Hog) from consuming all resources in a production namespace.
+3.  **Access Control:** Allowing administrators to grant or restrict access to specific chaos scenarios based on the namespace where they are deployed.
+
+== Creating the Operator Namespace
+
+Before installing the Krkn-operator, you must define a dedicated namespace. This allows for cleaner cleanup procedures and targeted monitoring of the operator's health.
+
+[source,bash]
+----
+# Create a dedicated namespace for the Krkn-operator
+kubectl create namespace krkn-operator-system
+
+# Verify the namespace was created successfully
+kubectl get namespace krkn-operator-system
+----
+
+== Configuring Namespace Scope
+
+When managing users and permissions (as defined in the link:Permission-Model[Permission Model]), administrators associate groups with specific clusters. However, you can refine this by applying Kubernetes RBAC (Role-Based Access Control) to limit the Krkn-operator's scope of influence to specific target namespaces.
+
+=== Best Practices for Namespace Management
+*   **Principle of Least Privilege:** Do not grant the Krkn-operator cluster-admin permissions if it only needs to perform experiments within a specific namespace (e.g., `app-staging`).
+*   **Cleanup:** When deleting namespaces as part of a chaos experiment (e.g., the *Namespace Failure* scenario), ensure that the Krkn-operator has the necessary cluster-level permissions to manage those specific objects, while restricting its ability to touch critical infrastructure namespaces like `kube-system`.
+
+== Hands-on Lab: Managing Namespaces for Chaos
+
+In this exercise, you will create a target namespace for your chaos experiments.
+
+. **Step 1: Create a sandbox namespace**
++
+[source,bash]
+----
+kubectl create namespace chaos-sandbox
+----
+
+. **Step 2: Verify Permissions**
++
+Ensure the Krkn-operator service account has permissions to interact with the `chaos-sandbox` namespace. If you are using the default Helm installation, verify the RoleBinding:
++
+[source,bash]
+----
+kubectl get rolebindings -n chaos-sandbox
+----
+
+. **Step 3: Orchestrate a Namespace Failure**
++
+Once your namespace is prepared, you can target it via the Krkn-operator interface or configuration file to simulate a namespace deletion.
++
+[IMPORTANT]
+====
+Ensure no mission-critical applications are running in a namespace tagged for deletion during a "Namespace Failure" experiment, as this operation will remove the namespace and all contained resources for the defined duration.
+====
+
+. **Step 4: Cleanup**
++
+After the experiment concludes and the namespace is restored, verify the objects:
++
+[source,bash]
+----
+kubectl get pods -n chaos-sandbox
+----

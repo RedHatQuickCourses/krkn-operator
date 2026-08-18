@@ -39,4 +39,91 @@ Beyond technical requirements, consider these operational prerequisites:
 [IMPORTANT]
 ====
 Never execute chaos experiments on a production cluster without first validating the experiment workflows in a staging or development environment. Always monitor cluster health closely during the initial deployment phase to ensure the operator's own resource footprint does not interfere with existing workloads.
+====#  Prerequisites for cluster deployment
+
+= Prerequisites for cluster deployment
+
+Before deploying the `krkn-operator` into your Kubernetes environment, it is essential to ensure that your cluster meets the following technical requirements. Proper preparation ensures that the operator functions correctly, especially when interacting with target clusters for chaos orchestration.
+
+== System Requirements
+
+*   **Kubernetes Version:** Ensure you are running a supported version of Kubernetes (refer to the specific operator release notes for the minimum version, typically the last three minor releases).
+*   **Compute Resources:** The operator and its managed components require sufficient headroom. As noted in our best practices, applications—including the chaos controller itself—may spike in resource usage during initialization or re-recovery cycles.
+    *   **Memory:** Ensure your node pools are sized to accommodate the operator pod and any associated monitoring sidecars.
+    *   **Monitoring:** If you plan to utilize the *Resiliency Score* feature, ensure that a Prometheus instance is reachable within the cluster to execute the required PromQL-based metrics queries.
+
+== Permissions and Access
+
+The `krkn-operator` requires elevated privileges to monitor and manipulate cluster resources. 
+
+*   **Cluster-Admin Role:** The operator requires sufficient RBAC permissions to create, update, and delete resources across the namespaces it manages. 
+*   **Namespace Management:** You must decide whether to deploy the operator in a dedicated namespace or a shared one. We recommend a dedicated namespace (e.g., `krkn-system`) to isolate the operator’s footprint and simplify security auditing.
+*   **Target Cluster Registration:** If you intend to use the *Multi-cluster Execution* feature, ensure your environment allows network connectivity between the operator cluster and the target clusters. While OCM/ACM integration is optional, it simplifies automatic discovery; otherwise, you must prepare the credentials for manual registration of target providers.
+
+== Network and Connectivity
+
+*   **Private Registry Access:** If your environment restricts access to public container registries, you must pre-configure the `krkn-operator` to pull images from your internal private registry. Ensure that the image pull secrets are available in the target namespace.
+*   **Egress Requirements:** The operator needs egress access to any external APIs or private registries required for image retrieval and, if applicable, reporting metrics to your centralized observability stack.
+
+== Best Practice: Planning for Resilience
+
+When preparing your cluster deployment, keep the "Resiliency Score" methodology in mind:
+
+[IMPORTANT]
+.Resource Sizing
 ====
+An application pod might use significantly more resources during reinitialization after a chaos-induced crash. Ensure your cluster autoscaler is configured to handle these bursts so that the operator’s activity does not lead to resource starvation for your production workloads.
+====
+
+Before proceeding to the installation phase, verify your current cluster capacity using:
+
+[source,bash]
+----
+kubectl get nodes
+kubectl describe nodes | grep -A 5 "Allocated resources"
+----
+
+Once these prerequisites are met, you are ready to proceed with the Helm chart deployment.#  Prerequisites for cluster deployment
+
+= Prerequisites for cluster deployment
+
+Before deploying the `krkn-operator` into your environment, it is essential to prepare your Kubernetes cluster to ensure compatibility, security, and operational stability. The operator acts as a central control plane for chaos orchestration, requiring sufficient resources and specific permissions to interact with target clusters and manage experiment lifecycles.
+
+== Cluster Environment Requirements
+
+The `krkn-operator` is designed for Kubernetes-native chaos engineering. To ensure a successful installation, your environment must meet the following criteria:
+
+*   **Kubernetes Version:** Ensure your cluster is running a supported version of Kubernetes (refer to the specific operator release notes for minimum version compatibility).
+*   **Compute Resources:** The operator platform requires consistent resource availability. As noted in our best practices, monitor your node sizing carefully. Chaos experiments—and the operator itself—may experience spikes in resource consumption, particularly when generating telemetry or managing multiple concurrent experiment jobs.
+*   **Permissions:** You must have `cluster-admin` privileges (or equivalent rights) to install the operator, manage Custom Resource Definitions (CRDs), and configure necessary Roles/ClusterRoles.
+
+== Network and Connectivity
+
+The `krkn-operator` excels in multi-cluster environments. To leverage its full capabilities, ensure:
+
+*   **Egress Connectivity:** The operator requires egress access to container registries to pull the `krkn-operator` image and related components. If your organization restricts public access, configure your **Private Registries** ahead of time.
+*   **Control Plane Access:** Ensure the operator has network visibility to the API servers of the target clusters it will manage. 
+    *   *Note:* While OCM/ACM integration is optional and simplifies automatic cluster discovery, the operator remains fully functional using manual registration of target cluster kubeconfigs.
+
+== Preparation Checklist
+
+Before initiating the Helm installation, verify the following:
+
+[cols="1,3", options="header"]
+|===
+| Component | Requirement
+| **Namespace** | Identify a dedicated namespace for the operator to ensure resource isolation.
+| **Helm** | Ensure `helm` (v3.x+) is installed and authenticated with your cluster.
+| **Registry Access** | If using a private registry, have your pull secrets ready.
+| **Storage** | Ensure the underlying storage class supports the persistence requirements of the operator's backend database (if applicable for experiment history).
+|===
+
+== Best Practices for Stability
+
+Chaos engineering inherently pushes infrastructure to its limits. To ensure the operator does not become a bottleneck:
+
+1.  **Node Sizing:** Always account for "reinitialization spikes." When an application pod crashes during a chaos experiment, its recovery may require more memory (e.g., replaying write-ahead logs in Prometheus). Ensure your nodes are sized to handle these spikes so the `krkn-operator` remains stable.
+2.  **Recovery Logic:** Prior to deployment, verify that your target applications possess robust, fast recovery logic. This reduces the risk of cascading failures while the operator manages the experiments.
+3.  **Isolation:** Consider deploying the operator in a separate management cluster or a dedicated namespace with resource quotas (Limits and Requests) to prevent the operator from competing for resources with critical workloads.
+
+Once these prerequisites are met, you are ready to proceed with the namespace creation and Helm-based installation of the `krkn-operator`.

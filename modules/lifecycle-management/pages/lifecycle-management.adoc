@@ -6,4 +6,12 @@ Lifecycle management ensures the ongoing reliability and operational integrity o
 
 *   **Upgrades:** Performing seamless operator updates to incorporate new features and performance improvements.
 *   **Version Control:** Managing releases and compatibility to ensure consistency across chaos experiment environments.
-*   **Maintenance:** Monitoring operator health to ensure stable execution of chaos scenarios and continued adherence to defined service level indicators.
+*   **Maintenance:** Monitoring operator health to ensure stable execution of chaos scenarios and continued adherence to defined service level indicators.#  Lifecycle Management
+
+== Lifecycle Management
+
+Lifecycle management for the Krkn-operator encompasses the administrative tasks required to maintain a stable and current chaos engineering environment within your Kubernetes cluster.
+
+*   **Upgrades:** Performing seamless operator updates to ensure the latest features and stability patches are applied.
+*   **Versioning:** Managing release cycles to maintain compatibility with your cluster environment and experiment requirements.
+*   **Health Maintenance:** Monitoring operator performance and resource utilization to ensure consistent availability for orchestrating chaos scenarios.

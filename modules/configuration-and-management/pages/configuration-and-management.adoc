@@ -7,4 +7,24 @@ The Configuration and Management module provides the tools required to govern us
 *   **User and Access Control:** Administrators manage users and groups, assigning permissions to ensure secure access to clusters and operational features.
 *   **Infrastructure Setup:** Configure core platform components, including target providers, private registries, and cluster registration.
 *   **Chaos Experimentation:** Define and manage reusable configuration files for chaos experiments and orchestrate complex scenarios directly through the web interface.
-*   **Resource Administration:** Utilize file management capabilities to organize text-based configurations for consistent use across Chaos Studio workflows.
+*   **Resource Administration:** Utilize file management capabilities to organize text-based configurations for consistent use across Chaos Studio workflows.#  Configuration and Management
+
+[#configuration-and-management]
+== Configuration and Management
+
+The Krkn-operator provides centralized control for platform administration and chaos orchestration. Key management capabilities include:
+
+*   **User and Permission Control:** Administrators manage access by creating user accounts, defining groups, and assigning cluster-specific permissions.
+*   **Infrastructure Setup:** Configure essential infrastructure components, such as target cluster registration and integration with target providers like ACM.
+*   **Resource Management:** Upload and maintain reusable configuration and text-based files for consistent chaos experiment execution.
+*   **Chaos Orchestration:** Define, trigger, and monitor chaos experiments directly through the web interface to validate system resilience.
+*   **Registry Configuration:** Manage private container registries and control their visibility across the platform.#  Configuration and Management
+
+= Configuration and Management
+
+The Krkn-operator provides centralized administrative control to manage users, permissions, and chaos workflows effectively. Key capabilities include:
+
+*   **User and Access Control**: Administrators can register clusters, create groups, and manage user permissions to ensure secure access to chaos infrastructure.
+*   **Infrastructure Configuration**: Facilitates the setup of target providers (such as ACM integration) and private registries to support diverse deployment environments.
+*   **Scenario Orchestration**: Provides a web-based interface for designing, configuring, and executing complex chaos experiments.
+*   **Resource Management**: Enables the upload and management of reusable configuration files, allowing for consistent application of settings across various chaos scenarios.

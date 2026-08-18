@@ -48,4 +48,57 @@ kubectl logs -n krkn-operator-system -l control-plane=controller-manager --tail=
 +
 . **Verify Resource Limits:** Ensure that the `LimitRanges` and `ResourceQuotas` in the namespace do not restrict the operator from spawning the necessary pods to execute chaos experiments.
 
-By integrating these maintenance tasks into your standard platform administration routine, you ensure that the `krkn-operator` remains a resilient tool for validating your service level indicators (SLIs) and key performance indicators (KPIs) under duress.
+By integrating these maintenance tasks into your standard platform administration routine, you ensure that the `krkn-operator` remains a resilient tool for validating your service level indicators (SLIs) and key performance indicators (KPIs) under duress.#  Maintaining operator health
+
+= Maintaining Operator Health
+
+Maintaining the health of the `krkn-operator` is critical for ensuring that chaos experiments are executed reliably and that the operator does not become a bottleneck or a point of failure within your Kubernetes cluster. A healthy operator ensures that chaos scenarios are injected gracefully and that the reconciliation loop functions as expected.
+
+== Monitoring Operator Health
+
+To maintain the operational integrity of the `krkn-operator`, administrators should focus on three primary pillars: observability, resource management, and state verification.
+
+=== 1. Observability and Metrics
+The `krkn-operator` exposes Prometheus-formatted metrics that are essential for health monitoring. Use these metrics to create dashboards in Grafana or alerts in Alertmanager:
+*   **Reconciliation Errors:** Monitor the `controller_runtime_reconcile_errors_total` metric. A spike here indicates that the operator is struggling to reconcile the state of chaos scenarios against the cluster.
+*   **Work Queue Depth:** Ensure the work queue length remains stable. A growing queue suggests the operator is overloaded with pending tasks.
+*   **Pod Readiness:** Use standard Kubernetes probes to track the operator pod's status. If the operator enters a `CrashLoopBackOff`, check the logs using:
++
+[source,bash]
+----
+kubectl logs -n krkn-namespace deployment/krkn-operator-controller-manager
+----
+
+=== 2. Resource Management
+Chaos orchestration can be resource-intensive depending on the frequency and scale of your experiments. 
+*   **Resource Limits:** Ensure the `krkn-operator` deployment has appropriate CPU and memory requests/limits defined in its Helm values.
+*   **Node Health Checks:** As per best practices, deploy Machine Health Checks within your cluster. If the node running the `krkn-operator` becomes unhealthy, the Cluster API or machine management system should remediate the node to ensure the operator is rescheduled, preventing downtime in your chaos orchestration pipeline.
+
+=== 3. Log Aggregation and Auditing
+Regularly audit the operator logs to identify potential issues before they impact production environments. Look for:
+*   **Permission Denied Errors:** Often caused by stale `ClusterRoleBinding` or `ServiceAccount` misconfigurations.
+*   **Timeout Exceptions:** Verify connectivity between the operator and the Kubernetes API server.
+
+== Proactive Maintenance Strategies
+
+To keep the operator in a stable state, follow these administrative routines:
+
+*   **Cleanup of Completed Scenarios:** Ensure that completed or failed chaos experiment CRDs (Custom Resource Definitions) are cleaned up to prevent etcd bloating.
+*   **Regular Version Alignment:** Keep the operator version aligned with your Kubernetes minor version. Using outdated operators with newer K8s APIs can lead to silent failures in experiment execution.
+*   **Validation of Service Level Indicators (SLIs):** Periodically verify that your chaos experiments are correctly evaluating your application's SLIs. If an experiment fails to report accurate status, investigate the `Status` field within the chaos CRD.
+
+[NOTE]
+====
+When failures occur in production, they are costly. Always test your chaos scenarios in a staging environment before deploying the `krkn-operator` to production clusters to ensure that the orchestration logic aligns with your resilience expectations.
+====
+
+== Troubleshooting Common Health Issues
+
+|===
+| Symptom | Probable Cause | Recommended Action
+| High Reconciliation Time | Excessive CRDs in namespace | Cleanup old experiment objects.
+| Operator pod flapping | Resource constraints (OOMKilled) | Increase memory limits in `values.yaml`.
+| Experiments not triggering | RBAC configuration mismatch | Validate `ClusterRole` permissions for the operator ServiceAccount.
+|===
+
+By integrating these health checks into your platform administration routine, you ensure that the `krkn-operator` remains a reliable tool for testing system resilience and identifying weaknesses before they impact end-users.

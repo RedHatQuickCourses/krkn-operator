@@ -57,4 +57,120 @@ If a user reports that they cannot see a cluster or execute a command, verify th
 
 *   **Group Membership:** Ensure the user is explicitly assigned to a group.
 *   **Group Policies:** Check if the target cluster is correctly mapped to the user's group.
-*   **Permission Level:** Confirm that the user has the 'Run' permission, as this is a prerequisite for executing scenarios and using terminal features.
+*   **Permission Level:** Confirm that the user has the 'Run' permission, as this is a prerequisite for executing scenarios and using terminal features.#  Managing users and permissions
+
+= Managing users and permissions
+
+The `krkn-operator` follows a robust, group-based access control model designed to ensure that chaos engineering activities are performed securely and within defined operational boundaries. By decoupling permissions from individual users and attaching them to groups, administrators can maintain consistent security policies across large teams.
+
+== The Permission Model
+
+Access in the `krkn-operator` is hierarchical. Every user must belong to at least one group; a user without a group assignment has no access to the platform's resources.
+
+=== Group-Based Permissions
+Administrators manage access by creating groups and defining a set of constraints for that group. Each group configuration includes:
+
+*   **Accessible Clusters:** Defines which target Kubernetes clusters the group can impact.
+*   **Permissions:** Determines the scope of actions allowed (View, Run, Delete).
+*   **Registry Visibility:** Controls which container registries are accessible for pulling chaos experiment images.
+
+=== Roles and Capabilities
+
+The platform defines two primary roles, each with distinct scopes of responsibility:
+
+[cols="1,3", options="header"]
+|===
+| Role | Capabilities
+| **Admin** | Full system control: registers/removes target clusters, creates/manages groups and users, configures private registries, and sets up target providers (e.g., ACM integration).
+| **User** | Operational access scoped by group membership: views and manages jobs, executes scenarios, designs workflows in Chaos Studio, and manages files within permitted boundaries.
+|===
+
+[IMPORTANT]
+====
+Every user must be assigned to a group to interact with the system. Without group membership, the user interface will remain restricted, and API calls will be rejected with an unauthorized status.
+====
+
+== Operational Scope for Users
+
+When a user is assigned to a group, their operational capabilities are restricted by the permissions granted to that group:
+
+*   **View and Manage Jobs:** Depends on the View/Delete permissions defined for the group.
+*   **Cluster Terminal:** Requires the `Run` permission.
+*   **Scenario Execution:** Users can only run chaos scenarios on clusters explicitly assigned to their group.
+*   **Chaos Studio:** Designing and saving workflows requires the `Run` permission.
+*   **File Management:** Access to upload or manage configuration files is scoped by the visibility settings of the user's group.
+
+== Administrative Workflow
+
+Administrators are responsible for maintaining the security posture of the `krkn-operator`. The lifecycle of permission management typically follows this flow:
+
+1.  **Define Groups:** Create a logical grouping (e.g., `qa-team`, `sre-platform`) that aligns with organizational structure.
+2.  **Assign Resources:** Map specific target clusters and registries to the created group.
+3.  **Assign Users:** Add users to the groups to grant them the corresponding level of access.
+
+[TIP]
+====
+To maintain a principle of least privilege, always start by assigning only the `View` permission to new users. Elevate to `Run` or `Delete` only when a user requires the ability to execute experiments or manage infrastructure lifecycle.
+====#  Managing users and permissions
+
+= Managing Users and Permissions
+
+The Krkn-operator utilizes a robust, group-based access control model to ensure that chaos experiments are performed securely and within the boundaries of organizational policy. By decoupling permissions from individual users and assigning them to groups, administrators can maintain consistent security postures across multiple clusters.
+
+== The Permission Model
+
+Access in the Krkn-operator environment is governed by **Groups**. A user cannot perform any actions on the platform unless they are explicitly assigned to a group.
+
+=== Key Components
+*   **Users:** Individuals who interact with the Krkn-operator. Every user must belong to at least one group to gain access to clusters, registries, or features.
+*   **Groups:** Logical containers that bundle access rights. When an Admin creates a group, they define:
+    *   **Cluster Accessibility:** Which target clusters the group can interact with.
+    *   **Permissions:** The level of access (View, Run, Delete) granted to the group.
+    *   **Registry Visibility:** Which container registries are accessible for fetching chaos experiment images.
+
+=== Roles and Responsibilities
+
+There are two primary roles defined within the Krkn-operator framework:
+
+*   **Administrator:** Possesses full access to the platform. Admins are responsible for the foundational infrastructure, including:
+    *   Registering and removing target clusters.
+    *   Creating and managing user accounts.
+    *   Defining group boundaries and assigning permissions.
+    *   Configuring infrastructure integrations (e.g., ACM).
+*   **User:** Operates within the scope defined by their group membership. Depending on their assigned permissions, they can:
+    *   **View and Manage Jobs:** Monitor the status and logs of chaos experiments.
+    *   **Run Scenarios:** Execute chaos experiments on assigned clusters.
+    *   **Chaos Studio:** Design and refine workflows (requires *Run* permission).
+    *   **Terminal Access:** Utilize the cluster terminal for troubleshooting (requires *Run* permission).
+
+[IMPORTANT]
+====
+Every user must belong to a group. A user without a group assignment will have no access to the platform, ensuring a "secure by default" posture.
+====
+
+== Administrative Workflow
+
+Administrators manage the environment through a hierarchical flow:
+
+1.  **Define Groups:** Identify the necessary access levels based on project or environment requirements (e.g., `prod-admins`, `qa-testers`).
+2.  **Assign Clusters:** Associate specific target clusters with the relevant group.
+3.  **Assign Permissions:** Grant specific capabilities:
+    *   `View`: Allows monitoring of existing jobs and cluster state.
+    *   `Run`: Allows execution of scenarios, workflow design, and terminal access.
+    *   `Delete`: Allows the removal of jobs or experiment artifacts.
+4.  **Create Users:** Provision accounts and map them to the established groups.
+
+[TIP]
+====
+When planning your permission model, adhere to the principle of least privilege. Only grant `Run` permissions to users who strictly require the ability to initiate destructive chaos experiments.
+====
+
+== Summary of Access Levels
+
+| Capability | View | Run | Delete |
+| :--- | :---: | :---: | :---: |
+| Monitor Job Status | Yes | Yes | Yes |
+| Execute Chaos Scenarios | No | Yes | No |
+| Design Workflows | No | Yes | No |
+| Access Cluster Terminal | No | Yes | No |
+| Delete Experiments | No | No | Yes |

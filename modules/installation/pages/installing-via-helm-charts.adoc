@@ -67,4 +67,117 @@ Once the Helm command completes, verify that the operator pods are running corre
 kubectl get pods -n krkn-operator-system
 ----
 
-Ensure the pods are in the `Running` state and that all containers have passed their readiness probes before attempting to configure chaos experiments.
+Ensure the pods are in the `Running` state and that all containers have passed their readiness probes before attempting to configure chaos experiments.#  Installing via Helm charts
+
+= Installing the Krkn-operator via Helm
+
+The Krkn-operator is packaged as a Helm chart, facilitating standardized deployments across Kubernetes and OpenShift environments. Using Helm allows for repeatable installations, version tracking, and configuration management through custom `values.yaml` files.
+
+== Prerequisites
+Before initiating the installation, ensure your environment meets the following requirements:
+
+* **Kubernetes Cluster**: Version 1.19 or higher, or OpenShift 4.x.
+* **Helm**: Version 3.0 or higher must be installed and configured to communicate with your cluster.
+* **Permissions**: Cluster-admin privileges (or equivalent) are required to create namespaces and deploy the operator.
+
+== Installation Methods
+
+The Krkn-operator can be deployed using a standard Quick Start method for rapid evaluation or a Production installation for specific ingress/gateway requirements.
+
+=== Quick Start
+For testing or demonstration purposes, you can deploy the latest version (v0.4.5-beta) using the default configuration. This command automatically creates the `krkn-operator-system` namespace.
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace
+----
+
+=== Production Installation
+In a production environment, you must account for external access to the operator's management interface. Choose the method based on your infrastructure:
+
+* **OpenShift**: Utilize native OpenShift Routes.
+* **Kubernetes**: Use Gateway API (recommended) or Ingress controllers.
+
+To customize these settings, create a `values.yaml` file containing your specific networking configurations and install using the following command:
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace \
+  -f values.yaml
+----
+
+== Namespace Management
+Best practice dictates isolating the Krkn-operator within its own dedicated namespace. The `--create-namespace` flag in the Helm commands above ensures that `krkn-operator-system` is created if it does not already exist. 
+
+NOTE: Keeping the operator in a dedicated namespace prevents resource contention and simplifies the application of RBAC (Role-Based Access Control) policies, ensuring that chaos orchestration remains scoped correctly.
+
+== Troubleshooting Installation
+* **Registry Access**: Ensure your cluster has network egress to `quay.io` to pull the OCI chart.
+* **Chart Version**: Always verify the latest available version by checking the Krkn-chaos repository, as OCI-based charts are immutable and tied to specific tags.
+* **Resource Conflicts**: If the installation fails, check for existing resources in the `krkn-operator-system` namespace using `kubectl get all -n krkn-operator-system` to identify potential naming collisions.#  Installing via Helm charts
+
+= Installing via Helm charts
+
+The `krkn-operator` is distributed as a Helm chart, providing a standardized and repeatable method for deploying the operator into your Kubernetes or OpenShift clusters. Using Helm allows for easy version tracking, dependency management, and configuration through `values.yaml` files.
+
+== Prerequisites
+Before beginning the installation, ensure your environment meets the following requirements:
+
+* **Kubernetes Cluster:** Version 1.19+ or OpenShift 4.x.
+* **Helm:** Version 3.0 or higher must be installed and configured to communicate with your cluster.
+* **Registry Access:** Ensure your cluster can pull images from `quay.io/krkn-chaos/charts/krkn-operator`.
+
+== Installation Methods
+
+There are two primary ways to install the Krkn-operator depending on your environment and traffic requirements.
+
+=== Quick Start
+For a standard installation using default settings, you can deploy the latest version directly using the OCI-based Helm chart. This will create the necessary namespace and deploy the operator components.
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace
+----
+
+=== Production Installation with Custom Configuration
+In production environments, you will typically need to configure external access to the operator. Depending on your cluster type, the recommended methods are:
+
+* **OpenShift:** Utilize native **Routes**.
+* **Kubernetes:** Utilize **Gateway API** (recommended) or **Ingress**.
+
+To apply custom configurations, create a `values.yaml` file tailored to your infrastructure requirements and pass it during the installation:
+
+[source,bash]
+----
+helm install krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system \
+  --create-namespace \
+  -f values.yaml
+----
+
+== Post-Installation Verification
+After running the installation command, verify that the operator components are successfully deploying in the target namespace:
+
+[source,bash]
+----
+# Check the status of the operator pods
+kubectl get pods -n krkn-operator-system
+
+# Check the Helm release status
+helm list -n krkn-operator-system
+----
+
+[NOTE]
+====
+If the operator fails to start, ensure that your `values.yaml` configuration is compatible with the version `0.4.5-beta`. Refer to the chart's `README.md` for specific configuration parameters related to authentication and resource limits.
+====

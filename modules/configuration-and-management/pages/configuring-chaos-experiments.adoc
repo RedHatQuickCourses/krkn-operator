@@ -79,4 +79,87 @@ kubectl get pods -n my-app
 [TIP]
 ====
 If the experiment does not trigger as expected, check the `krkn-operator` controller logs. Use `kubectl logs -l name=krkn-operator -n krkn-installer` to identify potential permission issues or invalid label selectors.
+====#  Configuring chaos experiments#  Configuring chaos experiments
+
+= Configuring Chaos Experiments
+
+Chaos experiments are the core units of work within the `krkn-operator`. They define the "fault" or "stress" to be injected into your Kubernetes environment. Configuring these experiments requires a clear understanding of the experiment lifecycle, scope, and the specific parameters required to simulate real-world failure scenarios effectively.
+
+== Anatomy of a Chaos Experiment
+
+In the context of the `krkn-operator`, experiments are typically defined as Kubernetes Custom Resources (CRs). A well-configured experiment consists of three primary components:
+
+*   **Target Scope:** Defines the blast radius. This includes the namespaces, labels, or specific nodes/pods that will be subjected to the chaos.
+*   **Fault Definition:** Specifies the type of disruption (e.g., pod kill, network latency, memory stress, CPU hogging).
+*   **Observation/Signaling:** Configuration that coordinates the chaos run with other test jobs (e.g., Performance or Scalability testing).
+
+[IMPORTANT]
 ====
+Before executing an experiment, always define the scope clearly. As noted in our testing methodology, a narrow, well-defined scope prevents multiple infrastructure issues from masking one another during analysis.
+====
+
+== Configuring Experiment Parameters
+
+To configure an experiment, you will define a YAML manifest that the `krkn-operator` controller watches. Common configuration parameters include:
+
+*   `duration`: The time window the experiment should run.
+*   `iterations`: How many times the fault should be applied.
+*   `labelSelector`: A precise selector to ensure the chaos impacts only the intended workloads.
+*   `probability`: The likelihood of a specific instance being targeted (useful for partial cluster testing).
+
+== Integrating with Test Pipelines
+
+When configuring experiments, consider the environment in which they execute:
+
+1.  **CI/CD Integration:** Configure your experiments to be automated. Use the `krkn-operator` signaling feature to start, stop, or pause scenarios based on the state of your ongoing performance or scalability test jobs.
+2.  **Continuous Chaos:** Treat chaos as a baseline. Configure experiments to run on a regular cadence to ensure that system health remains resilient as your software and infrastructure evolve.
+3.  **Observability:** Ensure that your experiment configuration includes monitoring hooks so that system reactions can be captured. The goal is to understand *how* the system responds rather than simply measuring a pass/fail state.
+
+== Hands-on Lab: Configuring a Basic Pod-Kill Experiment
+
+In this activity, you will define a simple chaos experiment to terminate pods in a designated namespace.
+
+### Step 1: Create the Experiment Manifest
+Create a file named `pod-kill-experiment.yaml`. This manifest instructs the operator to target a specific deployment.
+
+[source,yaml]
+----
+apiVersion: krkn.redhat.com/v1beta1
+kind: ChaosExperiment
+metadata:
+  name: sample-pod-kill
+  namespace: krkn-hub
+spec:
+  experiment: "pod-kill"
+  parameters:
+    duration: "120s"
+    labelSelector: "app=my-web-app"
+    namespace: "production"
+  signaling:
+    enabled: true
+----
+
+### Step 2: Apply the Configuration
+Apply the configuration to your cluster. The `krkn-operator` will detect the resource and prepare the execution engine.
+
+[source,bash]
+----
+kubectl apply -f pod-kill-experiment.yaml -n krkn-hub
+----
+
+### Step 3: Validate the Configuration
+Verify that the operator has registered the experiment and it is ready for execution.
+
+[source,bash]
+----
+kubectl get chaosexperiments -n krkn-hub
+----
+
+[TIP]
+====
+If you are running this in a production-like environment, ensure that your `labelSelector` is highly specific to avoid accidentally impacting critical system components. Always verify your target list before triggering the execution via the web interface.
+====
+
+== Troubleshooting Configuration Issues
+*   **Permission Denied:** Ensure the ServiceAccount assigned to the `krkn-operator` has the necessary RBAC roles to delete pods or modify network policies in the target namespace.
+*   **Orphaned Resources:** If an experiment is interrupted, check for remaining chaos pods. The operator is designed to clean these up, but manual intervention may be required if the operator pod itself is restarted during an experiment.

@@ -56,4 +56,61 @@ kubectl rollout status deployment/krkn-operator-controller-manager -n krkn-opera
 
 *   **Namespace Mismatch**: If you receive a "release not found" error, verify that the namespace provided in the `upgrade` command matches the namespace where the operator was originally installed.
 *   **CRD Conflicts**: If the upgrade fails due to CRD changes, ensure that you have the necessary cluster-level permissions to update Kubernetes custom resources.
-*   **Image Pull Errors**: If the pods are stuck in `ImagePullBackOff`, ensure your cluster has network connectivity to `quay.io` and that the OCI registry remains accessible.
+*   **Image Pull Errors**: If the pods are stuck in `ImagePullBackOff`, ensure your cluster has network connectivity to `quay.io` and that the OCI registry remains accessible.#  Upgrading the operator to a newer version
+
+= Upgrading the Krkn-operator
+
+As part of the lifecycle management of the Krkn-operator, periodic upgrades are necessary to leverage new chaos scenarios, performance improvements, and security patches. This section guides you through the process of upgrading your existing installation using Helm.
+
+== Prerequisites
+Before initiating an upgrade, ensure that:
+* You have `helm` installed and configured to access your Kubernetes cluster.
+* You have identified the target version (e.g., `0.4.5-beta`).
+* Your `kubectl` context is correctly set to the cluster where the operator is deployed.
+
+== Upgrade Process
+
+Upgrading the Krkn-operator involves pointing your Helm release to the desired OCI artifact version. Because the operator state is managed via Custom Resource Definitions (CRDs), Helm handles the transition of the deployment and associated controller logic.
+
+=== Step-by-Step Upgrade Procedure
+
+To upgrade the operator to a newer version, follow these steps:
+
+[source,bash]
+----
+helm upgrade krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system
+----
+
+*Note: Ensure the `--namespace` flag matches the namespace where your operator is currently installed.*
+
+== Verification
+After executing the upgrade command, verify that the operator has successfully rolled over to the new version:
+
+1. **Check the deployment status:**
++
+[source,bash]
+----
+kubectl rollout status deployment/krkn-operator-controller-manager -n krkn-operator-system
+----
+
+2. **Verify the pod image version:**
++
+[source,bash]
+----
+kubectl get pods -n krkn-operator-system -o jsonpath='{.items[0].spec.containers[0].image}'
+----
+
+== Troubleshooting Upgrade Issues
+
+If the operator fails to come up after an upgrade:
+
+* **Version Compatibility:** Verify that the OCI tag `0.4.5-beta` exists in the repository.
+* **CRD Conflicts:** Occasionally, new versions introduce schema changes. If the controller fails to start, check the logs of the manager pod:
++
+[source,bash]
+----
+kubectl logs -l control-plane=controller-manager -n krkn-operator-system
+----
+* **Namespace Constraints:** Ensure the `--namespace` provided during the upgrade is identical to the one used during the initial installation to avoid split-brain scenarios or duplicate deployments.

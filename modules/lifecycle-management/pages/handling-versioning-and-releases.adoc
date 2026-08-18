@@ -42,4 +42,47 @@ helm history krkn-operator -n krkn-namespace
 helm rollback krkn-operator [REVISION_NUMBER] -n krkn-namespace
 ----
 
-By maintaining strict version control and following the release lifecycle, teams can safely integrate Chaos Engineering into their continuous delivery pipelines while ensuring the `krkn-operator` remains a stable and predictable component of the infrastructure stack.
+By maintaining strict version control and following the release lifecycle, teams can safely integrate Chaos Engineering into their continuous delivery pipelines while ensuring the `krkn-operator` remains a stable and predictable component of the infrastructure stack.#  Handling versioning and releases
+
+= Handling versioning and releases
+
+In the context of the `Krkn-operator`, managing versions and releases is critical to ensuring cluster stability while benefiting from the latest chaos engineering capabilities. As Krkn matures, understanding how the operator lifecycle aligns with the broader Krkn ecosystem (including `krkn-lib` and `Krkn-hub`) ensures that your chaos experiments remain predictable and repeatable.
+
+== Understanding Krkn Versioning
+The Krkn ecosystem follows a structured versioning strategy designed to maintain compatibility across the dependency chain. Because the operator relies on underlying Python functions provided by `krkn-lib`, releases are synchronized to prevent breaking changes during runtime.
+
+*   **SemVer Compliance:** Releases follow Semantic Versioning (MAJOR.MINOR.PATCH).
+    *   **MAJOR:** Significant changes to the operator API, CRDs (Custom Resource Definitions), or major architectural shifts.
+    *   **MINOR:** New chaos scenarios or features added to the Krkn ecosystem.
+    *   **PATCH:** Security updates, bug fixes, or stability improvements for existing chaos experiments.
+
+== Release Strategy and Compatibility
+When planning an upgrade, it is important to consider the relationship between the operator and the core Krkn engine. 
+
+[NOTE]
+====
+Before upgrading the `Krkn-operator`, always verify the version of the `krkn-lib` dependency specified in the release notes. While the operator manages the lifecycle, the core logic resides in the engine; mismatches can result in failed telemetry data or execution errors.
+====
+
+=== Best Practices for Releases
+1.  **Check the Release Notes:** Always review the GitHub releases page for the `krkn-operator` repository to identify breaking changes in CRD schemas.
+2.  **Telemetry Data Integrity:** Krkn outputs telemetry data at the end of runs. When moving between versions, ensure that your post-processing scripts are compatible with any schema changes defined in the new release's `krkn-lib` models.
+3.  **Environment Isolation:** If you are using `Krkn-hub` in your CI/CD pipelines, ensure that your environment variables are pinned to specific operator versions to prevent unexpected chaos behaviors during automated testing.
+
+== Identifying Version Information
+You can retrieve the current version of your deployed operator using `kubectl`. This is useful for auditing and ensuring your environment is running the expected release.
+
+[source,bash]
+----
+# Check the image tag currently running in the operator deployment
+kubectl get deployment krkn-operator-controller-manager -n krkn-operator-system \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+----
+
+== Upgrade Considerations
+When performing an upgrade, the operator lifecycle manager (or manual Helm upgrade) handles the migration of existing resources. However, you should observe the following:
+
+*   **Stateful Experiments:** If a chaos experiment is currently running, avoid performing an operator upgrade. The interruption of the operator's control loop during an active scenario may result in orphaned chaos resources (e.g., pods that were meant to be killed or network latency that was meant to be cleared).
+*   **Backup Configs:** Use the File Management capabilities of the operator to export your existing configuration files before applying a version upgrade. This ensures you can revert to known-good configurations if the new version introduces unexpected behaviors.
+
+By adhering to these versioning and release practices, you maintain a robust resilience testing pipeline that is both stable and continuously improving.

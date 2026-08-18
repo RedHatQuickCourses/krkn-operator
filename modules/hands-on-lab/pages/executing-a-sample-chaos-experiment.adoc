@@ -76,4 +76,86 @@ If you have configured the Kraken **Signaling feature**, you can use it here to 
 If the experiment fails to start:
 * Verify that the `target_namespace` and `label_selector` match active resources in your cluster.
 * Ensure the service account used by the `Krkn-operator` has sufficient RBAC permissions to delete pods in the target namespace.
-* Check the status of the `ChaosExperiment` CR: `kubectl describe chaosexperiment sample-pod-failure -n krkn-operator-system`.
+* Check the status of the `ChaosExperiment` CR: `kubectl describe chaosexperiment sample-pod-failure -n krkn-operator-system`.#  Executing a sample chaos experiment
+
+= Executing a sample chaos experiment
+
+This section guides you through the execution of a fundamental chaos experiment using the Krkn-operator. We will focus on a standard pod-delete scenario, which is the cornerstone of verifying service resilience in a Kubernetes environment.
+
+== Prerequisites
+Before starting this experiment, ensure that:
+* The `krkn-operator` is successfully deployed in your cluster.
+* You have `kubectl` access configured for the target namespace.
+* You have identified a non-critical application or a "test" deployment to target for the chaos injection.
+
+== Understanding the Experiment Structure
+A chaos experiment in Krkn is defined by a `ChaosScenario` custom resource (CR). This resource dictates:
+* **The Fault Type:** (e.g., pod-delete, node-cpu-hog, network-latency).
+* **The Blast Radius:** Defined by labels, namespaces, or specific resource names.
+* **The Duration:** How long the chaos persists or how many iterations to perform.
+
+== Hands-on Lab: Executing a Pod-Delete Scenario
+
+Follow these steps to inject a pod-deletion fault into your environment.
+
+=== Step 1: Create the Scenario Manifest
+Create a file named `pod-delete-scenario.yaml`. This manifest instructs the operator to terminate pods matching a specific label.
+
+[source,yaml]
+----
+apiVersion: krkn.chaos/v1beta1
+kind: ChaosScenario
+metadata:
+  name: sample-pod-delete
+  namespace: krkn-operator
+spec:
+  scenario: pod-delete
+  duration: 60s
+  parameters:
+    label_selector: "app=demo-app"
+    namespace: "default"
+    grace_period: 0
+----
+
+=== Step 2: Apply the Scenario
+Apply the manifest to the cluster to trigger the operator's execution logic.
+
+[source,bash]
+----
+kubectl apply -f pod-delete-scenario.yaml
+----
+
+=== Step 3: Observe the Impact
+Once applied, the Krkn-operator will reconcile the state and begin the experiment. Use the following commands to monitor the behavior:
+
+1. **Check Operator Logs:**
++
+[source,bash]
+----
+kubectl logs -f deployment/krkn-operator -n krkn-operator
+----
+
+2. **Watch the Target Pods:**
++
+[source,bash]
+----
+kubectl get pods -n default -w
+----
+*Observation:* You should see the pods with the label `app=demo-app` terminating and being recreated by their respective ReplicaSet.
+
+=== Step 4: Verify Resilience
+After the duration specified (60s), the chaos will subside. Evaluate the system recovery:
+* Did the application recover automatically?
+* Did the monitoring tools trigger alerts during the outage?
+* Check your observability dashboard to see the correlation between the pod-delete timestamps and your service metrics.
+
+[TIP]
+====
+**Learning over Passing:** As noted in our best practices, do not focus on whether the test "passes." Focus on the system's reaction. If the pod-delete causes a cascade of failures, document the dependency chain—this is the primary goal of Chaos Engineering.
+====
+
+== Troubleshooting
+If the experiment does not trigger as expected:
+* **Check RBAC:** Ensure the Krkn-operator service account has sufficient permissions (ClusterRole/Role) to delete pods in the target namespace.
+* **Validate Selectors:** Ensure the `label_selector` in your CR matches the actual labels on the target pods.
+* **Events:** Check Kubernetes events in the `krkn-operator` namespace for any rejection errors: `kubectl get events -n krkn-operator`.

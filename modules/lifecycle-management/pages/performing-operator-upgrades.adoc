@@ -61,4 +61,61 @@ If the upgrade process encounters issues, follow these diagnostic steps:
 
 * **Version Pinning:** Always specify a `--version` flag to avoid accidental updates to unstable or incompatible releases.
 * **Read Release Notes:** Before upgrading, consult the official release notes for any breaking changes in the Custom Resource Definitions (CRDs) or configuration schema.
-* **Testing:** Perform upgrades in a non-production staging cluster before applying them to your production chaos orchestration environment.
+* **Testing:** Perform upgrades in a non-production staging cluster before applying them to your production chaos orchestration environment.#  Performing operator upgrades
+
+= Performing operator upgrades
+
+Upgrading the Krkn-operator ensures that your chaos engineering framework benefits from the latest stability improvements, security patches, and new experiment scenarios. This section details the standard procedure for upgrading the operator using Helm.
+
+== Prerequisites
+Before initiating an upgrade, ensure that:
+* You have access to the cluster where the Krkn-operator is deployed.
+* Your local `kubectl` and `helm` clients are configured to point to the correct cluster context.
+* You have reviewed the release notes for the target version to identify any breaking changes or required configuration migrations.
+
+== Upgrade Procedure
+The Krkn-operator is managed via Helm charts. To upgrade the operator, you utilize the `helm upgrade` command, pointing to the specific OCI registry path.
+
+=== Step-by-Step Upgrade
+1. **Identify the Target Version**: Check the [Krkn-chaos repository](https://quay.io/repository/krkn-chaos/charts/krkn-operator) to identify the desired version tag.
+2. **Execute the Upgrade**: Run the following command in your terminal, replacing the version number as needed:
+
+[source,bash]
+----
+helm upgrade krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator \
+  --version 0.4.5-beta \
+  --namespace krkn-operator-system
+----
+
+[NOTE]
+====
+If you have customized values (e.g., specific resource limits or node selectors), ensure you include your custom `values.yaml` using the `-f` flag to prevent your local configurations from being overwritten:
+`helm upgrade krkn-operator oci://quay.io/krkn-chaos/charts/krkn-operator -f my-values.yaml --namespace krkn-operator-system`
+====
+
+== Verifying the Upgrade
+After running the upgrade command, verify that the operator has transitioned to the new version successfully:
+
+1. **Check Deployment Status**:
++
+[source,bash]
+----
+kubectl rollout status deployment/krkn-operator-controller-manager -n krkn-operator-system
+----
+
+2. **Verify Versioning**: 
+Describe the deployment or inspect the image tag to confirm the expected version is running:
++
+[source,bash]
+----
+kubectl get deployment krkn-operator-controller-manager -n krkn-operator-system -o yaml | grep image:
+----
+
+== Troubleshooting
+If the upgrade process stalls or the operator fails to start:
+
+* **Rollback**: If the new version causes issues, you can revert to the previous release:
+  `helm rollback krkn-operator -n krkn-operator-system`
+* **Check Logs**: Inspect the controller logs for initialization errors:
+  `kubectl logs -l control-plane=controller-manager -n krkn-operator-system`
+* **CRD Compatibility**: Occasionally, new versions introduce updated Custom Resource Definitions (CRDs). Ensure that your `kubectl` version is sufficient to handle the CRD updates provided in the chart.

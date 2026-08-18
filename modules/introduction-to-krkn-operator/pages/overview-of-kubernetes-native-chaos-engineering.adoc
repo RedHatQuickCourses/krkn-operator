@@ -31,4 +31,63 @@ Traditional chaos engineering tools often operate at the infrastructure level (e
 *   **Krkn-operator:** The controller that watches for Chaos Custom Resources (CRDs) within your cluster, triggering the execution of scenarios from the hub.
 *   **Chaos Studio:** A management layer that enables the design of complex workflows (serial or parallel execution) and monitors the health of the target cluster during the experiment.
 
-By leveraging the Krkn-operator, teams can move from simply "knowing" their system is fragile to actively validating their auto-scaling policies, pod disruption budgets, and failover logic in a safe, controlled manner.
+By leveraging the Krkn-operator, teams can move from simply "knowing" their system is fragile to actively validating their auto-scaling policies, pod disruption budgets, and failover logic in a safe, controlled manner.#  Overview of Kubernetes-native Chaos Engineering
+
+= Overview of Kubernetes-native Chaos Engineering
+
+Kubernetes-native chaos engineering is the practice of proactively injecting controlled failures into a cluster environment to identify weaknesses in system resiliency, recoverability, and observability. By treating the cluster as a dynamic and inherently unstable environment, organizations can move beyond theoretical stability to empirical proof of system durability.
+
+== The Core Philosophy
+In a distributed environment like Kubernetes, failures—such as pod evictions, node crashes, or network latency—are inevitable. Kubernetes-native chaos engineering shifts the perspective from "preventing failure" to "building for failure." 
+
+By integrating chaos experiments directly into the Kubernetes lifecycle, we ensure that:
+* **System observability is verified:** We confirm that our monitoring and alerting tools actually trigger when anomalies occur.
+* **Resiliency is quantifiable:** Through tools like Krkn, we can assign a "Resiliency Score" based on PromQL-based metrics to measure how well an application sustains load during a disruption.
+* **Automation is embedded:** Chaos is not a one-time audit but a continuous part of the CI/CD pipeline, ensuring that new deployments do not regress the system’s baseline reliability.
+
+== Why Krkn-operator?
+While many chaos tools exist, **Krkn-operator** simplifies the orchestration of complex chaos scenarios. Traditional chaos engineering often requires managing disparate configuration files and complex environment variables. The Krkn ecosystem, specifically the operator, provides:
+
+* **Abstraction of Complexity:** It removes the burden of managing individual container images or manual `podman`/`docker` commands, allowing engineers to focus on the *intent* of the experiment.
+* **Unified Control Plane:** It provides a centralized interface for multi-cluster execution, allowing you to blast chaos across global environments simultaneously.
+* **Standardized Scenarios:** Utilizing `krkn-hub`, users gain access to a library of pre-defined, battle-tested scenarios that cover everything from network partition simulation to resource exhaustion (CPU/Memory).
+
+== How Krkn Fits into the Ecosystem
+The Krkn ecosystem is designed to be modular, ensuring that users can engage with chaos engineering at their own comfort level:
+
+* **Krknctl:** The recommended CLI tool for rapid prototyping and local execution, abstracting the runtime environment.
+* **Krkn-operator:** The platform-level engine that manages the full lifecycle of chaos experiments within the cluster, including user management, workspace isolation, and visual workflow design in "Chaos Studio."
+* **Krkn-hub:** The source of truth for scenario definitions, providing the building blocks for every experiment.
+
+By adopting a Kubernetes-native approach, the Krkn-operator treats "chaos" as a first-class citizen of the cluster—governed by the same RBAC, namespaces, and observability standards as your production applications. This integration ensures that chaos experiments are not just "attacks" on the system, but rather structured, measurable engineering tests.#  Overview of Kubernetes-native Chaos Engineering
+
+= Overview of Kubernetes-native Chaos Engineering
+
+Kubernetes-native Chaos Engineering is the practice of proactively injecting controlled failures into a Kubernetes environment to identify and mitigate weaknesses before they impact end-users. By intentionally inducing faults—such as pod terminations, network latency, or resource exhaustion—teams can validate the resiliency of their applications and the self-healing capabilities of the underlying cluster.
+
+== Why Chaos Engineering Matters
+In distributed systems, failures are inevitable. Infrastructure components, network partitions, and application bugs are common occurrences. Relying solely on manual testing is insufficient because it often fails to account for the complex, emergent behaviors that arise in highly dynamic environments like Kubernetes.
+
+Chaos engineering shifts the focus from "testing for success" to "testing for failure," allowing SREs and developers to:
+* **Validate Auto-scaling:** Ensure your cluster scales correctly when a node is suddenly terminated.
+* **Verify Health Checks:** Confirm that liveness and readiness probes accurately detect and recover from unstable application states.
+* **Measure Mean Time to Recovery (MTTR):** Observe how quickly your system restores service after a failure occurs.
+* **Build Confidence:** Shift from reactive troubleshooting to proactive system hardening.
+
+== The Krkn Approach
+Krkn is designed to be Kubernetes-native, meaning it leverages standard Kubernetes primitives to orchestrate chaos. Unlike legacy tools that require custom agents or complex sidecar injection, Krkn treats chaos scenarios as first-class citizens within the cluster ecosystem.
+
+The Krkn ecosystem consists of several components that simplify this workflow:
+
+* **Krkn-hub:** A repository of pre-packaged, containerized chaos scenarios. These scenarios are designed to be run as standard Kubernetes jobs, allowing you to use existing CI/CD pipelines and infrastructure tools to trigger tests.
+* **krknctl:** An orchestration layer that abstracts the complexity of manual configuration. It manages the lifecycle of these chaos jobs, allowing users to focus on defining the blast radius and success criteria rather than runtime management.
+* **Chaos Studio:** Provides a visual interface to manage workflows, enabling users to chain multiple scenarios together in serial or parallel sequences to simulate real-world, cascading failure scenarios.
+
+== Core Concepts
+Understanding the following concepts is essential for effective chaos orchestration:
+
+* **Blast Radius:** The scope of the cluster impacted by the experiment. In Krkn, this can be limited to specific namespaces, labels, or nodes.
+* **Steady State:** The measurable baseline behavior of your system under normal conditions. Before injecting chaos, you must define what "normal" looks like (e.g., latency under 200ms, 99.9% success rate).
+* **Observation:** Using tools like PromQL to monitor the system throughout the experiment. Krkn integrates with Prometheus to measure the "Resiliency Score," quantifying how well your application maintains its steady state during a fault injection.
+
+By embedding these practices directly into your Kubernetes workflow, you transition from simply deploying applications to engineering resilient, self-healing platforms.

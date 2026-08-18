@@ -9,4 +9,23 @@ Key features and capabilities include:
 *   **Centralized Orchestration:** Manage chaos experiments, user permissions, and cluster configurations from a single, unified web console.
 *   **Kubernetes-Native Architecture:** Built to operate directly within Kubernetes environments, leveraging native resources for seamless integration.
 *   **Chaos Management:** Simplifies the lifecycle of chaos engineering, from initial deployment to the execution and monitoring of complex experiments.
-*   **Operational Efficiency:** Eliminates the need for manual command-line execution by offering a robust management platform for chaos scenarios.
+*   **Operational Efficiency:** Eliminates the need for manual command-line execution by offering a robust management platform for chaos scenarios.#  Introduction to Krkn-operator
+
+= Introduction to Krkn-operator
+
+The Krkn-operator is a Kubernetes-native platform designed to streamline and orchestrate Chaos Engineering experiments. By centralizing management within a web interface, it eliminates the need for manual execution of chaos scenarios.
+
+*   **Chaos Engineering Orchestration:** Provides a unified platform to deploy, configure, and manage chaos experiments directly within Kubernetes.
+*   **Centralized Management:** Simplifies administrative tasks, including the management of users, clusters, permissions, and experiment execution workflows.
+*   **Operational Efficiency:** Transitions chaos testing from manual, ad-hoc execution to a structured, platform-driven approach.#  Introduction to Krkn-operator
+
+= Introduction to Krkn-operator
+
+The Krkn-operator is a Kubernetes-native platform designed to streamline Chaos Engineering by providing a centralized web interface for experiment orchestration. It replaces manual scenario execution with a unified management system for clusters, user permissions, and chaos workflows.
+
+Key features include:
+
+* **Chaos Orchestration:** Simplifies the deployment, configuration, and execution of chaos experiments directly within the cluster.
+* **Centralized Management:** Provides a single web console to manage users and coordinate complex chaos scenarios.
+* **Kubernetes-native Architecture:** Built to operate seamlessly within the Kubernetes ecosystem, ensuring deep integration with cluster resources.
+* **Operational Efficiency:** Eliminates the need for manual script management, enabling scalable and repeatable fault-injection testing.

@@ -56,4 +56,62 @@ In this exercise, you will trigger a sample chaos scenario using the web interfa
 [NOTE]
 ====
 If a job fails, use the **Cluster Terminal** to inspect the target resource logs to ensure the chaos injection reached the intended pod or node.
-====
+====#  Orchestrating scenarios via the web interface
+
+= Orchestrating scenarios via the web interface
+
+The Krkn-operator web interface provides a centralized control plane for managing, designing, and executing chaos experiments. By abstracting the underlying Kubernetes custom resources, the interface allows operators to focus on resiliency testing rather than manual YAML configuration.
+
+== Understanding Scenario Orchestration
+Orchestration within the web interface is categorized into two primary modes:
+
+*   **Single Scenario Execution:** Ideal for targeted testing of a specific failure mode (e.g., pod kill or network latency).
+*   **Chaos Studio Workflows:** A visual drag-and-drop environment for designing complex, multi-stage resilience tests involving both serial and parallel execution.
+
+== Configuration Parameters
+Before launching any scenario, you must configure the parameters associated with the chosen experiment. These are structured into three distinct tiers:
+
+[cols="1,3", options="header"]
+|===
+| Category | Description
+| **Mandatory** | Required settings that must be defined before the "Run" button is enabled (e.g., target namespace, resource labels).
+| **Optional** | Fine-grained controls such as duration, intensity, or specific filters to refine the experiment scope.
+| **Global** | Framework-level configurations, including integration settings for Prometheus, Elasticsearch, or Cerberus to track resiliency metrics.
+|===
+
+== Executing and Monitoring
+Once parameters are set, you can initiate the scenario. The workflow follows this standard lifecycle:
+
+1.  **Launch:** Initiate the execution via the Run action.
+2.  **Redirection:** The interface automatically navigates to the **Jobs** page.
+3.  **Real-time Monitoring:** Use the Jobs view to inspect logs, status transitions, and final outcome metrics for the scenario.
+
+== Key Interface Features for Orchestration
+To manage your chaos program effectively, the interface provides several integrated tools:
+
+*   **Chaos Studio:** Use this visual builder to construct dependency graphs. You can chain scenarios so that a network partition (Scenario A) runs simultaneously with a node restart (Scenario B) to test compound failure scenarios.
+*   **Cluster Terminal:** A read-only utility that allows you to verify the state of your target clusters before and after chaos injection.
+*   **File Management:** A centralized repository for uploading and versioning your experiment configuration files, ensuring consistency across environments.
+
+== Hands-on Lab: Executing a Scenario
+In this lab, you will orchestrate your first chaos experiment using the web interface.
+
+=== Prerequisites
+*   Krkn-operator deployed in your cluster.
+*   Access to the web dashboard.
+
+=== Step 1: Design a Basic Scenario
+1.  Navigate to **Run Scenarios** in the main navigation menu.
+2.  Select a standard scenario (e.g., `pod-delete`).
+3.  Fill in the **Mandatory** fields, such as `TARGET_NAMESPACE` and `LABEL_SELECTOR`.
+
+=== Step 2: Configure Fine-Grained Controls
+1.  Expand the **Optional** settings section.
+2.  Adjust the `DURATION` parameter to control how long the chaos experiment persists.
+3.  Verify that your **Global** settings are pointed to your observability stack (e.g., Prometheus) to ensure the experiment metrics are captured.
+
+=== Step 3: Execute and Observe
+1.  Click **Run**. 
+2.  Observe the automatic transition to the **Jobs** page.
+3.  Monitor the status change from `Pending` to `Running` to `Completed`.
+4.  Verify the experiment results by checking the logs provided in the Job details view.
